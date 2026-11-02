@@ -2,16 +2,21 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Lintel · 3D Smoke</title>
-    <style>html,body{color:#e8e6e1;background:#111418;height:100%;margin:0;font:13px/1.45 system-ui,sans-serif}#view{position:fixed;inset:0}#panel{background:#14181ee0;border-radius:8px;width:250px;padding:10px 12px;position:fixed;top:12px;left:12px}#panel h1{margin:0 0 6px;font-size:14px}#panel h2{color:#f0b37e;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px;font-size:11px}#panel label{cursor:pointer;align-items:center;gap:6px;margin:2px 0;display:flex}.seg{flex-wrap:wrap;gap:4px;display:flex}button,select{color:#e8e6e1;font:inherit;cursor:pointer;background:#2c333c;border:1px solid #3a424d;border-radius:5px;padding:3px 8px}button.on{background:#4a3a2a;border-color:#f0b37e}#status,#probe{color:#9aa3ad;font-variant-numeric:tabular-nums;margin-top:6px}#help{color:#f0b37e;margin-top:6px}.room-label{color:#fff;pointer-events:none;white-space:nowrap;background:#0000008c;border-radius:4px;padding:1px 6px;font-size:12px}.room-label.fire{background:#c84614d9}</style>
-    <script type="module" crossorigin src="/ultramarine-2026-10/assets/index-Cu-8LNlg.js"></script>
+    <style>html,body{overscroll-behavior:none;color:#e8e6e1;background:#111418;height:100%;margin:0;font:13px/1.45 system-ui,sans-serif;overflow:hidden}#view{position:fixed;inset:0}#panel{top:calc(12px + env(safe-area-inset-top));box-sizing:content-box;background:#14181ee0;border-radius:8px;width:250px;max-width:calc(100vw - 48px);max-height:calc(100% - 48px);padding:10px 12px;position:fixed;left:12px;overflow-y:auto}#panel h1{flex:1;margin:0;font-size:14px}#panelHead{align-items:center;gap:6px;margin-bottom:6px;display:flex}#panel.compact #controls{display:none}#enterVr{background:#b5561d;border-color:#f0b37e;width:100%;padding:8px;font-weight:600}#enterVr:disabled{color:#9aa3ad;background:#2c333c;border-color:#3a424d;font-weight:400}#error{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:20;color:#fff;overflow-wrap:anywhere;background:#7a1f12;border-radius:8px;padding:10px 12px;position:fixed}#error[hidden]{display:none}#vr{z-index:10;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;display:none;position:fixed;inset:0}body.vr #vr{display:block}body.vr #panel{display:none}#vr button,#vr select{pointer-events:auto;touch-action:manipulation;background:#14181ec7;padding:8px 10px;font-size:16px}#vr button.on{background:#b5561de6;border-color:#f0b37e}#vrTop{top:calc(10px + env(safe-area-inset-top));position:absolute;left:10px;right:10px}#vrBar{gap:6px;display:flex}#vrRoom{flex:1;min-width:0}#vrInfo{font-variant-numeric:tabular-nums;background:#00000080;border-radius:5px;margin-top:6px;padding:4px 8px;font-size:12px;display:inline-block}#stick{left:20px;bottom:calc(24px + env(safe-area-inset-bottom));box-sizing:border-box;pointer-events:auto;touch-action:none;background:#00000059;border:1.5px solid #fff6;border-radius:50%;width:110px;height:110px;position:absolute}#knob{background:#ffffffbf;border-radius:50%;width:46px;height:46px;margin:-23px;position:absolute;top:50%;left:50%}#vr #vrDoor{left:50%;bottom:calc(180px + env(safe-area-inset-bottom));white-space:nowrap;background:#b5561deb;border-color:#f0b37e;padding:12px 20px;font-weight:600;position:absolute;transform:translate(-50%)}#vr #vrDoor[hidden]{display:none}#vrButtons{right:12px;bottom:calc(24px + env(safe-area-inset-bottom));flex-direction:column;gap:6px;display:flex;position:absolute}#panel h2{color:#f0b37e;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px;font-size:11px}#panel label{cursor:pointer;align-items:center;gap:6px;margin:2px 0;display:flex}.seg{flex-wrap:wrap;gap:4px;display:flex}button,select{color:#e8e6e1;font:inherit;cursor:pointer;background:#2c333c;border:1px solid #3a424d;border-radius:5px;padding:3px 8px}button.on{background:#4a3a2a;border-color:#f0b37e}#status,#probe{color:#9aa3ad;font-variant-numeric:tabular-nums;margin-top:6px}#help{color:#f0b37e;margin-top:6px}.room-label{color:#fff;pointer-events:none;white-space:nowrap;background:#0000008c;border-radius:4px;padding:1px 6px;font-size:12px}.room-label.fire{background:#c84614d9}</style>
+    <script type="module" crossorigin src="/ultramarine-2026-10/assets/index-BlJZQpkD.js"></script>
   </head>
   <body>
     <div id="view"></div>
     <div id="panel">
-      <h1>Lintel · 3D smoke</h1>
+      <div id="panelHead">
+        <h1>Lintel · 3D smoke</h1>
+        <button id="more">More 更多</button>
+      </div>
+      <button id="enterVr" disabled>Loading 加载中…</button>
 
+      <div id="controls">
       <h2>Fire 起火</h2>
       <div class="seg">
         <select id="room"></select>
@@ -36,8 +41,57 @@
       <label><input type="checkbox" id="sealUpstairs" checked> Seal upstairs 封住二楼</label>
 
       <div id="help"></div>
+      </div>
       <div id="probe"></div>
       <div id="status">Loading…</div>
     </div>
+
+    <div id="vr">
+      <div id="vrTop">
+        <div id="vrBar">
+          <button id="exitVr">Exit 退出</button>
+          <select id="vrRoom"></select>
+        </div>
+        <div id="vrInfo"></div>
+      </div>
+      <div id="stick"><div id="knob"></div></div>
+      <button id="vrDoor" hidden></button>
+      <div id="vrButtons">
+        <button data-mode="smoke">Eyes 肉眼</button>
+        <button data-mode="heat">Thermal 热成像</button>
+        <button id="vrCrouch">Crouch 蹲下</button>
+      </div>
+    </div>
+
+    <div id="error" hidden></div>
+
+    <script>
+      // A plain script, so it still runs when the module below fails to load.
+      // On a phone there is no console to look in: a failed load was only a
+      // blank page, and nobody could tell a network problem from a phone that
+      // cannot run this.
+      (function () {
+        var panel = document.getElementById('panel');
+        if (innerWidth < 700) panel.classList.add('compact');
+        document.getElementById('more').addEventListener('click', function () { panel.classList.toggle('compact'); });
+
+        function show(message) {
+          var box = document.getElementById('error');
+          box.textContent = message;
+          box.hidden = false;
+        }
+        window.lintelError = show;
+        addEventListener('error', function (e) {
+          var url = e.target && (e.target.src || e.target.href);
+          show(url ? 'Could not load 加载失败: ' + url : 'Error 出错: ' + e.message);
+        }, true);
+        addEventListener('unhandledrejection', function (e) {
+          show('Error 出错: ' + (e.reason && e.reason.message || e.reason));
+        });
+        setTimeout(function () {
+          if (!window.lintelReady) show('Still loading after 60 s. The network may not reach this site. 加载超过 60 秒，可能是网络连不上这个网站。');
+        }, 60000);
+      })();
+    </script>
   </body>
 </html>
