@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" id="themeColor" content="#E1A556" />
     <title>Lintel · 3D Smoke</title>
-    <style>html,body{overscroll-behavior:none;color:#e8e6e1;background:#111418;height:100%;margin:0;font:13px/1.45 system-ui,sans-serif;overflow:hidden}#view{position:fixed;inset:0}#panel{top:calc(12px + env(safe-area-inset-top));box-sizing:content-box;background:#14181ee0;border-radius:8px;width:250px;max-width:calc(100vw - 48px);max-height:calc(100% - 48px);padding:10px 12px;position:fixed;left:12px;overflow-y:auto}#panel h1{flex:1;margin:0;font-size:14px}#panelHead{align-items:center;gap:6px;margin-bottom:6px;display:flex}#panel.compact #controls{display:none}#enterVr{background:#b5561d;border-color:#f0b37e;width:100%;padding:8px;font-weight:600}#enterVr:disabled{color:#9aa3ad;background:#2c333c;border-color:#3a424d;font-weight:400}#loader{--disc:clamp(132px, 40vmin, 320px);z-index:30;background:#e1a556;transition:opacity .45s;position:fixed;inset:0;overflow:hidden}#discBox{width:var(--disc);height:var(--disc);margin:calc(var(--disc) / -2);will-change:transform;transition:transform .65s cubic-bezier(.6,0,.2,1);position:absolute;top:50%;left:50%}#disc{will-change:transform;width:100%;height:100%;animation:.714s linear infinite spin;display:block}@keyframes spin{to{transform:rotate(360deg)}}#loadText{left:16px;right:16px;top:calc(50% + var(--disc) / 2 + 20px);text-align:center;color:#120b06;font-variant-numeric:tabular-nums;font:13px/1.4 ui-monospace,Menlo,monospace;transition:opacity .15s;position:absolute}#loader.stopped #disc{animation-play-state:paused}#loader.leaving{pointer-events:none}#loader.leaving #loadText,#loader.clear{opacity:0}@media (prefers-reduced-motion:reduce){#disc{animation-duration:4s}#discBox{transition:none}}#error{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;color:#fff;overflow-wrap:anywhere;background:#7a1f12;border-radius:8px;padding:10px 12px;position:fixed}#error[hidden]{display:none}#vr{z-index:10;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;display:none;position:fixed;inset:0}body.vr #vr{display:block}body.vr #panel{display:none}#vr button,#vr select{pointer-events:auto;touch-action:manipulation;background:#14181ec7;padding:8px 10px;font-size:16px}#vr button.on{background:#b5561de6;border-color:#f0b37e}#vrTop{top:calc(10px + env(safe-area-inset-top));position:absolute;left:10px;right:10px}#vrBar{gap:6px;display:flex}#vrRoom{flex:1;min-width:0}#vrInfo{font-variant-numeric:tabular-nums;background:#00000080;border-radius:5px;margin-top:6px;padding:4px 8px;font-size:12px;display:inline-block}#stick{left:20px;bottom:calc(24px + env(safe-area-inset-bottom));box-sizing:border-box;pointer-events:auto;touch-action:none;background:#00000059;border:1.5px solid #fff6;border-radius:50%;width:110px;height:110px;position:absolute}#knob{background:#ffffffbf;border-radius:50%;width:46px;height:46px;margin:-23px;position:absolute;top:50%;left:50%}#vr #vrDoor{left:50%;bottom:calc(180px + env(safe-area-inset-bottom));white-space:nowrap;background:#b5561deb;border-color:#f0b37e;padding:12px 20px;font-weight:600;position:absolute;transform:translate(-50%)}#vr #vrDoor[hidden]{display:none}#vrButtons{right:12px;bottom:calc(24px + env(safe-area-inset-bottom));flex-direction:column;gap:6px;display:flex;position:absolute}#panel h2{color:#f0b37e;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px;font-size:11px}#panel label{cursor:pointer;align-items:center;gap:6px;margin:2px 0;display:flex}.seg{flex-wrap:wrap;gap:4px;display:flex}button,select{color:#e8e6e1;font:inherit;cursor:pointer;background:#2c333c;border:1px solid #3a424d;border-radius:5px;padding:3px 8px}button.on{background:#4a3a2a;border-color:#f0b37e}#status,#probe{color:#9aa3ad;font-variant-numeric:tabular-nums;margin-top:6px}#help{color:#f0b37e;margin-top:6px}.room-label{color:#fff;pointer-events:none;white-space:nowrap;background:#0000008c;border-radius:4px;padding:1px 6px;font-size:12px}.room-label.fire{background:#c84614d9}</style>
-    <script type="module" crossorigin src="/ultramarine-2026-10/assets/index-_Cp0cJ1M.js"></script>
+    <style>html,body{overscroll-behavior:none;color:#e8e6e1;background:#111418;height:100%;margin:0;font:13px/1.45 system-ui,sans-serif;overflow:hidden}#view{position:fixed;inset:0}#panel{top:calc(12px + env(safe-area-inset-top));box-sizing:content-box;background:#14181ee0;border-radius:8px;width:250px;max-width:calc(100vw - 48px);max-height:calc(100% - 48px);padding:10px 12px;position:fixed;left:12px;overflow-y:auto}#panel h1{flex:1;margin:0;font-size:14px}#panelHead{align-items:center;gap:6px;margin-bottom:6px;display:flex}#panel.compact #controls{display:none}#enterVr{background:#b5561d;border-color:#f0b37e;width:100%;padding:8px;font-weight:600}#enterVr:disabled{color:#9aa3ad;background:#2c333c;border-color:#3a424d;font-weight:400}#loader{--disc:clamp(132px, 40vmin, 320px);z-index:30;background:#e1a556;transition:opacity .45s;position:fixed;inset:0;overflow:hidden}#discBox{width:var(--disc);height:var(--disc);margin:calc(var(--disc) / -2);will-change:transform;position:absolute;top:50%;left:50%}#disc{will-change:transform;width:100%;height:100%;animation:.714s linear infinite spin;display:block}@keyframes spin{to{transform:rotate(360deg)}}#loadText{left:16px;right:16px;top:calc(50% + var(--disc) / 2 + 20px);text-align:center;color:#120b06;font-variant-numeric:tabular-nums;font:13px/1.4 ui-monospace,Menlo,monospace;transition:opacity .15s;position:absolute}#loader.stopped #disc{animation-play-state:paused}#loader.leaving{pointer-events:none}#loader.leaving #loadText,#loader.clear{opacity:0}@media (prefers-reduced-motion:reduce){#disc{animation-duration:4s}}#error{left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:40;color:#fff;overflow-wrap:anywhere;background:#7a1f12;border-radius:8px;padding:10px 12px;position:fixed}#error[hidden]{display:none}#vr{z-index:10;pointer-events:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;display:none;position:fixed;inset:0}body.vr #vr{display:block}body.vr #panel{display:none}#vr button,#vr select{pointer-events:auto;touch-action:manipulation;background:#14181ec7;padding:8px 10px;font-size:16px}#vr button.on{background:#b5561de6;border-color:#f0b37e}#vrTop{top:calc(10px + env(safe-area-inset-top));position:absolute;left:10px;right:10px}#vrBar{gap:6px;display:flex}#vrRoom{flex:1;min-width:0}#vrInfo{font-variant-numeric:tabular-nums;background:#00000080;border-radius:5px;margin-top:6px;padding:4px 8px;font-size:12px;display:inline-block}#stick{left:20px;bottom:calc(24px + env(safe-area-inset-bottom));box-sizing:border-box;pointer-events:auto;touch-action:none;background:#00000059;border:1.5px solid #fff6;border-radius:50%;width:110px;height:110px;position:absolute}#knob{background:#ffffffbf;border-radius:50%;width:46px;height:46px;margin:-23px;position:absolute;top:50%;left:50%}#vr #vrDoor{left:50%;bottom:calc(180px + env(safe-area-inset-bottom));white-space:nowrap;background:#b5561deb;border-color:#f0b37e;padding:12px 20px;font-weight:600;position:absolute;transform:translate(-50%)}#vr #vrDoor[hidden]{display:none}#vrButtons{right:12px;bottom:calc(24px + env(safe-area-inset-bottom));flex-direction:column;gap:6px;display:flex;position:absolute}#panel h2{color:#f0b37e;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px;font-size:11px}#panel label{cursor:pointer;align-items:center;gap:6px;margin:2px 0;display:flex}.seg{flex-wrap:wrap;gap:4px;display:flex}button,select{color:#e8e6e1;font:inherit;cursor:pointer;background:#2c333c;border:1px solid #3a424d;border-radius:5px;padding:3px 8px}button.on{background:#4a3a2a;border-color:#f0b37e}#status,#probe{color:#9aa3ad;font-variant-numeric:tabular-nums;margin-top:6px}#help{color:#f0b37e;margin-top:6px}.room-label{color:#fff;pointer-events:none;white-space:nowrap;background:#0000008c;border-radius:4px;padding:1px 6px;font-size:12px}.room-label.fire{background:#c84614d9}</style>
+    <script type="module" crossorigin src="/ultramarine-2026-10/assets/index-EuMWltRZ.js"></script>
   </head>
   <body>
     <div id="view"></div>
@@ -142,28 +142,52 @@
         var loader = document.getElementById('loader');
         var text = document.getElementById('loadText');
         var shown = 0;
-        window.lintelLoad = {
+        var HOLE = 0.42;         // of the radius: stops short of the label, whose inner edge is at 0.5
+        var HOLE_OPENS = 0.3;    // part of the transition the hole takes to reach that size
+        var smooth = function (x) { return x * x * (3 - 2 * x); };
+        var lintelLoad = window.lintelLoad = {
+          opening: true,         // main.js holds the smoke back until the house is in view
+          openMs: 1000,
           // Stages can report out of order only by mistake; the number never goes back.
           set: function (label, percent) {
             shown = Math.max(shown, Math.floor(percent));
             text.textContent = label + ' ' + shown + '%';
           },
-          // The record grows until its black fills the screen, then the black
-          // fades into the room, which is dark too. Orange straight to the house
-          // was a hard cut.
+          // A hole opens in the middle of the record and you go through it: the
+          // hole grows to just inside the label, then record and hole grow together
+          // on one clock, so their proportions hold and it reads as one movement
+          // until the hole is past the corners of the screen. The mask cuts the
+          // whole screen, orange included, so the hole looks onto the real house.
           done: function () {
             shown = 100;
             text.textContent = '100%';
             document.getElementById('themeColor').content = '#111418';
-            var box = document.getElementById('discBox');
-            var d = box.getBoundingClientRect().width;
-            var motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650;
             loader.classList.add('leaving');
-            // The label's inner edge sits at half the radius and has to end up past
-            // the corners of the screen, or blue keeps sweeping through the black.
-            if (motion) box.style.transform = 'scale(' + (Math.hypot(innerWidth, innerHeight) / (d * 0.5) * 1.1) + ')';
-            setTimeout(function () { loader.classList.add('clear'); }, motion);
-            setTimeout(function () { loader.remove(); }, motion + 500);
+            var finish = function () { lintelLoad.opening = false; loader.remove(); };
+            var masks = window.CSS && (CSS.supports('mask-image', 'radial-gradient(#000, #000)') || CSS.supports('-webkit-mask-image', 'radial-gradient(#000, #000)'));
+            if (!masks || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+              lintelLoad.opening = false;
+              loader.classList.add('clear');
+              setTimeout(function () { loader.remove(); }, 500);
+              return;
+            }
+            var box = document.getElementById('discBox');
+            var radius = box.getBoundingClientRect().width / 2;
+            var growth = Math.hypot(innerWidth, innerHeight) / 2 / (HOLE * radius) * 1.02;
+            var start = null;
+            requestAnimationFrame(function step(now) {
+              if (start === null) start = now;
+              var p = Math.min(1, (now - start) / lintelLoad.openMs);
+              // A power rather than a straight line, so the zoom looks even: a
+              // straight line would seem to race at the start and crawl at the end.
+              var scale = Math.pow(growth, smooth(p));
+              var hole = HOLE * radius * scale * smooth(Math.min(1, p / HOLE_OPENS));
+              var mask = 'radial-gradient(circle at 50% 50%, transparent ' + hole + 'px, #000 ' + (hole + 0.5) + 'px)';
+              box.style.transform = 'scale(' + scale + ')';
+              loader.style.webkitMaskImage = mask;
+              loader.style.maskImage = mask;
+              if (p < 1) requestAnimationFrame(step); else finish();
+            });
           },
         };
       })();
