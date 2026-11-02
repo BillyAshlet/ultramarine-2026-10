@@ -18,12 +18,44 @@ import { PhoneLook, ThumbStick } from './phone-vr.js';
 
 // BASE_URL, not '/': on GitHub Pages the site lives under /ultramarine-2026-10/.
 const MODEL_URL = `${import.meta.env.BASE_URL}samples/AC20-FZK-Haus.ifc`;
+// Its size on disk, for the loading percentage. Servers send it compressed and
+// the Content-Length, when there is one, is the compressed size, while a stream
+// counts bytes after unpacking. If the model changes and this does not, only
+// the percentage is off.
+const MODEL_BYTES = 2526544;
 const CELL = 0.2;          // metres per grid cell
 const FIRE_SIZE = 0.6;     // metres across
 const ROOM_NAMES = {       // FZK-Haus is German; names for the picker
   Flur: 'Hallway 走廊', Buero: 'Study 书房', Bad: 'Bathroom 浴室', Schlafzimmer: 'Bedroom 卧室',
   Wohnen: 'Living room 客厅', 'Küche': 'Kitchen 厨房', Galerie: 'Attic 阁楼',
 };
+
+// Let the page draw the new percentage before work holds the thread again.
+// A timer, not requestAnimationFrame, which stops for good in a background tab.
+const letPagePaint = () => new Promise((done) => setTimeout(done, 30));
+
+async function downloadModel() {
+  const response = await fetch(MODEL_URL);
+  if (!response.ok) throw new Error(`${MODEL_URL}: HTTP ${response.status}`);
+  if (!response.body) return new Uint8Array(await response.arrayBuffer());
+  const chunks = [];
+  let received = 0;
+  const reader = response.body.getReader();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    received += value.length;
+    lintelLoad.set('Downloading the house 下载房子', 25 + 55 * Math.min(1, received / MODEL_BYTES));
+  }
+  const bytes = new Uint8Array(received);
+  let at = 0;
+  for (const chunk of chunks) { bytes.set(chunk, at); at += chunk.length; }
+  return bytes;
+}
+
+lintelLoad.set('Loading 加载中', 15);
+await letPagePaint();
 
 const view = document.getElementById('view');
 const status = document.getElementById('status');
@@ -92,13 +124,10 @@ async function loadHouse() {
   const api = new WebIFC.IfcAPI();
   api.SetWasmPath(`${import.meta.env.BASE_URL}wasm/`, true);
   await api.Init(undefined, true);
-  status.textContent = 'Downloading the house 下载房子…';
-  const response = await fetch(MODEL_URL);
-  if (!response.ok) throw new Error(`${MODEL_URL}: HTTP ${response.status}`);
-  const bytes = new Uint8Array(await response.arrayBuffer());
-  status.textContent = 'Reading the house 解析房子…';
-  // Let the page draw that message before parsing holds the thread.
-  await new Promise((done) => setTimeout(done));
+  lintelLoad.set('Downloading the house 下载房子', 25);
+  const bytes = await downloadModel();
+  lintelLoad.set('Reading the house 解析房子', 85);
+  await letPagePaint();
   const model = api.OpenModel(bytes);
 
   const materials = {};
@@ -151,6 +180,8 @@ async function loadHouse() {
 
 // --- start ---------------------------------------------------------------------
 const { byElement, rooms, materials } = await loadHouse();
+lintelLoad.set('Building the rooms 建立房间', 92);
+await letPagePaint();
 const setDressing = dressHouse({ renderer, scene, groups, materials, rooms, hemi, sun });
 const dressBox = document.getElementById('dress');
 setDressing(dressBox.checked);
@@ -389,6 +420,10 @@ function sampleAtEye() {
   return { smoke: fluid.dens[c], heat: fluid.temp[c] };
 }
 
+lintelLoad.set('Preparing the view 准备画面', 97);
+await letPagePaint();
+
+let firstFrame = true;
 renderer.setAnimationLoop(() => {
   const now = performance.now();
   fps = fps * 0.9 + (1000 / Math.max(1, now - lastFrame)) * 0.1;
@@ -414,6 +449,9 @@ renderer.setAnimationLoop(() => {
   smoke.thinGamma = +thinInput.value;
   smoke.render(scene, activeCamera, mode);
   if (!personView) labelRenderer.render(scene, camera);
+  // Not before this: the shaders compile during the first frame, which is a
+  // long stall on a phone.
+  if (firstFrame) { firstFrame = false; lintelLoad.done(); }
 
   status.textContent = `grid ${grid.nx}×${grid.ny}×${grid.nz} · ${fluid.fluid.length} air cells · ` +
     `step ${stepMs.toFixed(0)} ms · ${fps.toFixed(0)} fps · t ${simTime.toFixed(0)} (grid s)`;
