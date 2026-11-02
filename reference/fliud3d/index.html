@@ -15,7 +15,7 @@
       #enterVr { width: 100%; padding: 8px; background: #b5561d; border-color: #f0b37e; font-weight: 600; }
       #enterVr:disabled { background: #2c333c; border-color: #3a424d; color: #9aa3ad; font-weight: 400; }
       #loader { --disc: clamp(132px, 40vmin, 320px); position: fixed; inset: 0; z-index: 30; background: #E1A556; overflow: hidden; transition: opacity 450ms ease; }
-      #discBox { position: absolute; left: 50%; top: 50%; width: var(--disc); height: var(--disc); margin: calc(var(--disc) / -2); transition: transform 650ms cubic-bezier(0.6, 0, 0.2, 1); will-change: transform; }
+      #discBox { position: absolute; left: 50%; top: 50%; width: var(--disc); height: var(--disc); margin: calc(var(--disc) / -2); will-change: transform; }
       #disc { display: block; width: 100%; height: 100%; animation: spin 714ms linear infinite; will-change: transform; }
       @keyframes spin { to { transform: rotate(360deg); } }
       #loadText { position: absolute; left: 16px; right: 16px; top: calc(50% + var(--disc) / 2 + 20px); text-align: center; color: #120B06; font: 13px/1.4 ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; transition: opacity 150ms ease; }
@@ -23,7 +23,7 @@
       #loader.leaving { pointer-events: none; }
       #loader.leaving #loadText { opacity: 0; }
       #loader.clear { opacity: 0; }
-      @media (prefers-reduced-motion: reduce) { #disc { animation-duration: 4s; } #discBox { transition: none; } }
+      @media (prefers-reduced-motion: reduce) { #disc { animation-duration: 4s; } }
       #error { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 40; background: #7a1f12; color: #fff; padding: 10px 12px; border-radius: 8px; overflow-wrap: anywhere; }
       #error[hidden] { display: none; }
       #vr { display: none; position: fixed; inset: 0; z-index: 10; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
@@ -185,28 +185,52 @@
         var loader = document.getElementById('loader');
         var text = document.getElementById('loadText');
         var shown = 0;
-        window.lintelLoad = {
+        var HOLE = 0.42;         // of the radius: stops short of the label, whose inner edge is at 0.5
+        var HOLE_OPENS = 0.3;    // part of the transition the hole takes to reach that size
+        var smooth = function (x) { return x * x * (3 - 2 * x); };
+        var lintelLoad = window.lintelLoad = {
+          opening: true,         // main.js holds the smoke back until the house is in view
+          openMs: 1000,
           // Stages can report out of order only by mistake; the number never goes back.
           set: function (label, percent) {
             shown = Math.max(shown, Math.floor(percent));
             text.textContent = label + ' ' + shown + '%';
           },
-          // The record grows until its black fills the screen, then the black
-          // fades into the room, which is dark too. Orange straight to the house
-          // was a hard cut.
+          // A hole opens in the middle of the record and you go through it: the
+          // hole grows to just inside the label, then record and hole grow together
+          // on one clock, so their proportions hold and it reads as one movement
+          // until the hole is past the corners of the screen. The mask cuts the
+          // whole screen, orange included, so the hole looks onto the real house.
           done: function () {
             shown = 100;
             text.textContent = '100%';
             document.getElementById('themeColor').content = '#111418';
-            var box = document.getElementById('discBox');
-            var d = box.getBoundingClientRect().width;
-            var motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650;
             loader.classList.add('leaving');
-            // The label's inner edge sits at half the radius and has to end up past
-            // the corners of the screen, or blue keeps sweeping through the black.
-            if (motion) box.style.transform = 'scale(' + (Math.hypot(innerWidth, innerHeight) / (d * 0.5) * 1.1) + ')';
-            setTimeout(function () { loader.classList.add('clear'); }, motion);
-            setTimeout(function () { loader.remove(); }, motion + 500);
+            var finish = function () { lintelLoad.opening = false; loader.remove(); };
+            var masks = window.CSS && (CSS.supports('mask-image', 'radial-gradient(#000, #000)') || CSS.supports('-webkit-mask-image', 'radial-gradient(#000, #000)'));
+            if (!masks || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+              lintelLoad.opening = false;
+              loader.classList.add('clear');
+              setTimeout(function () { loader.remove(); }, 500);
+              return;
+            }
+            var box = document.getElementById('discBox');
+            var radius = box.getBoundingClientRect().width / 2;
+            var growth = Math.hypot(innerWidth, innerHeight) / 2 / (HOLE * radius) * 1.02;
+            var start = null;
+            requestAnimationFrame(function step(now) {
+              if (start === null) start = now;
+              var p = Math.min(1, (now - start) / lintelLoad.openMs);
+              // A power rather than a straight line, so the zoom looks even: a
+              // straight line would seem to race at the start and crawl at the end.
+              var scale = Math.pow(growth, smooth(p));
+              var hole = HOLE * radius * scale * smooth(Math.min(1, p / HOLE_OPENS));
+              var mask = 'radial-gradient(circle at 50% 50%, transparent ' + hole + 'px, #000 ' + (hole + 0.5) + 'px)';
+              box.style.transform = 'scale(' + scale + ')';
+              loader.style.webkitMaskImage = mask;
+              loader.style.maskImage = mask;
+              if (p < 1) requestAnimationFrame(step); else finish();
+            });
           },
         };
       })();

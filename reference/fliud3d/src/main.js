@@ -430,7 +430,10 @@ renderer.setAnimationLoop(() => {
   lastFrame = now;
   const dt = Math.min(clock.getDelta(), 0.1);
 
-  if (running) {
+  // Held back while the loading screen opens: a solver step takes a good part
+  // of a frame on a phone, and the opening is drawn on this same thread.
+  const stepping = running && !lintelLoad.opening;
+  if (stepping) {
     const s = performance.now();
     fluid.step();
     stepMs = stepMs * 0.9 + (performance.now() - s) * 0.1;
@@ -439,7 +442,7 @@ renderer.setAnimationLoop(() => {
   smoke.upload(fluid);
   const showWind = windBox.checked && !inVr;
   wind.lines.visible = showWind;
-  if (showWind && running) wind.update(fluid.dt);
+  if (showWind && stepping) wind.update(fluid.dt);
 
   const activeCamera = personView ? person.camera : camera;
   if (inVr) look.update();
