@@ -3,6 +3,7 @@
 //
 // Global view: orbit around the cut-away house and watch smoke and wind.
 // V: walk inside as a person (copied from ../../web), crouch under the smoke.
+// Enter VR: the same walk on a phone, with the gyro and a thumb stick.
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
@@ -13,6 +14,7 @@ import { Fluid3D } from './fluid3d.js';
 import { SmokePass } from './smoke-pass.js';
 import { WindParticles } from './wind-particles.js';
 import { dressHouse } from './dressing.js';
+import { PhoneLook, ThumbStick } from './phone-vr.js';
 
 // BASE_URL, not '/': on GitHub Pages the site lives under /ultramarine-2026-10/.
 const MODEL_URL = `${import.meta.env.BASE_URL}samples/AC20-FZK-Haus.ifc`;
@@ -29,8 +31,13 @@ const probe = document.getElementById('probe');
 const help = document.getElementById('help');
 
 const renderer = new THREE.WebGLRenderer({ antialias: false });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+const PIXEL_RATIO = Math.min(devicePixelRatio, 1.5);
+renderer.setPixelRatio(PIXEL_RATIO);
 view.appendChild(renderer.domElement);
+// A phone can fail where a desktop does not, in ways that only leave the screen
+// black: a shader its GPU rejects, or the context taken away when memory runs out.
+renderer.debug.onShaderError = (gl, program) => lintelError(`Shader 着色器: ${gl.getProgramInfoLog(program)}`);
+renderer.domElement.addEventListener('webglcontextlost', () => lintelError('The graphics context was lost, probably out of memory. 图形上下文丢失，可能是内存不够。'));
 const labelRenderer = new CSS2DRenderer();
 Object.assign(labelRenderer.domElement.style, { position: 'absolute', top: '0', pointerEvents: 'none' });
 view.appendChild(labelRenderer.domElement);
@@ -85,7 +92,14 @@ async function loadHouse() {
   const api = new WebIFC.IfcAPI();
   api.SetWasmPath(`${import.meta.env.BASE_URL}wasm/`, true);
   await api.Init(undefined, true);
-  const model = api.OpenModel(new Uint8Array(await (await fetch(MODEL_URL)).arrayBuffer()));
+  status.textContent = 'Downloading the house 下载房子…';
+  const response = await fetch(MODEL_URL);
+  if (!response.ok) throw new Error(`${MODEL_URL}: HTTP ${response.status}`);
+  const bytes = new Uint8Array(await response.arrayBuffer());
+  status.textContent = 'Reading the house 解析房子…';
+  // Let the page draw that message before parsing holds the thread.
+  await new Promise((done) => setTimeout(done));
+  const model = api.OpenModel(bytes);
 
   const materials = {};
   for (const [role, s] of Object.entries(STYLE)) {
@@ -206,7 +220,8 @@ scene.add(wind.lines);
 const centre = bounds.getCenter(new THREE.Vector3());
 const span = bounds.getSize(new THREE.Vector3()).length();
 controls.target.copy(centre);
-camera.position.copy(centre).add(new THREE.Vector3(0.55, 0.85, 0.75).multiplyScalar(span));
+// Further back on a screen taller than it is wide, or the sides of the house are cut off.
+camera.position.copy(centre).add(new THREE.Vector3(0.55, 0.85, 0.75).multiplyScalar(span * Math.max(1, innerHeight / innerWidth * 0.8)));
 
 const labels = new Map();
 for (const r of rooms) {
@@ -232,6 +247,7 @@ const person = new Person({
 person.onDoorToggle = (id, open) => {
   setDoor(id, open);
   fluid.updateTopology();
+  renderer.shadowMap.needsUpdate = true;
   status.textContent = `${doors.get(id).name} ${open ? 'opened 开' : 'closed 关'}`;
 };
 
@@ -247,11 +263,13 @@ function lightFire(room) {
   const cells = grid.cellsInBox(box).filter((i) => !grid.solid[i]);
   fluid.sources = [{ cells: Int32Array.from(cells), smoke: 4, heat: 6 }];
   for (const [id, div] of labels) div.classList.toggle('fire', id === room.id);
-  roomSelect.value = String(room.id);
+  for (const select of roomSelects) select.value = String(room.id);
 }
-const roomSelect = document.getElementById('room');
-for (const r of rooms) roomSelect.add(new Option(r.name, String(r.id)));
-roomSelect.addEventListener('change', () => { fluid.reset(); lightFire(rooms.find((r) => String(r.id) === roomSelect.value)); });
+const roomSelects = [document.getElementById('room'), document.getElementById('vrRoom')];
+for (const select of roomSelects) {
+  for (const r of rooms) select.add(new Option(r.name, String(r.id)));
+  select.addEventListener('change', () => { fluid.reset(); lightFire(rooms.find((r) => String(r.id) === select.value)); });
+}
 document.getElementById('random').addEventListener('click', () => {
   // The attic is open to the stairwell and has no fuel; a ground-floor room
   // is where a fire starts.
@@ -297,8 +315,52 @@ function setPersonView(on) {
     ? 'Click to look · WASD walk · hold Space crouch · E door · V global view'
     : 'Drag to orbit · V walk inside 进入房子';
 }
-addEventListener('keydown', (e) => { if (e.code === 'KeyV' && !e.repeat) setPersonView(!personView); });
+addEventListener('keydown', (e) => { if (e.code === 'KeyV' && !e.repeat && !inVr) setPersonView(!personView); });
 setPersonView(false);
+
+// --- phone VR ---------------------------------------------------------------------
+let inVr = false, enteredVr = false;
+const look = new PhoneLook(person.camera, renderer.domElement);
+const stick = new ThumbStick(document.getElementById('stick'), document.getElementById('knob'));
+person.stick = stick.value;
+const vrInfo = document.getElementById('vrInfo');
+const crouchButton = document.getElementById('vrCrouch');
+const doorButton = document.getElementById('vrDoor');
+let doorInReach = null;
+
+function updateDoorButton() {
+  doorInReach = person.doorNearby();
+  doorButton.hidden = doorInReach === null;
+  if (doorInReach === null) return;
+  const label = doors.get(doorInReach).open ? 'Close door 关门' : 'Open door 开门';
+  if (doorButton.textContent !== label) doorButton.textContent = label;
+}
+
+function setVr(on) {
+  inVr = on;
+  document.body.classList.toggle('vr', on);
+  person.touchMode = on;
+  controls.enabled = !on;
+  stick.release();
+  setPersonView(on);
+  if (on && !enteredVr) {
+    // Down the hallway rather than at the wall beside the start.
+    person.camera.quaternion.setFromAxisAngle(new THREE.Vector3(0, 1, 0), -Math.PI / 2);
+    enteredVr = true;
+  }
+  if (on) look.start(); else look.stop();
+  if (!on) { person.crouched = false; crouchButton.classList.remove('on'); }
+  // The ray-marched smoke costs per pixel, and the house does not move, so
+  // its shadows need drawing only when something changes.
+  renderer.setPixelRatio(on ? 1 : PIXEL_RATIO);
+  renderer.shadowMap.autoUpdate = !on;
+  renderer.shadowMap.needsUpdate = true;
+  resize();
+}
+document.getElementById('enterVr').addEventListener('click', () => { look.askForGyro(); setVr(true); });
+document.getElementById('exitVr').addEventListener('click', () => setVr(false));
+doorButton.addEventListener('click', () => { if (doorInReach !== null) person.toggleDoor(doorInReach); });
+crouchButton.addEventListener('click', () => { person.crouched = !person.crouched; crouchButton.classList.toggle('on', person.crouched); });
 
 function resize() {
   const w = innerWidth, h = innerHeight;
@@ -340,10 +402,12 @@ renderer.setAnimationLoop(() => {
     simTime += fluid.dt;
   }
   smoke.upload(fluid);
-  wind.lines.visible = windBox.checked;
-  if (windBox.checked && running) wind.update(fluid.dt);
+  const showWind = windBox.checked && !inVr;
+  wind.lines.visible = showWind;
+  if (showWind && running) wind.update(fluid.dt);
 
   const activeCamera = personView ? person.camera : camera;
+  if (inVr) look.update();
   if (personView) person.update(dt); else controls.update();
   smoke.time = simTime;
   smoke.detail = detailBox.checked;
@@ -359,7 +423,18 @@ renderer.setAnimationLoop(() => {
   } else {
     probe.textContent = fireRoom ? `Fire in 起火: ${fireRoom.name}` : '';
   }
+  if (inVr) {
+    updateDoorButton();
+    const at = sampleAtEye();
+    vrInfo.textContent = `${look.hasGyro ? 'Turn the phone to look 转动手机看' : 'Drag to look 拖动看四周'} · ${fps.toFixed(0)} fps` +
+      (at ? ` · smoke 烟 ${at.smoke.toFixed(2)} · heat 热 ${at.heat.toFixed(2)}` : '');
+  }
 });
 
+window.lintelReady = true;
+const enterVr = document.getElementById('enterVr');
+enterVr.disabled = false;
+enterVr.textContent = 'Enter VR 进入 VR';
+
 // Handle for poking at the scene from the browser console.
-window.__lintel3d = { fluid, grid, doors, rooms, person, voxelMs, setDoor, lightFire, wind, sealUpstairs };
+window.__lintel3d = { fluid, grid, doors, rooms, person, voxelMs, setDoor, lightFire, wind, sealUpstairs, look, stick, updateDoorButton };

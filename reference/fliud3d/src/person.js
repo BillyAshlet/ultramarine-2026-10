@@ -15,6 +15,8 @@ const WALK_SPEED = 1.4;
 const CROUCH_SPEED = 0.6;
 const BODY_RADIUS = 0.25;
 const DOOR_REACH = 1.8;
+const DOOR_NEARBY = 1.5;      // metres at which a door offers itself on a phone
+const STOREY_HEIGHT = 2;
 // Collision rays at knee and chest height: low enough for sills and stair
 // treads, high enough for walls and door leaves.
 const PROBE_HEIGHTS = [0.35, 1.2];
@@ -37,6 +39,12 @@ export class Person {
     this.domElement = domElement;
     this.colliders = colliders;
     this.doors = doors;
+    this.doorCentres = new Map([...doors].map(([id, meshes]) => {
+      const box = new THREE.Box3();
+      for (const m of meshes) box.expandByObject(m);
+      return [id, box.getCenter(new THREE.Vector3())];
+    }));
+    this.walls = colliders.filter((m) => m.userData.role !== 'door');
     this.openDoorMaterial = openDoorMaterial;
     this.floorY = floorY;
     this.position = new THREE.Vector3(start.x, floorY, start.z);
@@ -45,12 +53,17 @@ export class Person {
     this.active = false;
     this.raycaster = new THREE.Raycaster();
     this.onDoorToggle = null;
+    // Phone VR: a thumb stick and a crouch button stand in for the keys, and
+    // something else turns the camera, so a tap must not grab the pointer.
+    this.stick = { x: 0, y: 0 };
+    this.crouched = false;
+    this.touchMode = false;
 
     this.marker = makeMarker();
     scene.add(this.marker);
 
     domElement.addEventListener('click', () => {
-      if (this.active && !this.controls.isLocked) this.controls.lock();
+      if (this.active && !this.touchMode && !this.controls.isLocked) this.controls.lock();
     });
     addEventListener('keydown', (e) => {
       if (!this.active) return;
@@ -73,12 +86,15 @@ export class Person {
 
   setAspect(aspect) {
     this.camera.aspect = aspect;
+    // A phone held upright is narrow: at the usual 70 degrees up and down you
+    // would see only about 35 across.
+    this.camera.fov = aspect < 1 ? 85 : 70;
     this.camera.updateProjectionMatrix();
   }
 
   update(dt) {
     if (!this.active) return;
-    const crouching = this.keys.has('Space');
+    const crouching = this.keys.has('Space') || this.crouched;
     const targetEye = crouching ? EYE_CROUCHED : EYE_STANDING;
     this.eye += (targetEye - this.eye) * Math.min(1, dt * 10);
 
@@ -87,10 +103,12 @@ export class Person {
     forward.normalize();
     const right = new THREE.Vector3().crossVectors(forward, UP);
     const move = new THREE.Vector3()
-      .addScaledVector(forward, (this.keys.has('KeyW') ? 1 : 0) - (this.keys.has('KeyS') ? 1 : 0))
-      .addScaledVector(right, (this.keys.has('KeyD') ? 1 : 0) - (this.keys.has('KeyA') ? 1 : 0));
-    if (move.lengthSq() > 0) {
-      move.normalize().multiplyScalar((crouching ? CROUCH_SPEED : WALK_SPEED) * dt);
+      .addScaledVector(forward, (this.keys.has('KeyW') ? 1 : 0) - (this.keys.has('KeyS') ? 1 : 0) + this.stick.y)
+      .addScaledVector(right, (this.keys.has('KeyD') ? 1 : 0) - (this.keys.has('KeyA') ? 1 : 0) + this.stick.x);
+    const push = move.length();
+    if (push > 0) {
+      // Pushing the stick part of the way walks slower; keys always push fully.
+      move.multiplyScalar(Math.min(1, push) / push).multiplyScalar((crouching ? CROUCH_SPEED : WALK_SPEED) * dt);
       // One axis at a time, so walking into a wall at an angle slides along it.
       this.tryMove(move.x, 0);
       this.tryMove(0, move.z);
@@ -120,9 +138,36 @@ export class Person {
     this.raycaster.far = DOOR_REACH;
     const all = [...this.doors.values()].flat();
     const hit = this.raycaster.intersectObjects(all, false)[0];
-    if (!hit) return;
-    const id = hit.object.userData.expressID;
-    const open = !hit.object.userData.open;
+    if (hit) this.toggleDoor(hit.object.userData.expressID);
+  }
+
+  /**
+   * The closest door you are standing by, or null. Aiming at a door is fine
+   * with a mouse but fiddly with a phone in your hand, so being near is enough.
+   * A door on the far side of a wall can be just as close, so the way to it
+   * has to be clear.
+   */
+  doorNearby() {
+    const body = new THREE.Vector3(this.position.x, this.floorY + 1.2, this.position.z);
+    let best = null, bestDistance = DOOR_NEARBY;
+    for (const [id, centre] of this.doorCentres) {
+      if (Math.abs(centre.y - body.y) > STOREY_HEIGHT) continue;
+      const toDoor = new THREE.Vector3(centre.x - body.x, 0, centre.z - body.z);
+      const distance = toDoor.length();
+      if (distance >= bestDistance) continue;
+      if (distance > 0.05) {
+        this.raycaster.set(body, toDoor.divideScalar(distance));
+        this.raycaster.far = distance;
+        if (this.raycaster.intersectObjects(this.walls, false).length > 0) continue;
+      }
+      best = id;
+      bestDistance = distance;
+    }
+    return best;
+  }
+
+  toggleDoor(id) {
+    const open = !this.doors.get(id)[0].userData.open;
     for (const mesh of this.doors.get(id)) {
       mesh.userData.open = open;
       mesh.material = open ? this.openDoorMaterial : mesh.userData.closedMaterial;

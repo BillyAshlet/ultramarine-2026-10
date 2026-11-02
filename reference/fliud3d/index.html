@@ -2,13 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
     <title>Lintel · 3D Smoke</title>
     <style>
-      html, body { margin: 0; height: 100%; background: #111418; color: #e8e6e1; font: 13px/1.45 system-ui, sans-serif; }
+      html, body { margin: 0; height: 100%; overflow: hidden; overscroll-behavior: none; background: #111418; color: #e8e6e1; font: 13px/1.45 system-ui, sans-serif; }
       #view { position: fixed; inset: 0; }
-      #panel { position: fixed; top: 12px; left: 12px; background: rgba(20, 24, 30, 0.88); padding: 10px 12px; border-radius: 8px; width: 250px; }
-      #panel h1 { font-size: 14px; margin: 0 0 6px; }
+      #panel { position: fixed; top: calc(12px + env(safe-area-inset-top)); left: 12px; background: rgba(20, 24, 30, 0.88); padding: 10px 12px; border-radius: 8px; width: 250px; max-width: calc(100vw - 48px); max-height: calc(100% - 48px); overflow-y: auto; box-sizing: content-box; }
+      #panel h1 { font-size: 14px; margin: 0; flex: 1; }
+      #panelHead { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+      #panel.compact #controls { display: none; }
+      #enterVr { width: 100%; padding: 8px; background: #b5561d; border-color: #f0b37e; font-weight: 600; }
+      #enterVr:disabled { background: #2c333c; border-color: #3a424d; color: #9aa3ad; font-weight: 400; }
+      #error { position: fixed; left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 20; background: #7a1f12; color: #fff; padding: 10px 12px; border-radius: 8px; overflow-wrap: anywhere; }
+      #error[hidden] { display: none; }
+      #vr { display: none; position: fixed; inset: 0; z-index: 10; pointer-events: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+      body.vr #vr { display: block; }
+      body.vr #panel { display: none; }
+      #vr button, #vr select { pointer-events: auto; touch-action: manipulation; font-size: 16px; padding: 8px 10px; background: rgba(20, 24, 30, 0.78); }
+      #vr button.on { background: rgba(181, 86, 29, 0.9); border-color: #f0b37e; }
+      #vrTop { position: absolute; top: calc(10px + env(safe-area-inset-top)); left: 10px; right: 10px; }
+      #vrBar { display: flex; gap: 6px; }
+      #vrRoom { flex: 1; min-width: 0; }
+      #vrInfo { margin-top: 6px; display: inline-block; padding: 4px 8px; border-radius: 5px; background: rgba(0, 0, 0, 0.5); font-size: 12px; font-variant-numeric: tabular-nums; }
+      #stick { position: absolute; left: 20px; bottom: calc(24px + env(safe-area-inset-bottom)); width: 110px; height: 110px; border-radius: 50%; background: rgba(0, 0, 0, 0.35); border: 1.5px solid rgba(255, 255, 255, 0.4); box-sizing: border-box; pointer-events: auto; touch-action: none; }
+      #knob { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px; border-radius: 50%; background: rgba(255, 255, 255, 0.75); }
+      #vr #vrDoor { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(180px + env(safe-area-inset-bottom)); padding: 12px 20px; white-space: nowrap; font-weight: 600; background: rgba(181, 86, 29, 0.92); border-color: #f0b37e; }
+      #vr #vrDoor[hidden] { display: none; }
+      #vrButtons { position: absolute; right: 12px; bottom: calc(24px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 6px; }
       #panel h2 { font-size: 11px; margin: 10px 0 4px; color: #f0b37e; text-transform: uppercase; letter-spacing: .04em; }
       #panel label { display: flex; align-items: center; gap: 6px; margin: 2px 0; cursor: pointer; }
       .seg { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -23,8 +43,13 @@
   <body>
     <div id="view"></div>
     <div id="panel">
-      <h1>Lintel · 3D smoke</h1>
+      <div id="panelHead">
+        <h1>Lintel · 3D smoke</h1>
+        <button id="more">More 更多</button>
+      </div>
+      <button id="enterVr" disabled>Loading 加载中…</button>
 
+      <div id="controls">
       <h2>Fire 起火</h2>
       <div class="seg">
         <select id="room"></select>
@@ -49,9 +74,58 @@
       <label><input type="checkbox" id="sealUpstairs" checked> Seal upstairs 封住二楼</label>
 
       <div id="help"></div>
+      </div>
       <div id="probe"></div>
       <div id="status">Loading…</div>
     </div>
+
+    <div id="vr">
+      <div id="vrTop">
+        <div id="vrBar">
+          <button id="exitVr">Exit 退出</button>
+          <select id="vrRoom"></select>
+        </div>
+        <div id="vrInfo"></div>
+      </div>
+      <div id="stick"><div id="knob"></div></div>
+      <button id="vrDoor" hidden></button>
+      <div id="vrButtons">
+        <button data-mode="smoke">Eyes 肉眼</button>
+        <button data-mode="heat">Thermal 热成像</button>
+        <button id="vrCrouch">Crouch 蹲下</button>
+      </div>
+    </div>
+
+    <div id="error" hidden></div>
+
+    <script>
+      // A plain script, so it still runs when the module below fails to load.
+      // On a phone there is no console to look in: a failed load was only a
+      // blank page, and nobody could tell a network problem from a phone that
+      // cannot run this.
+      (function () {
+        var panel = document.getElementById('panel');
+        if (innerWidth < 700) panel.classList.add('compact');
+        document.getElementById('more').addEventListener('click', function () { panel.classList.toggle('compact'); });
+
+        function show(message) {
+          var box = document.getElementById('error');
+          box.textContent = message;
+          box.hidden = false;
+        }
+        window.lintelError = show;
+        addEventListener('error', function (e) {
+          var url = e.target && (e.target.src || e.target.href);
+          show(url ? 'Could not load 加载失败: ' + url : 'Error 出错: ' + e.message);
+        }, true);
+        addEventListener('unhandledrejection', function (e) {
+          show('Error 出错: ' + (e.reason && e.reason.message || e.reason));
+        });
+        setTimeout(function () {
+          if (!window.lintelReady) show('Still loading after 60 s. The network may not reach this site. 加载超过 60 秒，可能是网络连不上这个网站。');
+        }, 60000);
+      })();
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
