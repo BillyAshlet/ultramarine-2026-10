@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lintel · 3D Smoke</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #111418; color: #e8e6e1; font: 13px/1.45 system-ui, sans-serif; }
+      #view { position: fixed; inset: 0; }
+      #panel { position: fixed; top: 12px; left: 12px; background: rgba(20, 24, 30, 0.88); padding: 10px 12px; border-radius: 8px; width: 250px; }
+      #panel h1 { font-size: 14px; margin: 0 0 6px; }
+      #panel h2 { font-size: 11px; margin: 10px 0 4px; color: #f0b37e; text-transform: uppercase; letter-spacing: .04em; }
+      #panel label { display: flex; align-items: center; gap: 6px; margin: 2px 0; cursor: pointer; }
+      .seg { display: flex; gap: 4px; flex-wrap: wrap; }
+      button, select { background: #2c333c; color: #e8e6e1; border: 1px solid #3a424d; border-radius: 5px; padding: 3px 8px; font: inherit; cursor: pointer; }
+      button.on { background: #4a3a2a; border-color: #f0b37e; }
+      #status, #probe { color: #9aa3ad; margin-top: 6px; font-variant-numeric: tabular-nums; }
+      #help { color: #f0b37e; margin-top: 6px; }
+      .room-label { color: #fff; background: rgba(0, 0, 0, 0.55); padding: 1px 6px; border-radius: 4px; font-size: 12px; pointer-events: none; white-space: nowrap; }
+      .room-label.fire { background: rgba(200, 70, 20, 0.85); }
+    </style>
+  </head>
+  <body>
+    <div id="view"></div>
+    <div id="panel">
+      <h1>Lintel · 3D smoke</h1>
+
+      <h2>Fire 起火</h2>
+      <div class="seg">
+        <select id="room"></select>
+        <button id="random">Random 随机</button>
+      </div>
+      <div class="seg" style="margin-top:4px">
+        <button id="run">Pause 暂停</button>
+        <button id="reset">Reset 重置</button>
+      </div>
+
+      <h2>View 滤镜</h2>
+      <div class="seg">
+        <button data-mode="smoke">Eyes 肉眼</button>
+        <button data-mode="heat">Thermal 热成像</button>
+      </div>
+      <label><input type="checkbox" id="dress" checked> Floor lines &amp; lights 地板线与光照</label>
+      <label><input type="checkbox" id="detail" checked> Smoke detail 烟的细节</label>
+      <label>Thin smoke 稀烟浓度 <input type="range" id="thin" min="0.3" max="1" step="0.05" value="0.6"> <span id="thinVal">0.60</span></label>
+      <label><input type="checkbox" id="wind" checked> Wind streaks 风</label>
+      <label><input type="checkbox" id="roof"> Roof 屋顶</label>
+      <label><input type="checkbox" id="upperFloor"> Upper floor 二楼地板</label>
+      <label><input type="checkbox" id="sealUpstairs" checked> Seal upstairs 封住二楼</label>
+
+      <div id="help"></div>
+      <div id="probe"></div>
+      <div id="status">Loading…</div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
