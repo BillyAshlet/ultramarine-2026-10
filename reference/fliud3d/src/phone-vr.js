@@ -18,8 +18,14 @@ const BACK_OF_PHONE = new THREE.Quaternion(-Math.SQRT1_2, 0, 0, Math.SQRT1_2);
 /**
  * Turns a camera with the gyro, or with a finger where there is no gyro: a
  * desktop, a refused permission, or an in-app browser that does not pass the
- * sensor on. A finger still turns you sideways when the gyro works, so you can
- * look behind you without standing up and turning round.
+ * sensor on.
+ *
+ * A finger used to turn you sideways with the gyro on as well, so you could
+ * look behind you without standing up. That broke the illusion: the house only
+ * feels fixed around you while it turns exactly as far as you do, and a drag
+ * swung it with your body still, so you lost track of where things were. So
+ * with the gyro on only the phone turns the view, and turnAround() covers
+ * looking behind you, all at once, the way VR apps snap-turn.
  */
 export class PhoneLook {
   constructor(camera, domElement) {
@@ -45,11 +51,10 @@ export class PhoneLook {
       this.lastX = e.clientX; this.lastY = e.clientY;
     };
     this.onMove = (e) => {
-      if (e.pointerId !== this.dragId) return;
+      if (e.pointerId !== this.dragId || this.hasGyro) return;
       const dx = (e.clientX - this.lastX) * DRAG_PER_PIXEL;
       const dy = (e.clientY - this.lastY) * DRAG_PER_PIXEL;
       this.lastX = e.clientX; this.lastY = e.clientY;
-      if (this.hasGyro) { this.yawOffset += dx; return; }
       this.yaw += dx;
       this.pitch = THREE.MathUtils.clamp(this.pitch + dy, -1.5, 1.5);
     };
@@ -63,6 +68,11 @@ export class PhoneLook {
   askForGyro() {
     const ask = globalThis.DeviceOrientationEvent?.requestPermission;
     if (ask) ask.call(DeviceOrientationEvent).catch(() => {});
+  }
+
+  turnAround() {
+    if (this.hasGyro && this.yawOffset !== null) this.yawOffset += Math.PI;
+    else this.yaw += Math.PI;
   }
 
   start() {

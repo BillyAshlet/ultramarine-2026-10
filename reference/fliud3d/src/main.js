@@ -391,6 +391,7 @@ function setVr(on) {
 document.getElementById('enterVr').addEventListener('click', () => { look.askForGyro(); setVr(true); });
 document.getElementById('exitVr').addEventListener('click', () => setVr(false));
 doorButton.addEventListener('click', () => { if (doorInReach !== null) person.toggleDoor(doorInReach); });
+document.getElementById('vrTurn').addEventListener('click', () => look.turnAround());
 crouchButton.addEventListener('click', () => { person.crouched = !person.crouched; crouchButton.classList.toggle('on', person.crouched); });
 
 function resize() {
