@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wind and plume · Manchester 1985</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #101317; color: #e8e6e1; font: 13px/1.5 system-ui, sans-serif; }
+  #view { position: fixed; inset: 0; }
+  #panel { position: fixed; top: 12px; left: 12px; width: 300px; max-width: calc(100vw - 24px); box-sizing: border-box; max-height: calc(100% - 24px); overflow-y: auto; background: rgba(16, 19, 23, 0.9); border: 1px solid #2a3038; border-radius: 8px; padding: 12px; }
+  h1 { font-size: 14px; margin: 0 0 2px; }
+  .sub { color: #9aa3ad; margin: 0 0 10px; }
+  label { display: block; margin: 10px 0 2px; color: #f0b37e; font-size: 12px; }
+  input[type=range] { width: 100%; }
+  .seg { display: flex; gap: 4px; }
+  button { flex: 1; background: #232a32; color: #e8e6e1; border: 1px solid #39424d; border-radius: 5px; padding: 5px; font: inherit; cursor: pointer; }
+  button.on { background: #4a3a2a; border-color: #f0b37e; }
+  #big { font-size: 24px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  #stats { font-variant-numeric: tabular-nums; color: #cfd4d9; margin-top: 8px; }
+  #chart { display: block; width: 100%; margin-top: 10px; }
+  .note { color: #9aa3ad; font-size: 11px; margin-top: 10px; }
+  #error { color: #ff9b85; }
+  @media (max-width: 700px) {
+    #panel { top: auto; bottom: 8px; left: 8px; right: 8px; width: auto; max-width: none; max-height: 48%; }
+    #view { bottom: 48%; }
+  }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js" } }</script>
+</head>
+<body>
+<div id="view"></div>
+<div id="panel">
+  <h1>Wind and plume 风与火焰</h1>
+  <p class="sub">Manchester 1985, simplified. 曼彻斯特事故的简化实验。</p>
+
+  <label>Wind 风速</label>
+  <input id="wind" type="range" min="0" max="7" step="1" value="4" />
+  <div id="big"></div>
+
+  <label>Wind direction 风向</label>
+  <div class="seg">
+    <button data-yaw="40">40° off the nose 偏机头</button>
+    <button data-yaw="90">90° across 正侧风</button>
+  </div>
+
+  <label>Shows 显示</label>
+  <div class="seg">
+    <button data-view="iso">Above 300°C 等温面</button>
+    <button data-view="glow">Heat 热场</button>
+  </div>
+
+  <label>Camera 视角</label>
+  <div class="seg">
+    <button data-cam="rear">From behind 机尾看</button>
+    <button data-cam="above">Above 俯视</button>
+    <button data-cam="side">Side 侧面</button>
+  </div>
+
+  <div id="stats"></div>
+  <svg id="chart" viewBox="0 0 280 150"></svg>
+
+  <p class="note">
+    20 s average, 0.5 m grid. Fire settings were fixed against a still-air textbook plume before any wind ran.
+    Aircraft and pool outline are approximate; the angle off the nose is my assumption. No burn-through, no cabin.<br />
+    20 秒平均，50 厘米网格。火的参数在跑风之前已按静风教科书公式定好。飞机和油池形状是近似的，偏机头角度是我的假设。没有模拟烧穿，也没有客舱。
+  </p>
+  <p id="error"></p>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+
+const WINDS = [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5];
+const CELL = 0.5, NX = 68, NY = 44, NZ = 56;
+const SIZE = new THREE.Vector3(NX * CELL, NY * CELL, NZ * CELL);
+const CZ = 11, CY = 3.08, R = 1.88;
+
+const $ = (id) => document.getElementById(id);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+$('view').appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x101317);
+const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 300);
+scene.add(new THREE.HemisphereLight(0xdfe7f2, 0x3a3630, 2.2));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(-10, 30, 20);
+scene.add(sun);
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(SIZE.x, SIZE.z), new THREE.MeshLambertMaterial({ color: 0x33373c }));
+ground.rotation.x = -Math.PI / 2;
+ground.position.set(SIZE.x / 2, 0, SIZE.z / 2);
+scene.add(ground);
+
+// The aeroplane, drawn from the same numbers as the solid cells in windy.js.
+const skin = new THREE.MeshLambertMaterial({ color: 0xc9ced4 });
+const add = (geometry, x, y, z) => { const m = new THREE.Mesh(geometry, skin); m.position.set(x, y, z); scene.add(m); return m; };
+const NOSE = 1, TAIL = 31.5;
+const profile = [];
+for (let i = 0; i <= 60; i++) {
+  const x = NOSE + (TAIL - NOSE) * i / 60;
+  const a = x - NOSE, b = TAIL - x;
+  let r = R;
+  if (a < 4) r = R * Math.sqrt(Math.max(0, 1 - (1 - a / 4) ** 2));
+  if (b < 7) r = Math.min(r, R * (0.25 + 0.75 * b / 7));
+  profile.push(new THREE.Vector2(r, x));
+}
+const hull = new THREE.Mesh(new THREE.LatheGeometry(profile, 32), skin);
+hull.rotation.z = -Math.PI / 2;
+hull.position.set(0, CY, CZ);
+scene.add(hull);
+const wingShape = (side) => {
+  const g = new THREE.BufferGeometry();
+  const span = 14.2, lead = (s) => 11 + 0.466 * s, chord = (s) => 4.7 - 0.22 * s;
+  const p = [lead(0), 2.25, CZ, lead(0) + chord(0), 2.25, CZ, lead(span) + chord(span), 2.25, CZ + side * span, lead(span), 2.25, CZ + side * span];
+  g.setAttribute('position', new THREE.Float32BufferAttribute(p, 3));
+  g.setIndex([0, 1, 2, 0, 2, 3]);
+  g.computeVertexNormals();
+  return new THREE.Mesh(g, new THREE.MeshLambertMaterial({ color: 0xaab0b7, side: THREE.DoubleSide }));
+};
+scene.add(wingShape(1), wingShape(-1));
+for (const side of [1, -1]) {
+  const e = add(new THREE.CylinderGeometry(0.7, 0.7, 4.5, 20), 12.25, 1.5, CZ + side * 4.83);
+  e.rotation.z = Math.PI / 2;
+}
+const pool = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), new THREE.MeshBasicMaterial({ color: 0xc8461a }));
+pool.rotation.x = -Math.PI / 2;
+pool.position.set(16, 0.02, CZ + 5);
+scene.add(pool);
+
+// The averaged temperature, ray-marched through a box around everything.
+const volume = new THREE.Data3DTexture(new Uint8Array(NX * NY * NZ), NX, NY, NZ);
+volume.format = THREE.RedFormat;
+volume.minFilter = volume.magFilter = THREE.LinearFilter;
+volume.unpackAlignment = 1;
+volume.needsUpdate = true;
+const material = new THREE.ShaderMaterial({
+  glslVersion: THREE.GLSL3,
+  transparent: true,
+  depthWrite: false,
+  side: THREE.BackSide,
+  uniforms: { tVolume: { value: volume }, uSize: { value: SIZE }, uCam: { value: new THREE.Vector3() }, uMode: { value: 0 } },
+  vertexShader: `
+    out vec3 vWorld;
+    void main() {
+      vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * viewMatrix * vec4(vWorld, 1.0);
+    }`,
+  fragmentShader: `
+    precision highp float;
+    precision highp sampler3D;
+    in vec3 vWorld;
+    out vec4 outColor;
+    uniform sampler3D tVolume;
+    uniform vec3 uSize, uCam;
+    uniform int uMode;
+    float tempAt(vec3 p) { float s = texture(tVolume, p / uSize).r; return s * s * 1000.0; }
+    vec3 ramp(float t) {
+      t = clamp(t / 800.0, 0.0, 1.0);
+      return vec3(min(1.0, t * 2.4), clamp(t * 2.4 - 0.9, 0.0, 1.0), max(0.0, t * 3.0 - 2.2));
+    }
+    void main() {
+      vec3 dir = normalize(vWorld - uCam);
+      vec3 t0 = (vec3(0.0) - uCam) / dir, t1 = (uSize - uCam) / dir;
+      vec3 a = min(t0, t1), b = max(t0, t1);
+      float near = max(max(a.x, a.y), max(a.z, 0.0));
+      float far = min(b.x, min(b.y, b.z));
+      vec3 glow = vec3(0.0);
+      float alpha = 0.0;
+      for (float t = near; t < far; t += 0.15) {
+        vec3 p = uCam + dir * t;
+        float T = tempAt(p);
+        if (uMode == 0) {
+          if (T > 300.0) {
+            vec3 e = vec3(0.3, 0.0, 0.0);
+            vec3 n = normalize(vec3(tempAt(p + e.xyy) - tempAt(p - e.xyy), tempAt(p + e.yxy) - tempAt(p - e.yxy), tempAt(p + e.yyx) - tempAt(p - e.yyx)) + 1e-4);
+            float light = 0.45 + 0.55 * max(0.0, dot(-n, normalize(vec3(-0.3, 0.8, 0.5))));
+            outColor = vec4(vec3(0.85, 0.13, 0.08) * light, 1.0);
+            return;
+          }
+        } else {
+          float da = 1.0 - exp(-T * 0.0025 * 0.15);
+          glow += (1.0 - alpha) * da * ramp(T);
+          alpha += (1.0 - alpha) * da;
+          if (alpha > 0.97) break;
+        }
+      }
+      if (uMode == 0) discard;
+      outColor = vec4(glow / max(alpha, 1e-3), alpha);
+    }`,
+});
+const box = new THREE.Mesh(new THREE.BoxGeometry(SIZE.x, SIZE.y, SIZE.z), material);
+box.position.copy(SIZE).multiplyScalar(0.5);
+box.renderOrder = 2;
+scene.add(box);
+
+// A little orbit of our own: this page does not need the full controls.
+const target = new THREE.Vector3(16, 4, 12);
+let theta = 0, phi = 1.25, radius = 34;
+function placeCamera() {
+  camera.position.set(target.x + radius * Math.sin(phi) * Math.cos(theta), target.y + radius * Math.cos(phi), target.z + radius * Math.sin(phi) * Math.sin(theta));
+  camera.lookAt(target);
+}
+const CAMERAS = { rear: [0, 1.4, 34], above: [0.0, 0.25, 40], side: [Math.PI / 2, 1.35, 42] };
+function setCamera(name) {
+  [theta, phi, radius] = CAMERAS[name];
+  placeCamera();
+  for (const b of document.querySelectorAll('[data-cam]')) b.classList.toggle('on', b.dataset.cam === name);
+}
+let dragging = null;
+renderer.domElement.addEventListener('pointerdown', (e) => { dragging = [e.clientX, e.clientY]; });
+addEventListener('pointerup', () => { dragging = null; });
+addEventListener('pointermove', (e) => {
+  if (!dragging) return;
+  theta += (e.clientX - dragging[0]) * 0.006;
+  phi = Math.min(1.54, Math.max(0.1, phi - (e.clientY - dragging[1]) * 0.006));
+  dragging = [e.clientX, e.clientY];
+  placeCamera();
+});
+renderer.domElement.addEventListener('wheel', (e) => { radius = Math.min(90, Math.max(12, radius * (1 + e.deltaY * 0.001))); placeCamera(); e.preventDefault(); }, { passive: false });
+
+const name = (yaw, w) => `results/ac-y${yaw}-w${w}`;
+let yaw = 40, windIndex = 4, latestRequest = 0;
+const cache = new Map();
+const results = new Map();
+async function load(y, w) {
+  const key = name(y, w);
+  if (!cache.has(key)) {
+    const [bin, json] = await Promise.all([
+      fetch(`${key}.bin`).then((r) => { if (!r.ok) throw new Error(`${key}.bin: ${r.status}`); return r.arrayBuffer(); }),
+      fetch(`${key}.json`).then((r) => r.json()),
+    ]);
+    cache.set(key, { bytes: new Uint8Array(bin), json });
+  }
+  return cache.get(key);
+}
+function chart() {
+  const svg = $('chart');
+  const W = 280, H = 150, L = 34, B = 26, T = 8, Rr = 8;
+  const rows = WINDS.map((w) => results.get(`${yaw}-${w}`)).filter(Boolean);
+  const px = (w) => L + (W - L - Rr) * w / 3.5;
+  const peak = Math.max(1, ...rows.map((r) => r.skin.hot300));
+  const py = (v) => H - B - (H - B - T) * v / peak;
+  let s = `<rect x="${px(2.57)}" y="${T}" width="${px(3.5) - px(2.57)}" height="${H - B - T}" fill="#f0b37e" opacity="0.15"/>`;
+  s += `<line x1="${px(1.5)}" x2="${px(1.5)}" y1="${T}" y2="${H - B}" stroke="#7fb3d5" stroke-dasharray="3 3"/><line x1="${px(2)}" x2="${px(2)}" y1="${T}" y2="${H - B}" stroke="#7fb3d5"/>`;
+  s += `<line x1="${L}" x2="${W - Rr}" y1="${H - B}" y2="${H - B}" stroke="#555"/><line x1="${L}" x2="${L}" y1="${T}" y2="${H - B}" stroke="#555"/>`;
+  s += `<polyline fill="none" stroke="#e8553a" stroke-width="2" points="${rows.map((r) => `${px(r.wind)},${py(r.skin.hot300)}`).join(' ')}"/>`;
+  for (const r of rows) s += `<circle cx="${px(r.wind)}" cy="${py(r.skin.hot300)}" r="${r.wind === WINDS[windIndex] ? 4 : 2.5}" fill="#e8553a"/>`;
+  for (const w of [0, 1, 2, 3]) s += `<text x="${px(w)}" y="${H - B + 12}" fill="#9aa3ad" font-size="9" text-anchor="middle">${w}</text>`;
+  s += `<text x="${(L + W) / 2}" y="${H - 3}" fill="#9aa3ad" font-size="9" text-anchor="middle">wind 风速 m/s · dashed/solid: paper 1.5 / 2.0 · band: accident 事故</text>`;
+  s += `<text x="4" y="${T + 7}" fill="#9aa3ad" font-size="9">cells</text><text x="4" y="${T + 17}" fill="#9aa3ad" font-size="9">&gt;300°</text><text x="${L - 4}" y="${py(peak) + 3}" fill="#9aa3ad" font-size="9" text-anchor="end"></text>`;
+  svg.innerHTML = s;
+}
+async function show() {
+  const w = WINDS[windIndex];
+  $('big').textContent = `${w} m/s`;
+  for (const b of document.querySelectorAll('[data-yaw]')) b.classList.toggle('on', +b.dataset.yaw === yaw);
+  const request = ++latestRequest;
+  try {
+    const { bytes, json } = await load(yaw, w);
+    // Moving the slider fast, an earlier wind's file can arrive after a later one's.
+    if (request !== latestRequest) return;
+    volume.image.data.set(bytes);
+    volume.needsUpdate = true;
+    const g = json.skin.gapMetres;
+    $('stats').innerHTML = `Plume lean 火焰倾角 <b>${json.leanDegrees}°</b><br />Gap to fuselage 与机身间距 <b>${g === null ? 'none hot enough' : g + ' m'}</b><br />Skin cells over 300° 机身旁超过 300° 的格子 <b>${json.skin.hot300}</b> / ${json.skin.touching}`;
+    $('error').textContent = '';
+  } catch (e) { $('error').textContent = `Not ready 还没跑完: ${e.message}`; }
+}
+async function loadAll() {
+  for (const y of [40, 90]) for (const w of WINDS) {
+    try { results.set(`${y}-${w}`, await fetch(`${name(y, w)}.json`).then((r) => r.json())); } catch { /* not run yet */ }
+  }
+  chart();
+}
+$('wind').addEventListener('input', () => { windIndex = +$('wind').value; show(); chart(); });
+for (const b of document.querySelectorAll('[data-yaw]')) b.addEventListener('click', () => { yaw = +b.dataset.yaw; show(); chart(); });
+function setView(v) {
+  material.uniforms.uMode.value = v === 'iso' ? 0 : 1;
+  for (const b of document.querySelectorAll('[data-view]')) b.classList.toggle('on', b.dataset.view === v);
+}
+for (const b of document.querySelectorAll('[data-view]')) b.addEventListener('click', () => setView(b.dataset.view));
+for (const b of document.querySelectorAll('[data-cam]')) b.addEventListener('click', () => setCamera(b.dataset.cam));
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+setCamera('rear');
+setView('iso');
+loadAll().then(show);
+window.__plume = { WINDS, results };
+renderer.setAnimationLoop(() => {
+  material.uniforms.uCam.value.copy(camera.position);
+  renderer.render(scene, camera);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+off2-w0 lean 7.5 peak 19.3 skin {"touching":1294,"hot300":19,"hot150":86,"peak":562,"gapMetres":0} 737s
+off1-w3 lean 25.5 peak 12 skin {"touching":1294,"hot300":18,"hot150":119,"peak":511,"gapMetres":0} 739s
+off1-w2.5 lean 21 peak 13.4 skin {"touching":1294,"hot300":18,"hot150":117,"peak":530,"gapMetres":0} 742s
+off1-w3.5 lean 29.7 peak 12.1 skin {"touching":1294,"hot300":17,"hot150":143,"peak":512,"gapMetres":0} 742s
+off1-w1 lean 5.8 peak 18.9 skin {"touching":1294,"hot300":30,"hot150":116,"peak":639,"gapMetres":0} 744s
+off1-w0 lean 4.2 peak 19.4 skin {"touching":1294,"hot300":27,"hot150":100,"peak":644,"gapMetres":0} 744s
+off1-w1.5 lean 11.3 peak 17.7 skin {"touching":1294,"hot300":30,"hot150":134,"peak":602,"gapMetres":0} 744s
+off1-w2 lean 16.5 peak 15.2 skin {"touching":1294,"hot300":20,"hot150":122,"peak":562,"gapMetres":0} 745s
+off2-w1.5 lean 13.3 peak 16.3 skin {"touching":1294,"hot300":17,"hot150":99,"peak":499,"gapMetres":0} 834s
+off2-w1 lean 8.3 peak 18.5 skin {"touching":1294,"hot300":19,"hot150":98,"peak":540,"gapMetres":0} 836s
+off2-w3.5 lean 31.3 peak 11.3 skin {"touching":1294,"hot300":10,"hot150":76,"peak":418,"gapMetres":0} 830s
+off2-w2 lean 18.2 peak 13.7 skin {"touching":1294,"hot300":11,"hot150":85,"peak":459,"gapMetres":0} 832s
+off2-w2.5 lean 22.6 peak 12.2 skin {"touching":1294,"hot300":10,"hot150":72,"peak":425,"gapMetres":0} 832s
+off2-w3 lean 27 peak 11.5 skin {"touching":1294,"hot300":10,"hot150":71,"peak":409,"gapMetres":0} 832s
+fine-w0 lean 3.3 peak 18.8 skin {"touching":2489,"hot300":119,"hot150":181,"peak":795,"gapMetres":0} 1292s
+fine-w2 lean 13.2 peak 16.4 skin {"touching":2489,"hot300":93,"hot150":214,"peak":792,"gapMetres":0} 1293s
+SENSITIVITY DONE
