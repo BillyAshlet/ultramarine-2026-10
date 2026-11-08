@@ -20,6 +20,7 @@ and open http://localhost:5196/duplex-fire/.
 - Drag the flame, or double-click a floor, to move the fire. It restarts from nothing.
 - Both shows the whole house see-through; Level 1 / Level 2 cut it just under that storey's ceiling. With both showing, the fire moves only on its own storey: pick a storey to move it to the other.
 - Walls sets how see-through walls, floors and doors are (ceilings thin out faster, or two of them stacked into a haze over everything). The sun's shadows fade with it, so a faint wall throws a faint shadow. At 1 the walls are solid and hide the smoke behind them.
+- Gas, Electrical, Water and Heating show the MEP file's services in the overlay's colours, only to see where they run; they are not in the simulation. Pipes has its own opacity, apart from the walls'.
 - Growth picks the design fire's growth rate.
 
 The look (floorboards, tiles, skirting, low afternoon sun through the windows, soft shadows) is `src/dressing.js`, adapted from fliud3d's. It changes only the drawing. See-through surfaces do not write depth, so smoke behind a wall is drawn over the wall rather than tinted by it.

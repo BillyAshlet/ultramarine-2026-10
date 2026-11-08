@@ -25,6 +25,11 @@ const meta = await (await fetch(`${DATA}/meta.json`)).json();
 const load = async (name) => readLayer(meta, name, await (await fetch(`${DATA}/${name}.bin`)).arrayBuffer());
 const building = await load('building');
 const extras = { furniture: await load('furniture'), fixtures: await load('fixtures') };
+// The services, from the MEP file, in the overlay's colours: only to see
+// where they run. Nothing here is in the simulation yet.
+const SERVICES = ['gas', 'electrical', 'water', 'heating'];
+const services = {};
+for (const name of SERVICES) services[name] = await load(name);
 
 const grid = buildGrid(building, CELL);
 const rooms = meta.rooms.filter((r) => r.code !== 'R301');
@@ -50,6 +55,14 @@ for (const [name, layer] of Object.entries(extras)) {
   extraMeshes[name] = new THREE.Mesh(layer.geometry, material);
   extraMeshes[name].castShadow = extraMeshes[name].receiveShadow = true;
   scene.add(extraMeshes[name]);
+}
+// Pipes have their own material so they can be faded apart from the walls.
+// Too thin to matter for the sun, so they cast no shadow.
+const serviceMaterial = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide, clippingPlanes: [cut] });
+const serviceMeshes = {};
+for (const [name, layer] of Object.entries(services)) {
+  serviceMeshes[name] = new THREE.Mesh(layer.geometry, serviceMaterial);
+  scene.add(serviceMeshes[name]);
 }
 
 const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 200);
@@ -174,6 +187,23 @@ const setOpacity = () => {
 };
 opacity.addEventListener('input', setOpacity);
 setOpacity();
+for (const name of SERVICES) {
+  const box = document.getElementById(`show-${name}`);
+  const sync = () => { serviceMeshes[name].visible = box.checked; };
+  box.addEventListener('change', sync);
+  sync();
+}
+const pipeOpacity = document.getElementById('pipeOpacity');
+const setPipeOpacity = () => {
+  const o = +pipeOpacity.value, solid = o >= 0.99;
+  serviceMaterial.opacity = solid ? 1 : o;
+  serviceMaterial.transparent = !solid;
+  serviceMaterial.depthWrite = solid;
+  serviceMaterial.needsUpdate = true;
+  document.getElementById('pipeOpacityVal').textContent = o.toFixed(2);
+};
+pipeOpacity.addEventListener('input', setPipeOpacity);
+setPipeOpacity();
 
 function resize() {
   renderer.setSize(innerWidth, innerHeight);
@@ -213,4 +243,4 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 // For poking at it from the console; frame() draws once even in a hidden tab.
-window.duplexFire = { fire, grid, placeFire, showLevel, camera, meta, frame, dressed };
+window.duplexFire = { fire, grid, placeFire, showLevel, camera, meta, frame, dressed, serviceMeshes, serviceMaterial };
