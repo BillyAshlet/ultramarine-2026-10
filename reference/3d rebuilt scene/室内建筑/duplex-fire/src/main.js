@@ -169,8 +169,43 @@ for (const b of document.querySelectorAll('[data-mode]')) {
   b.addEventListener('click', () => {
     mode = b.dataset.mode;
     for (const o of document.querySelectorAll('[data-mode]')) o.classList.toggle('on', o === b);
+    document.getElementById('legend').hidden = mode !== 'heat';
   });
 }
+
+// The thermal view's colour bar, in degrees Celsius. The palette is not in
+// proportion to temperature: smoke-pass.js stores heat as a square root and
+// draws it raised to heatGamma, so low heat shows stronger. The ticks are
+// placed by the same sums, so each one sits on the colour it is drawn in.
+// The colour of a thick, uniform layer; a thin one shows paler.
+const AMBIENT_C = 20;   // windy.js takes ambient as 293 K
+function drawLegend() {
+  const canvas = document.getElementById('legendBar');
+  const g = canvas.getContext('2d');
+  const { width: w, height: h } = canvas;
+  const heatColour = (t) => [Math.min(1, t * 2.2), Math.min(1, Math.max(0, t * 2.2 - 0.9)), Math.max(0, t * 3 - 2.2)];
+  for (let y = 0; y < h; y++) {
+    const t = 1 - y / (h - 1);   // hottest at the top
+    const [r, gr, b] = heatColour(t).map((c) => Math.round(c * 255));
+    g.fillStyle = `rgb(${r},${gr},${b})`;
+    g.fillRect(0, y, w, 1);
+  }
+  // Where a temperature lands on the bar: the shader's own steps, in order.
+  const position = (celsius) => {
+    const stored = Math.sqrt(Math.min(1, Math.max(0, celsius - AMBIENT_C) / HEAT_SCALE));
+    return Math.min(1, Math.pow(stored, 2 * smoke.heatGamma) * 1.2);
+  };
+  const top = HEAT_SCALE * Math.pow(1 / 1.2, 1 / smoke.heatGamma) + AMBIENT_C;   // the palette runs out here
+  const ticks = document.getElementById('legendTicks');
+  ticks.innerHTML = '';
+  for (const c of [20, 40, 60, 100, 150, 200, 300, Math.round(top / 10) * 10]) {
+    const span = document.createElement('span');
+    span.textContent = c >= top - 5 ? `${c}+ °C` : `${c} °C`;
+    span.style.top = `${(1 - position(c)) * 100}%`;
+    ticks.appendChild(span);
+  }
+}
+drawLegend();
 const furnitureBox = document.getElementById('furniture');
 furnitureBox.addEventListener('change', () => {
   extraMeshes.furniture.visible = extraMeshes.fixtures.visible = furnitureBox.checked;
