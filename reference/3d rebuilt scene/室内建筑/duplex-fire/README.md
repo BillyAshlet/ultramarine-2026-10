@@ -18,8 +18,11 @@ python3 -m http.server 5196
 and open http://localhost:5196/duplex-fire/.
 
 - Drag the flame, or double-click a floor, to move the fire. It restarts from nothing.
-- Level 1 / Level 2 cut the house just under that storey's ceiling.
+- Both shows the whole house see-through; Level 1 / Level 2 cut it just under that storey's ceiling. With both showing, the fire moves only on its own storey: pick a storey to move it to the other.
+- Walls sets how see-through walls, floors and doors are (ceilings thin out faster, or two of them stacked into a haze over everything). The sun's shadows fade with it, so a faint wall throws a faint shadow. At 1 the walls are solid and hide the smoke behind them.
 - Growth picks the design fire's growth rate.
+
+The look (floorboards, tiles, skirting, low afternoon sun through the windows, soft shadows) is `src/dressing.js`, adapted from fliud3d's. It changes only the drawing. See-through surfaces do not write depth, so smoke behind a wall is drawn over the wall rather than tinted by it.
 
 `node tools/bench.mjs [cell] [seconds] [room] [growth]` runs it headless and prints speed and where the smoke has got to. It needs a `node_modules` with `three` next to it; a symlink to `../../../fliud3d/node_modules` works.
 
@@ -42,7 +45,7 @@ and open http://localhost:5196/duplex-fire/.
 
 - **Grid**: 44 × 32 × 89 cells at 20 cm, 82,355 of them air.
 - **The two units are sealed from each other**: flood-filling the air gives one region per unit, each holding all ten of its rooms and nothing of the other's.
-- **Speed**: about 36 ms a step under node, 35–49 ms in the browser while drawing. At 0.05 s a step that is 1.0–1.4 times real time.
+- **Speed**: about 36 ms a step under node, 35–52 ms in the browser while drawing (the upper end with see-through walls and shadows). At 0.05 s a step that is 1.0–1.4 times real time.
 - **Soot is kept**: after 60 s of a fast fire the house holds 6.74 g, against 6.75 g made.
 - **Smoke goes where hot gas goes**: a fast fire in A102 Living Room after 90 s (380 kW), soot in g/m³ by height above each floor:
 

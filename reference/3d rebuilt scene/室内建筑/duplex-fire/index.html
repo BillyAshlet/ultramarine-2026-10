@@ -28,8 +28,13 @@
   <h1>NIBS Duplex · fire 火灾推演</h1>
   <div id="fire"></div>
   <div class="row">
-    <button data-level="1" class="on">Level 1 一层</button>
+    <button data-level="all" class="on">Both 两层</button>
+    <button data-level="1">Level 1 一层</button>
     <button data-level="2">Level 2 二层</button>
+    <label><input type="checkbox" id="roof"> Roof 屋顶</label>
+  </div>
+  <div class="row">
+    <label style="flex:1">Walls 墙体 <span id="opacityVal"></span><br><input type="range" id="opacity" min="0.05" max="1" step="0.05" value="0.35" style="width:100%"></label>
   </div>
   <div class="row">
     <button id="run">Pause 暂停</button>
@@ -46,7 +51,7 @@
     </select></label>
     <label><input type="checkbox" id="furniture" checked> Furniture 家具</label>
   </div>
-  <div class="dim">Drag the flame, or double-click a floor, to move the fire. It restarts from nothing.<br>拖动火焰或双击地面来移动起火点，火会从头开始烧。</div>
+  <div class="dim">Drag the flame, or double-click a floor, to move the fire. It restarts from nothing. With both storeys showing it stays on its floor; pick a storey to move it to the other.<br>拖动火焰或双击地面来移动起火点，火会从头开始烧。两层一起显示时火只在本层移动，要换楼层先选那一层。</div>
   <div class="dim" style="margin-top:6px">A t² design fire up to 1 MW. Walls do not absorb heat yet, so far from the fire it reads too hot.<br>t² 设计火灾，上限 1 MW。墙体还不吸热，远处温度偏高。</div>
 </div>
 <div id="status"></div>
