@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Duplex overlay</title>
+<style>
+  :root { color-scheme: dark; --bg: #101216; --panel: rgba(20, 22, 28, 0.88); --text: #e6e6ea; --dim: #9a9aa6; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 13px/1.45 -apple-system, system-ui, sans-serif; }
+  canvas { display: block; }
+  .panel { position: fixed; background: var(--panel); border-radius: 8px; padding: 10px 12px; max-width: 300px; }
+  #layers { top: 12px; left: 12px; }
+  #info { bottom: 12px; left: 12px; min-width: 220px; }
+  #info:empty { display: none; }
+  h1 { font-size: 13px; margin: 0 0 6px; }
+  label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .row { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+  button { background: #2a2d36; color: var(--text); border: 0; border-radius: 4px; padding: 4px 8px; font: inherit; cursor: pointer; }
+  button.on { background: #4a6cf7; }
+  .dim { color: var(--dim); }
+  #loading { position: fixed; inset: 0; display: grid; place-items: center; color: var(--dim); }
+</style>
+<script type="importmap">{ "imports": { "three": "./vendor/three.module.js", "three/addons/OrbitControls.js": "./vendor/OrbitControls.js" } }</script>
+</head>
+<body>
+<div id="loading">Loading 加载中…</div>
+<div class="panel" id="layers">
+  <h1>NIBS Duplex · Architecture + MEP</h1>
+  <div id="toggles"></div>
+  <div class="row" id="floors">
+    <button data-floor="all" class="on">All 全部</button>
+    <button data-floor="1">Level 1 一层</button>
+    <button data-floor="2">Level 2 二层</button>
+  </div>
+  <div class="dim" style="margin-top:8px">Click an item. Electrical items show their whole circuit.<br>点构件看信息，电气构件会亮出同一回路。</div>
+</div>
+<div class="panel" id="info"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/OrbitControls.js';
+
+// Layer order is draw order; the building is a see-through shell over the rest.
+const LAYERS = [
+  { key: 'gas', label: 'Gas 燃气', colour: '#ffc400', on: true },
+  { key: 'electrical', label: 'Electrical 电气', colour: '#50dc78', on: true },
+  { key: 'water', label: 'Water 给排水', colour: '#3c8cff', on: true },
+  { key: 'heating', label: 'Heating 暖通', colour: '#e63ca0', on: false },
+  { key: 'fixtures', label: 'Fixtures 设备', colour: '#ebebeb', on: true },
+  { key: 'building', label: 'Building 建筑', colour: '#c8c8cd', on: true },
+  { key: 'furniture', label: 'Furniture 家具', colour: '#beaa8c', on: false },
+];
+// Storey elevations, the same in every file once units are converted.
+const LEVEL_2 = 3.1, ROOF = 6.0;
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.localClippingEnabled = true;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x101216);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x404050, 1.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.4);
+sun.position.set(-10, 20, 8);
+scene.add(sun);
+const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 200);
+camera.position.set(-9, 13, 26);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(4.4, 1.5, 8.9);
+controls.update();
+
+// Two clipping planes cut out one storey at a time.
+const below = new THREE.Plane(new THREE.Vector3(0, -1, 0), 1e6);
+const above = new THREE.Plane(new THREE.Vector3(0, 1, 0), 1e6);
+const clipping = [below, above];
+
+const meta = await (await fetch('data/meta.json')).json();
+const meshes = {};
+for (const L of LAYERS) {
+  const info = meta.layers[L.key];
+  if (!info) continue;
+  const buf = await (await fetch(`data/${L.key}.bin`)).arrayBuffer();
+  const pad = (n) => Math.ceil(n / 4) * 4;
+  const pos = new Float32Array(buf, 0, info.vertices * 3);
+  const col = new Uint8Array(buf, pos.byteLength, info.vertices * 3);
+  const IndexArray = info.wideIndex ? Uint32Array : Uint16Array;
+  const idx = new IndexArray(buf, pos.byteLength + pad(col.byteLength), info.indices);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3, true));
+  g.setIndex(new THREE.BufferAttribute(idx, 1));
+  g.computeVertexNormals();
+  const shell = L.key === 'building';
+  const m = new THREE.MeshLambertMaterial({
+    vertexColors: true, side: THREE.DoubleSide, clippingPlanes: clipping,
+    transparent: shell, opacity: shell ? 0.07 : 1, depthWrite: !shell,
+  });
+  const mesh = new THREE.Mesh(g, m);
+  mesh.name = L.key;
+  mesh.visible = L.on;
+  if (shell) {
+    // Faces alone, faint enough to see pipes through, read as fog; the
+    // edges are what make it read as walls and floors.
+    mesh.renderOrder = 1;
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(g, 30),
+      new THREE.LineBasicMaterial({ color: 0xc8c8d0, transparent: true, opacity: 0.35, clippingPlanes: clipping }),
+    );
+    mesh.add(edges);
+  }
+  scene.add(mesh);
+  meshes[L.key] = mesh;
+}
+document.getElementById('loading').remove();
+
+// Elements of each layer sorted by first triangle, to find what a click hit.
+const byLayer = {};
+for (const e of meta.elements) (byLayer[e.layer] ||= []).push(e);
+function elementAt(layer, face) {
+  return byLayer[layer].find((e) => face >= e.t0 && face < e.t1);
+}
+
+const toggles = document.getElementById('toggles');
+for (const L of LAYERS) {
+  if (!meshes[L.key]) continue;
+  const label = document.createElement('label');
+  label.innerHTML = `<input type="checkbox" ${L.on ? 'checked' : ''}><span class="swatch" style="background:${L.colour}"></span>${L.label}`;
+  label.querySelector('input').addEventListener('change', (ev) => { meshes[L.key].visible = ev.target.checked; });
+  toggles.appendChild(label);
+}
+document.getElementById('floors').addEventListener('click', (ev) => {
+  const f = ev.target.dataset.floor;
+  if (!f) return;
+  for (const b of ev.currentTarget.children) b.classList.toggle('on', b === ev.target);
+  // Level 1 keeps the crawl space under it, where the gas comes in.
+  const [lo, hi] = f === '1' ? [-10, LEVEL_2] : f === '2' ? [LEVEL_2, ROOF] : [-1e6, 1e6];
+  below.constant = hi; above.constant = -lo;
+});
+
+const highlight = new THREE.Group();
+scene.add(highlight);
+const info = document.getElementById('info');
+const ray = new THREE.Raycaster();
+const pointer = new THREE.Vector2();
+let downAt = null;
+renderer.domElement.addEventListener('pointerdown', (ev) => { downAt = [ev.clientX, ev.clientY]; });
+renderer.domElement.addEventListener('pointerup', (ev) => {
+  if (!downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
+  pointer.set((ev.clientX / innerWidth) * 2 - 1, -(ev.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(pointer, camera);
+  const visible = Object.values(meshes).filter((m) => m.visible && m.name !== 'building');
+  const hit = ray.intersectObjects(visible, false).find((h) => clipping.every((p) => p.distanceToPoint(h.point) >= 0));
+  select(hit ? elementAt(hit.object.name, hit.faceIndex) : null);
+});
+
+function box(e, colour) {
+  const b = new THREE.Box3(new THREE.Vector3(...e.min), new THREE.Vector3(...e.max)).expandByScalar(0.03);
+  return new THREE.Box3Helper(b, colour);
+}
+
+function select(e) {
+  highlight.clear();
+  info.innerHTML = '';
+  if (!e) return;
+  highlight.add(box(e, 0xffffff));
+  const lines = [`<b>${e.name}</b>`, `<span class="dim">${e.type} · ${e.source === 'arch' ? 'Architecture' : 'MEP'} file</span>`];
+  if (e.room) lines.push(`Room 房间: ${e.room}`);
+  else if (e.beside) lines.push(`In a wall, beside 墙内，靠近: ${e.beside}`);
+  if (e.system) lines.push(`System 系统: ${e.system}`);
+  if (e.panel && e.circuit) {
+    // The file has no wires, only which panel and circuit each item is on.
+    const same = meta.elements.filter((o) => o.panel === e.panel && o.circuit === e.circuit);
+    // Panels are named by family, not by the "Unit A Panelboard" the items
+    // point to, so find Unit A's by the room it stands in (A101, A102...).
+    const unit = /Unit ([AB])/.exec(e.panel)?.[1];
+    const panel = unit
+      ? meta.elements.find((o) => /Panelboard/.test(o.name) && (o.room || o.beside)?.startsWith(unit))
+      : meta.elements.find((o) => /Fire Alarm Control Panel/.test(o.name) && /Fire Alarm/.test(e.panel));
+    for (const o of same) if (o !== e) highlight.add(box(o, 0x50dc78));
+    const va = same.reduce((s, o) => s + (o.va || 0), 0);
+    lines.push(`Circuit 回路: ${e.panel} #${e.circuit}`, `${same.length} items, ${va} VA in total 共 ${same.length} 个，合计 ${va} VA`);
+    if (panel && panel !== e) highlight.add(box(panel, 0xffffff));
+    lines.push('<span class="dim">No wire routes in the file: the circuit is a list, not a drawing.<br>文件里没有导线路径，回路只是一张清单。</span>');
+  } else if (e.va) {
+    lines.push(`${e.va} VA`);
+  }
+  info.innerHTML = lines.join('<br>');
+}
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+window.overlay = { meta, meshes, select, camera, THREE };
+</script>
+</body>
+</html>
