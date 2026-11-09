@@ -137,17 +137,61 @@
   },
 
   "water_pipe": {
-    "label": "给水管",
+    "label": "给水管（铜）",
     "class": "水管",
-    "reference": "IFC: 'Pipe Types:Cold Water' / 'Hot Water'; material not given",
-    "combustible": { "value": false, "source": "假设: material unknown; task E decides plastic or copper" }
+    "reference": "IFC 'Pipe Types:Cold Water' / 'Hot Water'. Material 'Copper' in both the MEP and the Plumbing file; the Plumbing file's segment type is 'Copper - A', 25 mm: outer 25.4 mm, inner 23 mm. Kept full by the mains (架构.md ④).",
+    "note": "Only fittings can fail: copper melts at 1085 C, the joints are soldered. Water inside at mains pressure boils near 150 C and could hold a joint below solder melting for longer than modelled here (假设: the joint dries out locally).",
+    "combustible": { "value": false, "source": "copper (IFC)" },
+    "jointFailTemp": { "value": 233, "unit": "°C", "source": "Harris 95/5 tin-antimony solder data sheet: solidus 452 °F (233 °C), liquidus 464 °F (240 °C). 假设: the joints are 95/5 and open once they reach the solidus" },
+    "jointLag": { "value": 120, "unit": "s", "source": "假设: time for an exposed water-filled joint to follow the gas around it" },
+    "jointLagInWall": { "value": 600, "unit": "s", "source": "假设: a joint behind plasterboard (wallAir objects)" },
+    "jointOpening": { "value": 0.25, "source": "假设: share of the bore a failed joint opens; a cut opens all of it" },
+    "dischargeCoefficient": { "value": 0.62, "source": "sharp-edged orifice, the usual textbook value" }
   },
 
   "drain_pipe": {
     "label": "排水管",
     "class": "排水管",
-    "reference": "IFC: 'Pipe Types:Waste' and 'Pipe Types:PVC' (storm)",
-    "combustible": { "value": true, "source": "PVC for storm (IFC type name); waste pipe material not given (假设 plastic)" }
+    "reference": "IFC: waste pipe material 'Plastic', segment 'Plastic - Schedule 40' (Plumbing file), fittings 'PVC - Sch 40 - DWV'; storm 'Pipe Types:PVC'. Not under pressure, so a broken drain does not spray.",
+    "combustible": { "value": true, "source": "PVC Schedule 40 (IFC)" }
+  },
+
+  "water_supply": {
+    "label": "水网（无限供应）",
+    "class": "水网",
+    "reference": "Each unit's cold water enters through the west wall, about 0.46 m under the ground floor (e455 Unit A, e421 Unit B). The model has no meter or main valve; one of each is put there (假设 where they stand).",
+    "mainsPressure": { "value": 413700, "unit": "Pa", "source": "假设: 60 psi, the middle of the 40–80 psi that water utilities quote for homes (LADWP requires a regulator above 80 psi)" },
+    "serviceLength": { "value": 15, "unit": "m", "source": "假设: street to house" },
+    "serviceDiameter": { "value": 0.023, "unit": "m", "source": "IFC: the entry pipe is 25 mm Copper A, inner 23 mm" },
+    "meterLoss": { "value": 103400, "unit": "Pa", "source": "[估] 15 psi lost at the meter's top flow: AWWA C700 limits for a 5/8 in home meter as meter makers quote them; not checked against the standard" },
+    "meterFlow": { "value": 0.00126, "unit": "m³/s", "source": "[估] 20 gpm, top flow of a 5/8 in home meter (AWWA C700 as quoted); not checked" },
+    "frictionFactor": { "value": 0.02, "source": "假设: smooth copper near Re 1e5 (Blasius gives 0.018)" },
+    "fittingLoss": { "value": 1, "source": "假设: K per elbow, tee or transition; handbooks give 0.3–2" },
+    "innerToOuter": { "value": 0.905, "source": "IFC: 25 mm pipe, inner 23 mm over outer 25.4 mm; used for the 15 mm pipes too (假设)" }
+  },
+
+  "water_spray": {
+    "label": "喷出的水",
+    "class": "水",
+    "reference": "Water in the air, kg/m³, carried by the solver (addScalar). Drops fall, evaporate in gas over 100 °C, land on the floor or on furniture (o.wet kg, o.wetRate kg/m²/s = mm/s; combustion reads them).",
+    "dropDiameter": { "value": 0.001, "unit": "m", "source": "假设: sprinkler and burst-pipe drops of about 1 mm" },
+    "fallSpeed": { "value": 4.03, "unit": "m/s", "source": "Gunn & Kinzer 1949 (J. Meteorology 6:243), terminal speed of a 1.0 mm drop; from memory, not re-read" },
+    "evaporationHeat": { "value": 2613000, "unit": "J/kg", "source": "[估] 4.19 kJ/(kg·K) × (100 − 15) K + 2257 kJ/kg (steam tables), water coming in at 15 °C (假设); hot-water pipes (about 49 °C) would need 2.47, not separated" },
+    "evaporationRate": { "value": "Ranz–Marshall", "source": "Ranz & Marshall 1952: Nu = 2 + 0.6 Re^½ Pr^⅓ for a falling drop; air conductivity and viscosity at the film temperature from power-law fits to air tables (checked at 600 K against Incropera's table: 0.046 vs 0.047 W/(m·K), 5.27e-5 m²/s both). 假设: no evaporation in gas under 100 °C" },
+    "suppression": { "value": "τ = 3.0 × (mm/s)^-1.85 s", "source": "For task B. Evans 1993, NISTIR 5254: heat release after a sprinkler goes off decays as exp(−t/τ), τ from wood-crib tests; 410 s at 0.07 mm/s. Madrzykowski & Vettori 1992, NISTIR 4833: office furnishings decay at least as exp(−0.0023 t); a vinyl/PU sofa's flames on top went out in seconds" }
+  },
+
+  "sprinkler": {
+    "label": "喷淋头（加装）",
+    "class": "喷淋头",
+    "reference": "Reliable F1Res49 pendent, Bulletin 135 (March 2025): 3 mm glass bulb, fast response, UL 1626, for NFPA 13/13R/13D. The Duplex has none; added with duplexFire.water.addSprinkler(x, y, z).",
+    "combustible": { "value": false, "source": "brass and glass" },
+    "activationTemp": { "value": 68, "unit": "°C", "source": "Reliable Bulletin 135: 155 °F (68 °C) rating" },
+    "rti": { "value": 50, "unit": "(m·s)^½", "source": "NFPA 13: a residential sprinkler is fast response, RTI 50 or less (as quoted by QRFS; the standard not read). 50 is the slowest allowed" },
+    "linkModel": { "value": "dTe/dt = √u / RTI × (Tg − Te)", "source": "Heskestad & Smith 1976 RTI model, as used by FDS and CFAST; not re-read" },
+    "kFactor": { "value": 4.9, "unit": "gpm/psi^½", "source": "Reliable Bulletin 135: K 4.9 (71 metric); 13 gpm (49 L/min) at 7 psi over 12 × 12 ft" },
+    "coverage": { "value": 3.7, "unit": "m", "source": "Reliable Bulletin 135: 12 × 12 ft (3.7 × 3.7 m) square; spray spread evenly over it (假设)" },
+    "branchDiameter": { "value": 0.023, "unit": "m", "source": "假设: fed by a 25 mm branch from the nearest cold pipe" }
   },
 
   "appliance": {
