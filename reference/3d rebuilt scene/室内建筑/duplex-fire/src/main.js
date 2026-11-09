@@ -5,6 +5,8 @@ import { OrbitControls } from 'three/addons/OrbitControls.js';
 import { readLayer, buildGrid, HouseFire, poolAt, GROWTH, CELL } from './house.js';
 import { SmokePass } from './smoke-pass.js';
 import { dressDuplex } from './dressing.js';
+import { Doors } from './doors.js';
+import { thickenPipes } from './pipes.js';
 
 const DATA = '../duplex-overlay/data';
 // A storey on its own is shown cut just under its own ceiling; 'all' shows
@@ -29,7 +31,10 @@ const extras = { furniture: await load('furniture'), fixtures: await load('fixtu
 // where they run. Nothing here is in the simulation yet.
 const SERVICES = ['gas', 'electrical', 'water', 'heating'];
 const services = {};
-for (const name of SERVICES) services[name] = await load(name);
+for (const name of SERVICES) {
+  services[name] = await load(name);
+  thickenPipes(services[name]);
+}
 
 const grid = buildGrid(building, CELL);
 const rooms = meta.rooms.filter((r) => r.code !== 'R301');
@@ -48,7 +53,7 @@ scene.add(hemi);
 
 const cut = new THREE.Plane(new THREE.Vector3(0, -1, 0), LEVELS.all.cut);
 const dressed = dressDuplex({ renderer, scene, building, clippingPlanes: [cut], hemi });
-// Furniture stays solid: it is what the eye measures the rooms by.
+// Furniture and fixtures share one material, faded with the walls (see setOpacity).
 const material = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide, clippingPlanes: [cut] });
 const extraMeshes = {};
 for (const [name, layer] of Object.entries(extras)) {
@@ -94,6 +99,8 @@ marker.position.y = 0.3;
 ring.position.y = 0.02;
 scene.add(fireMarker);
 
+const doors = new Doors({ scene, building, grid, fire, rooms, dressedDoors: dressed.groups.door, cut, renderer });
+
 let fireLevel = 1;
 /** Move the fire and start again from nothing: a design fire grows from t = 0. */
 function placeFire(x, z, lvl) {
@@ -115,25 +122,34 @@ function showLevel(lvl) {
 for (const b of document.querySelectorAll('[data-level]')) {
   b.addEventListener('click', () => showLevel(b.dataset.level === 'all' ? 'all' : +b.dataset.level));
 }
-// With both storeys showing, the fire stays on its own storey: a click cannot
-// tell which floor was meant. Pick a storey to move it between floors.
-const floorLevel = () => (level === 'all' ? fireLevel : level);
-
-// Dragging the flame moves the fire; so does a double-click on a floor.
+// Where a fire would go: a point on one storey's floor, inside a room.
+//
+// The storey is always chosen first, never guessed from the click: with both
+// storeys showing a click hits both floors, and seen from above the upper
+// floor covers nearly all of the lower one. Guessing (the floor in front,
+// Shift for the one below) was tried and still read as ambiguous.
 const ray = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
-const floorPoint = (ev) => {
+const rayAt = (ev) => {
   const r = renderer.domElement.getBoundingClientRect();
   pointer.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
   ray.setFromCamera(pointer, camera);
-  const p = new THREE.Vector3();
-  return ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -LEVELS[floorLevel()].floor), p) ? p : null;
+  return ray.ray;
 };
+const floorPoint = (ev, lvl) => {
+  rayAt(ev);
+  const p = new THREE.Vector3();
+  if (!ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), -LEVELS[lvl].floor), p)) return null;
+  return roomAt(p.x, p.z, lvl) ? { p, lvl } : null;
+};
+
+// Dragging the flame moves it on its own storey.
 let dragging = false;
+let downAt = null;
 renderer.domElement.addEventListener('pointerdown', (ev) => {
-  const r = renderer.domElement.getBoundingClientRect();
-  pointer.set(((ev.clientX - r.left) / r.width) * 2 - 1, -((ev.clientY - r.top) / r.height) * 2 + 1);
-  ray.setFromCamera(pointer, camera);
+  downAt = [ev.clientX, ev.clientY];
+  if (placeLevel) return;
+  rayAt(ev);
   if (fireMarker.visible && ray.intersectObject(fireMarker, true).length) {
     dragging = true;
     controls.enabled = false;
@@ -141,18 +157,142 @@ renderer.domElement.addEventListener('pointerdown', (ev) => {
 });
 addEventListener('pointermove', (ev) => {
   if (!dragging) return;
-  const p = floorPoint(ev);
-  if (p && roomAt(p.x, p.z, floorLevel())) fireMarker.position.set(p.x, LEVELS[floorLevel()].floor, p.z);
+  const hit = floorPoint(ev, fireLevel);
+  if (hit) fireMarker.position.set(hit.p.x, LEVELS[fireLevel].floor, hit.p.z);
 });
 addEventListener('pointerup', () => {
   if (!dragging) return;
   dragging = false;
   controls.enabled = true;
-  placeFire(fireMarker.position.x, fireMarker.position.z, floorLevel());
+  placeFire(fireMarker.position.x, fireMarker.position.z, fireLevel);
 });
+
+// Place mode: "Fire on Level 1" or "Fire on Level 2". A see-through flame
+// follows the pointer on that storey's floor, with the 0.6 m square the fire
+// burns on; grey where it can't go. The other storey is drawn see-through
+// meanwhile (below). A click puts the fire there and leaves the mode; Esc
+// leaves without moving it. Kept a mode of its own, so looking around or
+// opening a door never moves the fire by accident, which would restart it.
+let placeLevel = null;
+const ghostMaterial = new THREE.MeshBasicMaterial({ color: 0xff6a1a, transparent: true, opacity: 0.55, depthTest: false });
+const ghost = new THREE.Group();
+const ghostCone = new THREE.Mesh(marker.geometry, ghostMaterial);
+ghostCone.scale.setScalar(1.4);
+ghostCone.position.y = 0.42;
+const ghostPad = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.6).rotateX(-Math.PI / 2), ghostMaterial);
+ghostPad.position.y = 0.03;
+// A thin light pillar up to the ceiling: from across the house the cone is
+// a few pixels, and the pillar shows where it stands.
+const ghostPillar = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 2.4, 12),
+  new THREE.MeshBasicMaterial({ color: 0xffb070, transparent: true, opacity: 0.35, depthTest: false }));
+ghostPillar.position.y = 1.2;
+ghost.add(ghostCone, ghostPad, ghostPillar);
+ghost.renderOrder = 15;
+ghost.visible = false;
+scene.add(ghost);
+let ghostHit = null, lastMove = null;
+const placeButtons = [...document.querySelectorAll('[data-place]')];
+const placeHint = document.getElementById('placeHint');
+function setPlacing(lvl) {
+  placeLevel = lvl;
+  for (const b of placeButtons) b.classList.toggle('on', +b.dataset.place === lvl);
+  placeHint.hidden = !lvl;
+  placeHint.textContent = lvl ? `Level ${lvl} ${lvl}层 · click a floor 点地面放下 · Esc: cancel 取消` : '';
+  ghost.visible = false;
+  ghostHit = null;
+  doors.hover(null);
+  renderer.domElement.style.cursor = lvl ? 'crosshair' : '';
+}
+for (const b of placeButtons) {
+  b.addEventListener('click', () => setPlacing(placeLevel === +b.dataset.place ? null : +b.dataset.place));
+}
+function moveGhost(ev) {
+  const hit = floorPoint(ev, placeLevel);
+  ghostHit = hit && poolAt(grid, hit.p.x, hit.p.z, LEVELS[placeLevel].floor).length ? hit : null;
+  ghost.visible = !!hit;
+  if (!hit) return;
+  ghost.position.set(hit.p.x, LEVELS[placeLevel].floor, hit.p.z);
+  ghostMaterial.color.set(ghostHit ? 0xff6a1a : 0x8a8f98);
+  placeHint.textContent = `Level ${placeLevel} ${placeLevel}层 · ${roomAt(hit.p.x, hit.p.z, placeLevel)?.code ?? ''} · Esc: cancel 取消`;
+}
+renderer.domElement.addEventListener('pointermove', (ev) => {
+  lastMove = ev;
+  if (placeLevel) { moveGhost(ev); return; }
+  doors.hover(dragging ? null : doors.pick(rayAt(ev)));
+});
+renderer.domElement.addEventListener('pointerleave', () => { doors.hover(null); ghost.visible = false; });
+addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && placeLevel) setPlacing(null); });
+// While placing, a two-finger swipe on a trackpad turns the view instead of
+// zooming, so you can look around the house with the flame still in hand;
+// a pinch (which the browser reports as a wheel with ctrlKey) still zooms.
+// Caught on the canvas's parent, before OrbitControls sees it.
+const orbit = new THREE.Spherical();
+document.getElementById('view').addEventListener('wheel', (ev) => {
+  if (!placeLevel || ev.ctrlKey) return;
+  ev.preventDefault();
+  ev.stopPropagation();
+  const offset = camera.position.clone().sub(controls.target);
+  orbit.setFromVector3(offset);
+  // Swiping drags the house the way the fingers move.
+  orbit.theta += ev.deltaX * 0.004;
+  orbit.phi = Math.min(Math.PI - 0.05, Math.max(0.05, orbit.phi + ev.deltaY * 0.004));
+  camera.position.copy(controls.target).add(offset.setFromSpherical(orbit));
+  camera.lookAt(controls.target);
+  controls.update();
+  if (lastMove) moveGhost(lastMove);
+}, { capture: true, passive: false });
+
+// While placing, the other storey (walls, floors, furniture, pipes, doors)
+// is drawn as a fine screen of dots, half the pixels left out, so it neither
+// hides the storey you are placing on nor gets mistaken for it. So is
+// anything nearer the eye than the ghost flame, on either storey, so the
+// walls in front don't hide where the fire is going. Leaving
+// pixels out, rather than fading them, needs no change to how the
+// see-through materials are sorted, and works the same on solid ones.
+// The split is by height: Level 1 up to its ceiling, Level 2 from its floor.
+const FADE_ABOVE = 2.6;   // placing on Level 1: thin out from its ceiling up
+const FADE_BELOW = 2.7;   // placing on Level 2: thin out below its floor slab
+const fade = { uFadeMode: { value: 0 }, uFadeDist: { value: 0 } };   // mode: 0 off, 1 above, 2 below
+const fadeMaterials = [
+  ...Object.values(dressed.groups).map((m) => m.material),
+  material, serviceMaterial, doors.material,
+];
+for (const m of fadeMaterials) {
+  m.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, fade);
+    shader.vertexShader = 'varying float vFadeY;\n' + shader.vertexShader.replace('#include <project_vertex>',
+      '#include <project_vertex>\n  vFadeY = (modelMatrix * vec4(transformed, 1.0)).y;');
+    shader.fragmentShader = 'uniform int uFadeMode;\nuniform float uFadeDist;\nvarying float vFadeY;\n' +
+      shader.fragmentShader.replace('#include <dithering_fragment>', `#include <dithering_fragment>
+      bool other = (uFadeMode == 1 && vFadeY > ${FADE_ABOVE.toFixed(2)}) || (uFadeMode == 2 && vFadeY < ${FADE_BELOW.toFixed(2)});
+      bool inFront = uFadeMode > 0 && length(vViewPosition) < uFadeDist;
+      if ((other || inFront) && mod(floor(gl_FragCoord.x) + floor(gl_FragCoord.y), 2.0) < 1.0) discard;`);
+  };
+  m.customProgramCacheKey = () => 'fade-other-storey';
+  m.needsUpdate = true;
+}
+function updateFade() {
+  fade.uFadeMode.value = placeLevel === 1 ? 1 : placeLevel === 2 ? 2 : 0;
+  // A little short of the flame, so the floor it stands on stays whole.
+  fade.uFadeDist.value = placeLevel && ghost.visible ? camera.position.distanceTo(ghost.position) - 0.6 : 0;
+}
+
+// A click, not the end of a drag that turned the view.
+renderer.domElement.addEventListener('pointerup', (ev) => {
+  if (!placeLevel || !downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
+  moveGhost(ev);
+  if (!ghostHit) return;
+  placeFire(ghostHit.p.x, ghostHit.p.z, ghostHit.lvl);
+  setPlacing(null);
+});
+
+// Pointing at a door makes it breathe; double-clicking it opens or shuts it.
+// Double-clicking a floor no longer moves the fire: it was too easy to do
+// when aiming at a door. Use Fire on Level 1 / 2.
 renderer.domElement.addEventListener('dblclick', (ev) => {
-  const p = floorPoint(ev);
-  if (p && roomAt(p.x, p.z, floorLevel())) placeFire(p.x, p.z, floorLevel());
+  if (placeLevel) return;
+  const door = doors.pick(rayAt(ev));
+  if (door) doors.toggle(door);
 });
 
 // --- controls ------------------------------------------------------------------
@@ -218,10 +358,31 @@ setRoof();
 const opacity = document.getElementById('opacity');
 const setOpacity = () => {
   dressed.setOpacity(+opacity.value);
+  // Furniture and fixtures fade with the walls, so a solid sofa no longer
+  // hides the smoke and doors behind it when the walls are see-through.
+  const o = +opacity.value, solid = o >= 0.99;
+  material.opacity = solid ? 1 : o;
+  material.transparent = !solid;
+  material.depthWrite = solid;
+  material.needsUpdate = true;
+  doors.setOpacity(o);
   document.getElementById('opacityVal').textContent = (+opacity.value).toFixed(2);
 };
 opacity.addEventListener('input', setOpacity);
 setOpacity();
+// How dense smoke (and, in the thermal view, heat) is drawn: scales how fast
+// light dies through it. Drawing only; the simulation is untouched.
+const SMOKE_SIGMA = smoke.material.uniforms.uSmokeSigma.value;
+const HEAT_SIGMA = smoke.material.uniforms.uHeatSigma.value;
+const smokeOpacity = document.getElementById('smokeOpacity');
+const setSmokeOpacity = () => {
+  const k = +smokeOpacity.value;
+  smoke.material.uniforms.uSmokeSigma.value = SMOKE_SIGMA * k;
+  smoke.material.uniforms.uHeatSigma.value = HEAT_SIGMA * k;
+  document.getElementById('smokeOpacityVal').textContent = `×${k.toFixed(2)}`;
+};
+smokeOpacity.addEventListener('input', setSmokeOpacity);
+setSmokeOpacity();
 for (const name of SERVICES) {
   const box = document.getElementById(`show-${name}`);
   const sync = () => { serviceMeshes[name].visible = box.checked; };
@@ -264,13 +425,17 @@ function frame() {
   }
   if (!dragging) fireMarker.position.set(firePos.x, LEVELS[fireLevel].floor, firePos.z);
   fireMarker.visible = level === 'all' || fireLevel === level;
+  doors.update(clock.elapsedTime);
+  updateFade();
   smoke.upload(fire);
   controls.update();
   smoke.time = simTime;
   smoke.render(scene, camera, mode);
 
   const room = roomAt(firePos.x, firePos.z, fireLevel);
-  fireInfo.textContent = `Fire in 起火: ${room ? `${room.code} ${room.name}` : '?'} · ${(fire.heatRelease() / 1000).toFixed(0)} kW`;
+  const note = doors.currentNotice();
+  fireInfo.textContent = `Fire in 起火: ${room ? `${room.code} ${room.name}` : '?'} · ${(fire.heatRelease() / 1000).toFixed(0)} kW` +
+    (note ? ` · ${note}` : '');
   status.textContent = `t ${Math.floor(simTime / 60)}:${String(Math.floor(simTime % 60)).padStart(2, '0')} · ` +
     `${grid.nx}×${grid.ny}×${grid.nz} grid, ${fire.fluid.length} air cells · step ${stepMs.toFixed(0)} ms · ` +
     `${(fire.dt / (stepMs / 1000 || 1)).toFixed(1)}× real time at most`;
@@ -278,4 +443,4 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 // For poking at it from the console; frame() draws once even in a hidden tab.
-window.duplexFire = { fire, grid, placeFire, showLevel, camera, meta, frame, dressed, serviceMeshes, serviceMaterial };
+window.duplexFire = { fire, grid, placeFire, showLevel, camera, meta, frame, dressed, serviceMeshes, serviceMaterial, doors };

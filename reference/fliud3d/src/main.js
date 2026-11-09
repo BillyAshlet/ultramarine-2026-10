@@ -15,6 +15,7 @@ import { SmokePass } from './smoke-pass.js';
 import { WindParticles } from './wind-particles.js';
 import { dressHouse } from './dressing.js';
 import { PhoneLook, ThumbStick } from './phone-vr.js';
+import { SpiralStair } from './stairs.js';
 
 // BASE_URL, not '/': on GitHub Pages the site lives under /ultramarine-2026-10/.
 const MODEL_URL = `${import.meta.env.BASE_URL}samples/AC20-FZK-Haus.ifc`;
@@ -28,6 +29,14 @@ const FIRE_SIZE = 0.6;     // metres across
 const ROOM_NAMES = {       // FZK-Haus is German; names for the picker
   Flur: 'Hallway 走廊', Buero: 'Study 书房', Bad: 'Bathroom 浴室', Schlafzimmer: 'Bedroom 卧室',
   Wohnen: 'Living room 客厅', 'Küche': 'Kitchen 厨房', Galerie: 'Attic 阁楼',
+};
+// The spiral stairs in FZK-Haus, measured from its 15 treads and its post: each
+// tread rises 0.18 m and turns 15.4 degrees. Another model needs its own.
+const degrees = (d) => d * Math.PI / 180;
+const FZK_STAIR = {
+  centre: { x: 7.46, z: -3.0965 }, walkRadius: 0.55,
+  bottomAngle: degrees(151), topAngle: degrees(-85),
+  bottomY: 0, topY: 2.7, landing: 0.3,
 };
 
 // Let the page draw the new percentage before work holds the thread again.
@@ -268,12 +277,14 @@ for (const r of rooms) {
 const hallway = rooms.find((r) => r.name.startsWith('Hallway')) ?? rooms[0];
 const person = new Person({
   domElement: renderer.domElement,
-  colliders: [...meshesOf('wall'), ...meshesOf('door'), ...meshesOf('window'), ...meshesOf('other')],
+  colliders: [...meshesOf('wall'), ...meshesOf('door'), ...meshesOf('window'), ...meshesOf('other'), ...meshesOf('roof')],
   doors: new Map([...doors].map(([id, d]) => [id, d.meshes])),
   openDoorMaterial,
   start: { x: hallway.box.getCenter(new THREE.Vector3()).x, z: hallway.box.getCenter(new THREE.Vector3()).z },
   floorY: hallway.box.min.y,
   scene,
+  stair: new SpiralStair(FZK_STAIR),
+  upperFloors: meshesOf('floor'),
 });
 person.onDoorToggle = (id, open) => {
   setDoor(id, open);
@@ -326,6 +337,9 @@ const detailBox = document.getElementById('detail');
 // Lower draws thin, spreading smoke denser; 1 draws it as simulated.
 const thinInput = document.getElementById('thin');
 thinInput.addEventListener('input', () => { document.getElementById('thinVal').textContent = (+thinInput.value).toFixed(2); });
+// The same for the thermal view; 1 keeps colour in proportion to temperature.
+const heatInput = document.getElementById('heatBoost');
+heatInput.addEventListener('input', () => { document.getElementById('heatBoostVal').textContent = (+heatInput.value).toFixed(2); });
 const roofBox = document.getElementById('roof');
 const floorBox = document.getElementById('upperFloor');
 groups.roof.visible = false;
@@ -451,6 +465,7 @@ renderer.setAnimationLoop(() => {
   smoke.time = simTime;
   smoke.detail = detailBox.checked;
   smoke.thinGamma = +thinInput.value;
+  smoke.heatGamma = +heatInput.value;
   smoke.render(scene, activeCamera, mode);
   if (!personView) labelRenderer.render(scene, camera);
   // Not before this: the shaders compile during the first frame, which is a

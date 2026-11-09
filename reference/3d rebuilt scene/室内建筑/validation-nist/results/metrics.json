@@ -1,0 +1,276 @@
+{
+ "alarm": {
+  "sdc25": {
+   "foyer": {
+    "sim": 30,
+    "ion": 68,
+    "photo": 122
+   },
+   "den": {
+    "sim": 54,
+    "ion": 122,
+    "photo": 152
+   },
+   "hallway": {
+    "sim": 52,
+    "ion": 106,
+    "photo": 112
+   },
+   "bedroom1": {
+    "sim": 92,
+    "ion": 134,
+    "photo": 162
+   }
+  },
+  "sdc26": {
+   "foyer": {
+    "sim": 62,
+    "ion": 64,
+    "photo": 102
+   },
+   "den": {
+    "sim": 82,
+    "ion": 132,
+    "photo": 216
+   },
+   "hallway": {
+    "sim": 80,
+    "ion": 112,
+    "photo": 136
+   },
+   "bedroom1": {
+    "sim": 108,
+    "ion": 146,
+    "photo": 200
+   }
+  }
+ },
+ "untenable": {
+  "sdc25": {
+   "foyer": {
+    "sim": 116,
+    "report": 202,
+    "fromData": 202.0
+   },
+   "den": {
+    "sim": 134,
+    "report": 250,
+    "fromData": null
+   },
+   "hallway": {
+    "sim": 130,
+    "report": 220,
+    "fromData": 220.0
+   },
+   "bedroom1": {
+    "sim": 172,
+    "report": 250,
+    "fromData": null
+   }
+  },
+  "sdc26": {
+   "foyer": {
+    "sim": 66,
+    "report": 236,
+    "fromData": 226.0
+   },
+   "den": {
+    "sim": 136,
+    "report": 268,
+    "fromData": null
+   },
+   "hallway": {
+    "sim": 132,
+    "report": 250,
+    "fromData": 236.0
+   },
+   "bedroom1": {
+    "sim": 202,
+    "report": 270,
+    "fromData": 258.0
+   }
+  }
+ },
+ "peakRise": {
+  "sdc25": {
+   "kitchen-1": 2.26,
+   "kitchen-2": 1.59,
+   "kitchen-3": 1.64,
+   "kitchen-4": 1.61,
+   "kitchen-5": 1.55,
+   "den-1": 0.52,
+   "den-2": 0.7,
+   "den-3": 1.23,
+   "den-4": 2.05,
+   "den-5": 1.82,
+   "foyer-1": 0.53,
+   "foyer-2": 0.46,
+   "foyer-3": 0.47,
+   "foyer-4": 0.79,
+   "foyer-5": 0.65,
+   "hallway-1": 0.48,
+   "hallway-2": 0.46,
+   "hallway-3": 0.39,
+   "hallway-4": 0.3,
+   "hallway-5": 0.12,
+   "bedroom1-1": 0.4,
+   "bedroom1-2": 0.42,
+   "bedroom1-3": 0.33,
+   "bedroom1-4": 0.17,
+   "bedroom1-5": 0.1,
+   "bedroom3-1": 0.32,
+   "bedroom3-2": 0.34,
+   "bedroom3-3": 0.29,
+   "bedroom3-4": 0.15,
+   "bedroom3-5": 0.1
+  },
+  "sdc26": {
+   "kitchen-1": 1.61,
+   "kitchen-2": 1.33,
+   "kitchen-3": 1.36,
+   "kitchen-4": 1.53,
+   "kitchen-5": 1.65,
+   "den-1": 0.48,
+   "den-2": 0.7,
+   "den-3": 1.37,
+   "den-4": 2.53,
+   "den-5": 2.71,
+   "foyer-1": 0.54,
+   "foyer-2": 0.47,
+   "foyer-3": 0.42,
+   "foyer-4": 0.78,
+   "foyer-5": 0.97,
+   "hallway-1": 0.47,
+   "hallway-2": 0.44,
+   "hallway-3": 0.39,
+   "hallway-4": 0.31,
+   "hallway-5": 0.13,
+   "bedroom1-1": 0.37,
+   "bedroom1-2": 0.35,
+   "bedroom1-3": 0.27,
+   "bedroom1-4": 0.15,
+   "bedroom1-5": 0.07,
+   "bedroom3-1": 0.34,
+   "bedroom3-2": 0.31,
+   "bedroom3-3": 0.26,
+   "bedroom3-4": 0.14,
+   "bedroom3-5": 0.12
+  },
+  "sdc25-summary": {
+   "n": 30,
+   "bias": 0.51,
+   "sigmaLog": 0.9
+  },
+  "sdc26-summary": {
+   "n": 30,
+   "bias": 0.5,
+   "sigmaLog": 0.94
+  }
+ },
+ "repeatability": {
+  "n": 30,
+  "ratio26over25": 0.85,
+  "sigmaLog": 0.15
+ },
+ "heatArrival": {
+  "sdc25": {
+   "kitchen": {
+    "sim": 172,
+    "meas": 194.0
+   },
+   "den": {
+    "sim": 206,
+    "meas": 162.0
+   },
+   "foyer": {
+    "sim": 118,
+    "meas": 94.0
+   },
+   "hallway": {
+    "sim": 198,
+    "meas": 152.0
+   },
+   "bedroom1": {
+    "sim": 230,
+    "meas": 190.0
+   },
+   "bedroom3": {
+    "sim": 242,
+    "meas": 206.0
+   }
+  },
+  "sdc26": {
+   "kitchen": {
+    "sim": 220,
+    "meas": 224.0
+   },
+   "den": {
+    "sim": 234,
+    "meas": 212.0
+   },
+   "foyer": {
+    "sim": 172,
+    "meas": 106.0
+   },
+   "hallway": {
+    "sim": 232,
+    "meas": 160.0
+   },
+   "bedroom1": {
+    "sim": 250,
+    "meas": 226.0
+   },
+   "bedroom3": {
+    "sim": 264,
+    "meas": 242.0
+   }
+  }
+ },
+ "sootFit": {
+  "fittedOn": "sdc25",
+  "scale": 0.12,
+  "sootYield": 0.012,
+  "rmsSeconds": {
+   "sdc25-fit": 16.4,
+   "sdc26-predicted": 14.1,
+   "sdc25-assumed0.1": 93.6,
+   "sdc26-assumed0.1": 127.3
+  },
+  "sdc25": {
+   "foyer": {
+    "alarm": 32,
+    "untenable": 208
+   },
+   "den": {
+    "alarm": 128,
+    "untenable": 232
+   },
+   "hallway": {
+    "alarm": 126,
+    "untenable": 232
+   },
+   "bedroom1": {
+    "alarm": 142,
+    "untenable": null
+   }
+  },
+  "sdc26": {
+   "foyer": {
+    "alarm": 64,
+    "untenable": 232
+   },
+   "den": {
+    "alarm": 106,
+    "untenable": 254
+   },
+   "hallway": {
+    "alarm": 110,
+    "untenable": 252
+   },
+   "bedroom1": {
+    "alarm": 140,
+    "untenable": null
+   }
+  }
+ }
+}

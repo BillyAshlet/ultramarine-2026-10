@@ -13,15 +13,18 @@ const EYE_CROUCHED = 0.7;
 // only means something if walking takes as long as it really does.
 const WALK_SPEED = 1.4;
 const CROUCH_SPEED = 0.6;
+// Along the slope. A placeholder that looks right, not a measured stair speed.
+const STAIR_SPEED = 0.6;
 const BODY_RADIUS = 0.25;
 const DOOR_REACH = 1.8;
 const DOOR_NEARBY = 1.5;      // metres at which a door offers itself on a phone
 const STOREY_HEIGHT = 2;
-// Collision rays at knee and chest height: low enough for sills and stair
-// treads, high enough for walls and door leaves.
-const PROBE_HEIGHTS = [0.35, 1.2];
+// Collision rays at knee and chest height, low enough for sills and high enough
+// for walls and door leaves, and over the head for the attic's sloping roof.
+const PROBE_HEIGHTS = [0.35, 1.2, 1.7];
 
 const UP = new THREE.Vector3(0, 1, 0);
+const DOWN = new THREE.Vector3(0, -1, 0);
 
 export class Person {
   /**
@@ -32,8 +35,10 @@ export class Person {
    * @param {THREE.Material} o.openDoorMaterial  how an open door is drawn
    * @param {{x:number, z:number}} o.start
    * @param {number} o.floorY
+   * @param {import('./stairs.js').SpiralStair} [o.stair]
+   * @param {THREE.Mesh[]} [o.upperFloors]  what you can stand on upstairs
    */
-  constructor({ domElement, colliders, doors, openDoorMaterial, start, floorY, scene }) {
+  constructor({ domElement, colliders, doors, openDoorMaterial, start, floorY, scene, stair, upperFloors = [] }) {
     this.camera = new THREE.PerspectiveCamera(70, 1, 0.03, 300);
     this.controls = new PointerLockControls(this.camera, domElement);
     this.domElement = domElement;
@@ -58,6 +63,15 @@ export class Person {
     this.stick = { x: 0, y: 0 };
     this.crouched = false;
     this.touchMode = false;
+
+    this.stair = stair;
+    this.upperFloors = upperFloors;
+    this.rampS = null;           // where on the stairs you are, null when off them
+    this.rampForward = 1;        // which way along them "forward" takes you
+    this.waitForRelease = false;
+    // Getting on or off moves you a little at once; this hides the jump by
+    // easing the eye from where it was.
+    this.slide = new THREE.Vector3();
 
     this.marker = makeMarker();
     scene.add(this.marker);
@@ -102,18 +116,78 @@ export class Person {
     forward.y = 0;
     forward.normalize();
     const right = new THREE.Vector3().crossVectors(forward, UP);
+    const ahead = (this.keys.has('KeyW') ? 1 : 0) - (this.keys.has('KeyS') ? 1 : 0) + this.stick.y;
     const move = new THREE.Vector3()
-      .addScaledVector(forward, (this.keys.has('KeyW') ? 1 : 0) - (this.keys.has('KeyS') ? 1 : 0) + this.stick.y)
+      .addScaledVector(forward, ahead)
       .addScaledVector(right, (this.keys.has('KeyD') ? 1 : 0) - (this.keys.has('KeyA') ? 1 : 0) + this.stick.x);
     const push = move.length();
-    if (push > 0) {
-      // Pushing the stick part of the way walks slower; keys always push fully.
-      move.multiplyScalar(Math.min(1, push) / push).multiplyScalar((crouching ? CROUCH_SPEED : WALK_SPEED) * dt);
-      // One axis at a time, so walking into a wall at an angle slides along it.
-      this.tryMove(move.x, 0);
-      this.tryMove(0, move.z);
+    this.slide.multiplyScalar(Math.exp(-dt * 6));
+    if (push === 0) this.waitForRelease = false;
+
+    if (this.rampS !== null) {
+      this.walkRamp(ahead, crouching, dt);
+    } else if (push > 0 && !this.waitForRelease) {
+      const s = this.stair?.boarding(this.position.x, this.position.z, this.upstairs(), move.x, move.z);
+      if (s === 0 || s === 1) {
+        this.boardRamp(s, ahead);
+      } else {
+        // Pushing the stick part of the way walks slower; keys always push fully.
+        move.multiplyScalar(Math.min(1, push) / push).multiplyScalar((crouching ? CROUCH_SPEED : WALK_SPEED) * dt);
+        // One axis at a time, so walking into a wall at an angle slides along it.
+        this.tryMove(move.x, 0);
+        this.tryMove(0, move.z);
+      }
     }
     this.syncCamera();
+  }
+
+  upstairs() {
+    return this.stair !== undefined && this.floorY > this.stair.bottomY + 0.1;
+  }
+
+  /**
+   * On the ramp "forward" means carrying on the way you got on, wherever you are
+   * looking: on a spiral you would otherwise have to physically turn most of a
+   * circle to climb it, which nobody sitting down can do, and you could not stop
+   * to look back at the smoke. Sideways does nothing. Getting on from the top
+   * makes forward go down, or pushing forward at the top would throw you straight
+   * back off.
+   */
+  boardRamp(s, ahead) {
+    const p = this.stair.at(s);
+    this.rampS = s;
+    this.rampForward = (s === 0 ? 1 : -1) * (ahead < 0 ? -1 : 1);
+    this.slide.set(this.position.x - p.x, 0, this.position.z - p.z);
+    this.position.set(p.x, p.y, p.z);
+    this.floorY = p.y;
+  }
+
+  walkRamp(ahead, crouching, dt) {
+    const push = Math.max(-1, Math.min(1, ahead));
+    const speed = crouching ? STAIR_SPEED * CROUCH_SPEED / WALK_SPEED : STAIR_SPEED;
+    this.rampS += this.rampForward * push * speed * dt / this.stair.length;
+    if (this.rampS <= 0 || this.rampS >= 1) {
+      const end = this.rampS <= 0 ? 0 : 1;
+      const p = this.stair.at(end), off = this.stair.landingAt(end);
+      this.slide.set(p.x - off.x, 0, p.z - off.z);
+      this.position.set(off.x, off.y, off.z);
+      this.floorY = off.y;
+      this.rampS = null;
+      // Forward here was along the stairs. Carrying it over would suddenly mean
+      // the way you are looking, so wait for the stick to be let go.
+      this.waitForRelease = true;
+      return;
+    }
+    const p = this.stair.at(this.rampS);
+    this.position.set(p.x, p.y, p.z);
+    this.floorY = p.y;
+  }
+
+  /** Upstairs the floor has a big hole in it: stay on it, a body's width from the edge. */
+  floorEndsAt(x, z) {
+    this.raycaster.set(new THREE.Vector3(x, this.floorY + 0.1, z), DOWN);
+    this.raycaster.far = 0.4;
+    return this.raycaster.intersectObjects(this.upperFloors, false).length === 0;
   }
 
   tryMove(dx, dz) {
@@ -121,6 +195,12 @@ export class Person {
     const length = step.length();
     if (length === 0) return;
     const direction = step.clone().divideScalar(length);
+    const nextX = this.position.x + dx, nextZ = this.position.z + dz;
+    if (this.upstairs()) {
+      if (this.floorEndsAt(nextX + direction.x * BODY_RADIUS, nextZ + direction.z * BODY_RADIUS)) return;
+    } else if (this.stair?.blocksGround(nextX, nextZ)) {
+      return;
+    }
     const solid = this.colliders.filter((m) => !m.userData.open);
     for (const h of PROBE_HEIGHTS) {
       const origin = new THREE.Vector3(this.position.x, this.floorY + h, this.position.z);
@@ -176,7 +256,7 @@ export class Person {
   }
 
   syncCamera() {
-    this.camera.position.set(this.position.x, this.floorY + this.eye, this.position.z);
+    this.camera.position.set(this.position.x + this.slide.x, this.floorY + this.eye, this.position.z + this.slide.z);
     this.marker.position.set(this.position.x, this.floorY, this.position.z);
     const forward = this.camera.getWorldDirection(new THREE.Vector3());
     this.marker.rotation.y = Math.atan2(forward.x, forward.z);

@@ -1,0 +1,9 @@
+sdc25-dh15 fluid cells 30254 140s
+sdc25-base fluid cells 30254 140s
+sdc25-dh25 fluid cells 30254 141s
+sdc26-base fluid cells 30254 149s
+sdc25-cell24 fluid cells 17402 78s
+sdc25-h30 fluid cells 30254 134s
+sdc25-h5 fluid cells 30254 134s
+sdc25-cell15 fluid cells 72939 341s
+SWEEP DONE

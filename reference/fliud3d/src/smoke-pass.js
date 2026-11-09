@@ -49,6 +49,7 @@ const fragmentShader = /* glsl */ `
   uniform float uJitter;
   uniform int uDetail;            // 0 = the plain grid, as before; 1 = with detail
   uniform float uThinGamma;       // below 1 draws thin smoke denser; 1 = as simulated
+  uniform float uHeatGamma;       // below 1 draws low heat stronger; 1 = in proportion to heat
   uniform float uTime;            // simulation time (grid seconds)
   uniform float uVelRange;        // metres per grid second that a full channel means
   uniform float uNoiseTile;       // metres one tile of noise spans
@@ -83,6 +84,13 @@ const fragmentShader = /* glsl */ `
   // drawing changes; the simulation is untouched.
   float looks(float stored) { return pow(stored, 2.0 * uThinGamma); }
   float smokeAt(vec3 p) { return looks(texture(tVolume, gridUvw(p)).r); }
+
+  // The same for the thermal view. Measured on FZK-Haus, heat barely decays
+  // but is spread thin: nine cells in ten stay under 0.05, which the palette
+  // draws nearly black, so only the air right at the fire showed. Heat is
+  // also stored as a square root, for the same reason as smoke. With this
+  // below 1 the colours no longer stand in proportion to temperature.
+  float heatLooks(float stored) { return pow(stored, 2.0 * uHeatGamma); }
 
   // Noise that rides the wind. Sliding a texture along a velocity stretches
   // it more the longer it slides, so two copies take turns: each slides for
@@ -139,8 +147,9 @@ const fragmentShader = /* glsl */ `
       vec3 p = uCamPos + dir * t;
       vec2 cell = texture(tVolume, gridUvw(p)).rg;
       if (uMode == 1) {
-        float a = 1.0 - exp(-uHeatSigma * cell.g * uStep);
-        glow += transmit * a * heatColor(cell.g * 1.2);
+        float heat = heatLooks(cell.g);
+        float a = 1.0 - exp(-uHeatSigma * heat * uStep);
+        glow += transmit * a * heatColor(heat * 1.2);
         transmit *= 1.0 - a;
       } else if (uDetail == 0) {
         float a = 1.0 - exp(-uSmokeSigma * looks(cell.r) * uStep);
@@ -159,7 +168,7 @@ const fragmentShader = /* glsl */ `
         // Only the hottest smoke, right over the flames, picks up their light.
         // At a lower threshold the whole rising plume glowed, which read as
         // a pillar of fire up to the ceiling.
-        c += fire * smoothstep(0.75, 1.2, cell.g) * 0.7;
+        c += fire * smoothstep(0.75, 1.2, cell.g * cell.g) * 0.7;
         glow += transmit * a * c;
         transmit *= 1.0 - a;
       }
@@ -220,6 +229,7 @@ export class SmokePass {
     this.grid = grid;
     this.detail = true;
     this.thinGamma = 0.6;
+    this.heatGamma = 0.6;
     this.time = 0;
     const size = renderer.getDrawingBufferSize(new THREE.Vector2());
     this.target = new THREE.WebGLRenderTarget(size.x, size.y, {
@@ -273,6 +283,7 @@ export class SmokePass {
         uJitter: { value: 0 },
         uDetail: { value: 1 },
         uThinGamma: { value: 0.6 },
+        uHeatGamma: { value: 0.6 },
         uTime: { value: 0 },
         uVelRange: { value: VEL_RANGE_CELLS * grid.cell },
         uNoiseTile: { value: 1.6 },
@@ -304,7 +315,7 @@ export class SmokePass {
       let c = 1 + sy * j + sz * k;
       for (let i = 1; i <= nx; i++, c++, o += 2, o4 += 4) {
         this.voxels[o] = Math.min(255, Math.sqrt(Math.max(0, dens[c]) / 1.5) * 255);
-        this.voxels[o + 1] = Math.min(255, temp[c] * 212);
+        this.voxels[o + 1] = Math.min(255, Math.sqrt(Math.max(0, temp[c]) / 1.2) * 255);
         this.windBytes[o4] = pack(u[c]);
         this.windBytes[o4 + 1] = pack(v[c]);
         this.windBytes[o4 + 2] = pack(w[c]);
@@ -327,6 +338,7 @@ export class SmokePass {
     u.uJitter.value = Math.random();
     u.uDetail.value = this.detail ? 1 : 0;
     u.uThinGamma.value = this.thinGamma;
+    u.uHeatGamma.value = this.heatGamma;
     u.uTime.value = this.time;
     this.renderer.render(this.postScene, this.postCamera);
   }

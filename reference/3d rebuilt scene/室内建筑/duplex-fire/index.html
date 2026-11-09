@@ -47,6 +47,9 @@
     <label style="flex:1">Walls 墙体 <span id="opacityVal"></span><br><input type="range" id="opacity" min="0.05" max="1" step="0.05" value="0.35" style="width:100%"></label>
   </div>
   <div class="row">
+    <label style="flex:1">Smoke 烟浓淡 <span id="smokeOpacityVal"></span><br><input type="range" id="smokeOpacity" min="0.1" max="3" step="0.05" value="1" style="width:100%"></label>
+  </div>
+  <div class="row">
     <label class="layer"><input type="checkbox" id="show-gas" checked><span class="swatch" style="background:#ffc400"></span>Gas 燃气</label>
     <label class="layer"><input type="checkbox" id="show-electrical" checked><span class="swatch" style="background:#50dc78"></span>Electrical 电气</label>
     <label class="layer"><input type="checkbox" id="show-water"><span class="swatch" style="background:#3c8cff"></span>Water 给排水</label>
@@ -58,9 +61,12 @@
   <div class="row">
     <button id="run">Pause 暂停</button>
     <button id="restart">Restart 重来</button>
+    <button data-place="1">Fire on Level 1 火放一层</button>
+    <button data-place="2">Fire on Level 2 火放二层</button>
     <button data-mode="smoke" class="on">Smoke 烟</button>
     <button data-mode="heat">Heat 热</button>
   </div>
+  <div class="dim" id="placeHint" hidden></div>
   <div class="row">
     <label>Growth 增长 <select id="growth">
       <option value="slow">Slow 慢</option>
@@ -70,7 +76,7 @@
     </select></label>
     <label><input type="checkbox" id="furniture" checked> Furniture 家具</label>
   </div>
-  <div class="dim">Drag the flame, or double-click a floor, to move the fire. It restarts from nothing. With both storeys showing it stays on its floor; pick a storey to move it to the other.<br>拖动火焰或双击地面来移动起火点，火会从头开始烧。两层一起显示时火只在本层移动，要换楼层先选那一层。</div>
+  <div class="dim">Pick Fire on Level 1 or 2, then click a floor there; the other storey turns see-through meanwhile. Or drag the flame along its own floor. The fire restarts from nothing. Double-click a door to open or shut it.<br>先选「火放一层」或「火放二层」，再点那层的地面；放置时另一层会变成半透明。也可以拖动火焰在本层移动。火会从头开始烧。双击门可以开关门。</div>
   <div class="dim" style="margin-top:6px">A t² design fire up to 1 MW. Walls, floors and ceilings take heat out of the air.<br>t² 设计火灾，上限 1 MW。墙、地板和天花板会吸走空气里的热。</div>
 </div>
 <div id="legend" hidden>

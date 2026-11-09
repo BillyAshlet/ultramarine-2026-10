@@ -92,6 +92,52 @@ function addThinLayers(grid, meshes) {
 }
 
 /**
+ * The 92 mm stud partitions are about 12 cm thick, thinner than a cell. The
+ * column rays in voxelize sample cell centres, 20 cm apart, so a partition
+ * lying between two rows of centres was missed entirely: four upstairs walls
+ * (bedrooms to hallway, bathroom and utility) did not exist, and smoke went
+ * round a closed door through them. Here each such wall gets its own column
+ * rays along its centre line, marking the one row of cells it runs through.
+ * Ray pairs, not boxes, for the same reason as voxelize: a wall's door
+ * openings are holes in it, and a box would brick them up.
+ */
+function addThinWalls(grid, walls) {
+  const { nx, ny, nz, origin, cell, index, solid } = grid;
+  const ray = new THREE.Raycaster();
+  const down = new THREE.Vector3(0, -1, 0);
+  const NUDGE = 1e-3;
+  for (const m of walls) {
+    const e = m.userData.element;
+    const dx = e.max[0] - e.min[0], dz = e.max[2] - e.min[2];
+    if (Math.min(dx, dz) >= cell) continue;
+    const alongX = dx > dz;
+    // The row of cells the wall's centre line runs through.
+    const mid = alongX ? (e.min[2] + e.max[2]) / 2 : (e.min[0] + e.max[0]) / 2;
+    const row = Math.floor((mid - (alongX ? origin.z : origin.x)) / cell) + 1;
+    const [lo, hi] = alongX ? [e.min[0], e.max[0]] : [e.min[2], e.max[2]];
+    const o = alongX ? origin.x : origin.z;
+    const n = alongX ? nx : nz;
+    const first = Math.max(1, Math.ceil((lo - o) / cell + 0.5));
+    const last = Math.min(n, Math.floor((hi - o) / cell + 0.5));
+    for (let s = first; s <= last; s++) {
+      const along = o + (s - 0.5) * cell + NUDGE;
+      ray.set(alongX ? new THREE.Vector3(along, 100, mid) : new THREE.Vector3(mid, 100, along), down);
+      const ys = [];
+      for (const hit of ray.intersectObject(m, false)) {
+        if (ys.length === 0 || Math.abs(ys[ys.length - 1] - hit.point.y) > 1e-4) ys.push(hit.point.y);
+      }
+      const [i, k] = alongX ? [s, row] : [row, s];
+      for (let h = 0; h + 1 < ys.length; h += 2) {
+        for (let j = 1; j <= ny; j++) {
+          const y = origin.y + (j - 0.5) * cell;
+          if (y <= ys[h] && y >= ys[h + 1]) solid[index(i, j, k)] = 1;
+        }
+      }
+    }
+  }
+}
+
+/**
  * Walls, floors, ceilings and closed windows become solid cells. Inside doors
  * start open and outside doors shut, as in ../../fliud3d. Stairs, railings and
  * furniture are left out: thinner than a cell, they would plug the stairwell.
@@ -113,6 +159,7 @@ export function buildGrid(building, cell = CELL) {
 
   const grid = voxelize({ bounds, cell, solids: [...walls, ...by(/^IfcSlab$/), ...by(/^IfcBeam$/)] });
   addThinLayers(grid, by(/^IfcCovering$/));
+  addThinWalls(grid, walls);
 
   const fill = (box, value) => { for (const c of grid.cellsInBox(box)) grid.solid[c] = value; };
   for (const m of by(/^IfcWindow$/)) fill(widened(m.userData.element, cell * 2), 1);

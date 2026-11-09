@@ -1,0 +1,71 @@
+{
+ "burnRoomHeatUntenable": {
+  "measured": 210.0,
+  "report": 210,
+  "leaky": null,
+  "closed": null,
+  "open": null
+ },
+ "burnRoomPeakRise": {
+  "measured": 327.9,
+  "leaky": 93.3,
+  "closed": 85.7,
+  "open": 73.8
+ },
+ "outside": {
+  "hallway": {
+   "measuredPeak25": 0.51,
+   "measuredPeak300": 0.09,
+   "measuredAlarm": 22.0,
+   "measuredUntenable": null,
+   "leaky": {
+    "peak25": 1.76,
+    "peak300": 1.75,
+    "alarm": 66,
+    "untenable": 212
+   },
+   "closed": {
+    "peak25": 0.0,
+    "peak300": 0.0,
+    "alarm": null,
+    "untenable": null
+   },
+   "open": {
+    "peak25": 0.73,
+    "peak300": 0.73,
+    "alarm": 36,
+    "untenable": 196
+   }
+  },
+  "bedroom1": {
+   "measuredPeak25": 0.32,
+   "measuredPeak300": 0.06,
+   "measuredAlarm": 104.0,
+   "measuredUntenable": null,
+   "leaky": {
+    "peak25": 1.64,
+    "peak300": 1.62,
+    "alarm": 130,
+    "untenable": 242
+   },
+   "closed": {
+    "peak25": 0.0,
+    "peak300": 0.0,
+    "alarm": null,
+    "untenable": null
+   },
+   "open": {
+    "peak25": 0.7,
+    "peak300": 0.69,
+    "alarm": 56,
+    "untenable": 236
+   }
+  }
+ },
+ "hallwayPeakRise": {
+  "measured": 10.7,
+  "leaky": 30.1,
+  "closed": 0,
+  "open": 46.5
+ }
+}

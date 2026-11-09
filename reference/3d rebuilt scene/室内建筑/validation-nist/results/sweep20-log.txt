@@ -1,0 +1,4 @@
+sdc20-closed fluid cells 30194 629s
+sdc20-leaky fluid cells 30196 634s
+sdc20-open fluid cells 30254 639s
+SWEEP20 DONE
