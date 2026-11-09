@@ -133,7 +133,50 @@
     "label": "燃气管",
     "class": "燃气管",
     "reference": "IFC: 'Pipe Types:Mechanical Pipe', systems Unit A / Unit B Natural Gas; the model has no gas meter or regulator",
-    "combustible": { "value": false, "source": "steel pipe (假设: the IFC gives no material)" }
+    "combustible": { "value": false, "source": "steel pipe (假设: the IFC gives no material)" },
+    "innerDiameter": { "value": 0.0266, "unit": "m", "source": "[估] the IFC pipe boxes are 33 mm across, the outer diameter of 1 in steel pipe (33.4 mm); 1 in Schedule 40 is 26.6 mm inside (ASME B36.10, from memory, not re-read)" },
+    "frictionFactor": { "value": 0.03, "source": "假设: Darcy factor for 1 in steel at Re about 1e4 (Moody chart, roughness 0.045 mm)" },
+    "fittingLoss": { "value": 1, "source": "假设: K per elbow; handbooks give 0.3–2 (as water_supply)" },
+    "dischargeCoefficient": { "value": 0.6, "source": "DNV GL Report 630650 Rev. 3 (Hy4Heat WP7, 2020): a 7.2 mm hole at 20 mbar let out 6.4 m³/h of methane, which gives Cd about 0.57 (read by a research sub-session; the Cd is our arithmetic)" }
+  },
+
+  "gas_supply": {
+    "label": "燃气网（无限供应）",
+    "class": "燃气网",
+    "reference": "Each unit's gas line comes in through the west wall about 0.67 m under the ground floor (e573 Unit A, e566 Unit B), outside the simulated grid. The model has no meter, regulator or shut-off valve; one of each is put at that outer end (假设 where they stand). Behind it the network is always there at the regulator's set pressure (架构.md ④); the only thing that stops it is shutting the valve.",
+    "deliveryPressure": { "value": 1744, "unit": "Pa", "source": "NTSB PAR-19/01 (Silver Spring, 2019) p. 16: 5–7 in. w.c. downstream of the service regulator; 7 in. w.c. taken, and held at any flow (假设: the regulator does not droop)" },
+    "meterResistance": { "value": 3.22e7, "unit": "Pa/(m³/s)²", "source": "[估] AC-250 diaphragm meter (the common US home meter) is rated 250 SCFH at 0.5 in. w.c. differential, and 528 SCFH at 2 in. (Honeywell/Elster datasheet as summarised by a research sub-session; not read); Δp/Q² from the first gives 3.22e7, from the second 2.89e7" },
+    "relativeDensity": { "value": 0.6, "source": "the specific gravity US meters and regulators are rated at (Honeywell datasheet, summary); pure methane is 0.55" },
+    "heatOfCombustion": { "value": 3.34e7, "unit": "J/m³", "source": "[估] lower heating value of methane at 20 °C: NIST Chemistry WebBook ΔcH° = −890.7 kJ/mol (higher value), less 2 × 44.0 kJ/mol for the water as vapour, over 24.06 L/mol; US pipeline gas averages 1,036 Btu/ft³ higher value (EIA 2023), about 3 % above methane (not used)" },
+    "excessFlowValve": { "value": null, "source": "not modelled: 49 CFR 192.383 has required one on new or replaced single-family services since 2010, closing at its rated flow to 50 % above; a full cut at the flows here (about 15 m³/h) could trip one sized for a home. Whether the Duplex has one is not known" }
+  },
+
+  "gas_mixture": {
+    "label": "燃气与空气",
+    "class": "燃气",
+    "reference": "Gas in the air as a volume fraction, carried by the solver (addScalar 'gas'). Lighter than air: it rises at g (1 − relative density) × fraction.",
+    "lowerLimit": { "value": 0.05, "source": "Zabetakis 1965, USBM Bulletin 627, Table A-1: methane 5.0 % (natural gas of 85–95 % methane 4.9 %; the Silver Spring gas 4.78 %, NTSB). Read by a research sub-session" },
+    "upperLimit": { "value": 0.15, "source": "Zabetakis 1965, Table A-1: methane 15.0 %" },
+    "autoignitionTemp": { "value": 540, "unit": "°C", "source": "Zabetakis 1965, Table A-1: methane 540 °C (natural gas 530 °C). Used as: gas in air this hot lights" },
+    "flameFuel": { "value": 20, "unit": "K", "source": "假设: a cell holding unburnt fuel worth 20 K or more (fire.fuel) has flame in it and lights gas; the 30 kW igniter keeps about 100 K in its cells" },
+    "closedPressure": { "value": 7.0e5, "unit": "Pa", "source": "Tomlin et al. 2015, J. Loss Prev. 35:169: a stoichiometric natural gas cloud filling a closed room would reach 7–8 bar (read by a research sub-session). 7 bar rise taken" },
+    "pressureModel": { "value": "Δp ≈ closedPressure × cloud volume / connected air volume", "source": "[估] a cloud burning in a closed space that holds much more air raises the pressure about in proportion to the share it fills (the partial-volume idea in NFPA 68; our simplification). No venting or leakage, so this is an upper bound" },
+    "windowFailure": { "value": 3000, "unit": "Pa", "source": "Kiwa 2021 (Hy4Heat KIW-WP7-GEN-REP-0003), citing the Astbury tests: domestic windows failed at 21–48 mbar; 30 mbar taken (假设 where in the range)" },
+    "doorFailure": { "value": 3000, "unit": "Pa", "source": "假设: an interior door's latch gives at the same pressure as a window; building elements fail one after another at 100–200 mbar (Kiwa 2021, citing the King inquiry), walls not modelled" },
+    "eventVolume": { "value": 0.05, "unit": "m³", "source": "假设: a burn of less gas than this (1.7 MJ) is not reported as a deflagration and pushes nothing open" },
+    "flameHeight": { "value": "L = 0.235 Q^0.4 − 1.02 D (m, Q in kW)", "source": "Heskestad's flame height correlation as given in the SFPE Handbook (from memory, not re-read). A lit outlet's flame lights gas in the cells straight above it up to L: about 2 m for a cut line (200 kW), 0.4 m for the leaking boiler valve (5 kW)" },
+    "radiantFraction": { "value": 0.2, "source": "假设: a share of the gas flame's heat lost as radiation; methane flames are among the least sooty, nothing looked up" },
+    "sootYield": { "value": 0, "source": "假设: methane makes almost no soot at atmospheric pressure (Cranfield, Brookes 1996, summary); taken as none" }
+  },
+
+  "gas_appliance_valve": {
+    "label": "锅炉燃气阀 / 调压器（假设位置）",
+    "class": "燃气阀",
+    "reference": "Each boiler's gas inlet (where the gas line ends in A205 / B205 Utility) has the boiler's own gas valve and regulator: die-cast aluminium with rubber diaphragms (as the Actaris B42 service regulator: aluminium case ASTM B85, Buna-N diaphragm). It is not in the model; it is put at the last piece of each unit's gas line (假设 where). In the Technical Safety BC case (#5616714) a house fire melted both appliance regulators away and the gas fed the fire until the fire department shut the meter.",
+    "leakTemp": { "value": 440, "unit": "°C", "source": "Grohn & Scheele 1997, 'Brandsicherheit von Gasanlagen' Teil 1, SBZ 12/1997: gas appliance control valves (zinc or aluminium die-cast with elastomers) leak 'from 440 °C at the latest' (German; read by a research sub-session)" },
+    "leakFlow": { "value": 0.56, "unit": "m³/h", "source": "Grohn & Scheele 1997, Teil 2 (SBZ 13/1997), TU München fire test: a meter pressure regulator leaked about 560 L/h after 25 min, room 819 °C, the part 692 °C. Taken from the moment it starts leaking (假设: the test gives one point, at a higher temperature)" },
+    "meltTemp": { "value": 660, "unit": "°C", "source": "NTSB PAR-19/01 pp. 18–19: aluminium alloy melts about 1,220 °F (660 °C); melted regulator covers were read as at least that hot. From here the valve is open at the pipe's full bore (假设)" },
+    "lag": { "value": 550, "unit": "s", "source": "[估] time constant of the part's temperature behind the air around it, fitted to the TU München point above: under the ISO 834 curve (815 °C at 25 min) a first-order lag of 550 s gives 698 °C at 25 min (test: 692 °C)" }
   },
 
   "water_pipe": {
