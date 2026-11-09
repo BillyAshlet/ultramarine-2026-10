@@ -1,0 +1,22 @@
+ac-y90-w1 lean 12 peak 15.2 skin {"touching":1294,"hot300":23,"hot150":75,"peak":632,"gapMetres":0} 138s
+ac-y90-w0.5 lean 6.7 peak 15.4 skin {"touching":1294,"hot300":18,"hot150":61,"peak":617,"gapMetres":0} 138s
+free-w3 lean 46.9 peak 11.1 skin undefined 139s
+free-w4 lean 55.4 peak 9.9 skin undefined 140s
+ac-y90-w0 lean 5.4 peak 15.9 skin {"touching":1294,"hot300":16,"hot150":57,"peak":607,"gapMetres":0} 140s
+free-w1 lean 9.1 peak 16.3 skin undefined 140s
+free-w2 lean 28.5 peak 13.2 skin undefined 141s
+free-w0 lean 0.4 peak 18 skin undefined 145s
+ac-y90-w1.5 lean 16.5 peak 14.3 skin {"touching":1294,"hot300":30,"hot150":85,"peak":634,"gapMetres":0} 154s
+ac-y90-w2 lean 20.9 peak 13.5 skin {"touching":1294,"hot300":36,"hot150":90,"peak":648,"gapMetres":0} 154s
+ac-y90-w3.5 lean 36.9 peak 11.4 skin {"touching":1294,"hot300":127,"hot150":211,"peak":800,"gapMetres":0} 154s
+ac-y90-w2.5 lean 26.8 peak 12.8 skin {"touching":1294,"hot300":51,"hot150":137,"peak":743,"gapMetres":0} 155s
+ac-y90-w3 lean 32.5 peak 12.4 skin {"touching":1294,"hot300":76,"hot150":172,"peak":796,"gapMetres":0} 155s
+ac-y40-w0 lean 5.4 peak 15.9 skin {"touching":1294,"hot300":16,"hot150":57,"peak":607,"gapMetres":0} 154s
+ac-y40-w0.5 lean 4.7 peak 15.2 skin {"touching":1294,"hot300":16,"hot150":53,"peak":577,"gapMetres":0} 154s
+ac-y40-w1 lean 10.2 peak 15.1 skin {"touching":1294,"hot300":13,"hot150":35,"peak":477,"gapMetres":0} 154s
+ac-y40-w1.5 lean 17.8 peak 13.9 skin {"touching":1294,"hot300":0,"hot150":13,"peak":267,"gapMetres":0.5} 131s
+ac-y40-w2 lean 22.8 peak 13.3 skin {"touching":1294,"hot300":0,"hot150":7,"peak":202,"gapMetres":0.5} 131s
+ac-y40-w3.5 lean 40.4 peak 10.7 skin {"touching":1294,"hot300":31,"hot150":61,"peak":584,"gapMetres":0} 130s
+ac-y40-w3 lean 35.4 peak 11.3 skin {"touching":1294,"hot300":19,"hot150":40,"peak":502,"gapMetres":0} 130s
+ac-y40-w2.5 lean 29.5 peak 12 skin {"touching":1294,"hot300":8,"hot150":24,"peak":394,"gapMetres":0} 131s
+SWEEP DONE

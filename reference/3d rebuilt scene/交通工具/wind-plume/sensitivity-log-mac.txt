@@ -1,0 +1,24 @@
+off1-w3.5 lean 37.9 peak 11.8 skin {"touching":1294,"hot300":58,"hot150":156,"peak":741,"gapMetres":0} 169s
+off1-w3 lean 33.4 peak 12.3 skin {"touching":1294,"hot300":35,"hot150":107,"peak":622,"gapMetres":0} 169s
+off1-w2.5 lean 28.2 peak 12.3 skin {"touching":1294,"hot300":16,"hot150":69,"peak":519,"gapMetres":0} 170s
+off1-w1.5 lean 17.7 peak 13.8 skin {"touching":1294,"hot300":14,"hot150":61,"peak":474,"gapMetres":0} 170s
+off1-w2 lean 23.2 peak 13.3 skin {"touching":1294,"hot300":14,"hot150":62,"peak":471,"gapMetres":0} 170s
+off1-w1 lean 12.3 peak 15 skin {"touching":1294,"hot300":13,"hot150":54,"peak":481,"gapMetres":0} 170s
+off2-w0 lean 8.3 peak 16.3 skin {"touching":1294,"hot300":7,"hot150":27,"peak":366,"gapMetres":0} 172s
+off1-w0 lean 6.3 peak 16 skin {"touching":1294,"hot300":12,"hot150":41,"peak":473,"gapMetres":0} 172s
+off2-w3 lean 34.4 peak 11.7 skin {"touching":1294,"hot300":14,"hot150":57,"peak":460,"gapMetres":0} 172s
+off2-w3.5 lean 38.5 peak 11.6 skin {"touching":1294,"hot300":24,"hot150":89,"peak":544,"gapMetres":0} 172s
+off2-w2.5 lean 29.2 peak 12.4 skin {"touching":1294,"hot300":10,"hot150":46,"peak":390,"gapMetres":0} 172s
+off2-w1.5 lean 18.3 peak 12.5 skin {"touching":1294,"hot300":8,"hot150":36,"peak":360,"gapMetres":0} 172s
+off2-w1 lean 13 peak 14.5 skin {"touching":1294,"hot300":8,"hot150":33,"peak":370,"gapMetres":0} 173s
+off2-w2 lean 23.9 peak 12.8 skin {"touching":1294,"hot300":7,"hot150":36,"peak":351,"gapMetres":0} 172s
+nowing-w0 lean 2.1 peak 17.7 skin {"touching":1310,"hot300":0,"hot150":0,"peak":23,"gapMetres":1.8} 172s
+nowing-w1 lean 8.5 peak 16.4 skin {"touching":1310,"hot300":0,"hot150":0,"peak":64,"gapMetres":1.5} 172s
+nowing-w3 lean 28.8 peak 12 skin {"touching":1310,"hot300":46,"hot150":93,"peak":655,"gapMetres":0} 168s
+nowing-w1.5 lean 13.3 peak 15.4 skin {"touching":1310,"hot300":0,"hot150":0,"peak":127,"gapMetres":1} 169s
+nowing-w2.5 lean 22.8 peak 13.8 skin {"touching":1310,"hot300":18,"hot150":46,"peak":440,"gapMetres":0} 168s
+nowing-w3.5 lean 33.2 peak 13 skin {"touching":1310,"hot300":92,"hot150":192,"peak":791,"gapMetres":0} 169s
+nowing-w2 lean 18.1 peak 15 skin {"touching":1310,"hot300":0,"hot150":18,"peak":245,"gapMetres":0.5} 171s
+fine-w2 lean 21 peak 15 skin {"touching":2489,"hot300":60,"hot150":138,"peak":737,"gapMetres":0} 483s
+fine-w0 lean 7.1 peak 16.7 skin {"touching":2489,"hot300":52,"hot150":129,"peak":748,"gapMetres":0} 487s
+SENSITIVITY DONE

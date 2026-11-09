@@ -1,8 +1,9 @@
 // The sweep's numbers, against a pool-fire tilt correlation that knows nothing
 // of this accident: cos(theta) = 1 / sqrt(u*) for u* >= 1 (American Gas Association),
 // u* = wind / (g m'' D / rho)^(1/3), m'' = 38 MW / 44 MJ/kg / 16 m2.
+// node tools/summary.cjs [old]: the heat-keeping solver's results, or the old solver's.
 const fs = require('fs'), path = require('path');
-const dir = path.join(__dirname, '../results');
+const dir = path.join(__dirname, process.argv[2] === 'old' ? '../results' : '../results/mac');
 const read = (n) => { try { return JSON.parse(fs.readFileSync(path.join(dir, n + '.json'))); } catch { return null; } };
 const uc = Math.cbrt(9.81 * (38e6 / 44e6 / 16) * Math.sqrt(16 * 4 / Math.PI) / 1.2);
 const aga = (u) => { const s = u / uc; return s <= 1 ? 0 : Math.acos(1 / Math.sqrt(s)) * 180 / Math.PI; };

@@ -219,7 +219,7 @@ addEventListener('pointermove', (e) => {
 });
 renderer.domElement.addEventListener('wheel', (e) => { radius = Math.min(90, Math.max(12, radius * (1 + e.deltaY * 0.001))); placeCamera(); e.preventDefault(); }, { passive: false });
 
-const name = (yaw, w) => `results/ac-y${yaw}-w${w}`;
+const name = (yaw, w) => `results/mac/ac-y${yaw}-w${w}`;
 let yaw = 40, windIndex = 4, latestRequest = 0;
 const cache = new Map();
 const results = new Map();

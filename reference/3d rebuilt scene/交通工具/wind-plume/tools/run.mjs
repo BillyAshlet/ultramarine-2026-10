@@ -1,14 +1,17 @@
 // One run: node tools/run.mjs '{"name":"...","wind":2,"yaw":40,"aircraft":true,...}'
 // Averages temperature once the fire has settled, measures it, and writes the
-// numbers and an 8-bit copy of the averaged temperature to results/.
+// numbers and an 8-bit copy of the averaged temperature to results/mac/ (the
+// heat-keeping solver, windmac.js, the default) or, with "solver":"old", to
+// results/ (fluid3d.js + windy.js, which makes heat; kept to compare).
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WindyFire, buildScene } from '../src/windy.js';
+import { WindyMacFire } from '../src/windmac.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const o = {
-  cell: 0.5, size: { x: 34, y: 22, z: 28 }, wind: 0, yaw: 90, aircraft: false,
+  solver: 'mac', cell: 0.5, size: { x: 34, y: 22, z: 28 }, wind: 0, yaw: 90, aircraft: false,
   heatRelease: 38e6, radiantFraction: 0.3, burnTime: 1.5,
   dt: 0.04, seconds: 40, averageFrom: 20, iterations: 30, vorticity: 0, smagorinsky: 0.2,
   ...JSON.parse(process.argv[2]),
@@ -18,8 +21,11 @@ const scene = buildScene(o);
 // Yaw is the angle off the nose the wind comes from, on the left side.
 const a = o.yaw * Math.PI / 180;
 const wind = { x: o.wind * Math.cos(a), z: -o.wind * Math.sin(a) };
-const f = new WindyFire({ ...scene, wind, heatRelease: o.heatRelease, radiantFraction: o.radiantFraction, burnTime: o.burnTime, smagorinsky: o.smagorinsky });
-f.dt = o.dt; f.iterations = o.iterations; f.vorticity = o.vorticity;
+const Fire = o.solver === 'old' ? WindyFire : WindyMacFire;
+const out = join(here, o.solver === 'old' ? '../results' : '../results/mac');
+const f = new Fire({ ...scene, wind, heatRelease: o.heatRelease, radiantFraction: o.radiantFraction, burnTime: o.burnTime, smagorinsky: o.smagorinsky });
+f.dt = o.dt; f.iterations = o.iterations;
+if (o.solver === 'old') f.vorticity = o.vorticity;
 
 const mean = new Float64Array(f.size);
 let samples = 0, peakSpeed = 0;
@@ -103,21 +109,21 @@ if (o.aircraft) {
 const centreline = slices.map((s) => ({ y: s.y, peak: Math.round(s.peak), x: +s.x.toFixed(2), z: +s.z.toFixed(2) }));
 
 const result = {
-  name: o.name, wind: o.wind, yaw: o.yaw, aircraft: o.aircraft, cell: o.cell, burnTime: o.burnTime, dt: o.dt,
+  name: o.name, solver: o.solver, wind: o.wind, yaw: o.yaw, aircraft: o.aircraft, cell: o.cell, burnTime: o.burnTime, dt: o.dt,
   iterations: o.iterations, vorticity: o.vorticity, smagorinsky: o.smagorinsky, size: { nx, ny, nz },
   leanDegrees: lean === null ? null : +lean.toFixed(1), peakSpeed: +peakSpeed.toFixed(1),
   skin: o.aircraft ? { touching, hot300, hot150, peak: Math.round(peakAtSkin), gapMetres: gap === null ? null : +gap.toFixed(2) } : undefined,
   centreline, seconds: o.seconds, wallSeconds: Math.round((Date.now() - t0) / 1000),
 };
-mkdirSync(join(here, '../results'), { recursive: true });
-writeFileSync(join(here, `../results/${o.name}.json`), JSON.stringify(result));
+mkdirSync(out, { recursive: true });
+writeFileSync(join(out, `${o.name}.json`), JSON.stringify(result));
 if (o.saveVolume !== false) {
-  const out = new Uint8Array(nx * ny * nz);
+  const bytes = new Uint8Array(nx * ny * nz);
   let n = 0;
   for (let k = 1; k <= nz; k++) for (let j = 1; j <= ny; j++) for (let i = 1; i <= nx; i++, n++) {
     // Square root, so the plume's cool edge keeps its precision: 255 is 1000 degrees.
-    out[n] = Math.min(255, Math.sqrt(Math.max(0, mean[idx(i, j, k)]) / 1000) * 255);
+    bytes[n] = Math.min(255, Math.sqrt(Math.max(0, mean[idx(i, j, k)]) / 1000) * 255);
   }
-  writeFileSync(join(here, `../results/${o.name}.bin`), out);
+  writeFileSync(join(out, `${o.name}.bin`), bytes);
 }
 console.log(o.name, 'lean', result.leanDegrees, 'peak', result.peakSpeed, 'skin', JSON.stringify(result.skin), `${result.wallSeconds}s`);

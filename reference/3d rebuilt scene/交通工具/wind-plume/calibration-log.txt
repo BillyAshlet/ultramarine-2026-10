@@ -1,0 +1,15 @@
+cal-cs40-tau0.5 lean 0.4 peak 18 skin undefined 123s
+cal-cs40-tau3 lean 0.4 peak 15.5 skin undefined 123s
+cal-cs40-tau1.5 lean 0.4 peak 16.4 skin undefined 125s
+cal-cs20-tau1.5 lean 0.1 peak 21.9 skin undefined 125s
+cal-cs20-tau3 lean 0.1 peak 19.4 skin undefined 125s
+cal-cs20-tau0.5 lean 0.1 peak 24 skin undefined 131s
+Heskestad: flame height 11.4 m, virtual origin 1.03 m, centreline velocity at the flame tip 14.1 m/s
+name | 12.25 m solver/Heskestad | 14.25 m solver/Heskestad | 16.25 m solver/Heskestad | 18.25 m solver/Heskestad | 20.25 m solver/Heskestad | mean |log| | peak speed
+cal-cs20-tau0.5 | 497/395 | 454/300 | 418/237 | 388/193 | 362/161 | 0.543 | 24
+cal-cs20-tau1.5 | 433/395 | 401/300 | 375/237 | 352/193 | 332/161 | 0.433 | 21.9
+cal-cs20-tau3 | 361/395 | 338/300 | 319/237 | 302/193 | 287/161 | 0.306 | 19.4
+cal-cs40-tau0.5 | 319/395 | 285/300 | 259/237 | 237/193 | 219/161 | 0.173 | 18
+cal-cs40-tau1.5 | 285/395 | 261/300 | 241/237 | 224/193 | 210/161 | 0.179 | 16.4
+cal-cs40-tau3 | 240/395 | 222/300 | 208/237 | 195/193 | 185/161 | 0.216 | 15.5
+closest: cal-cs40-tau0.5

@@ -1,0 +1,40 @@
+# node tools/budget.mjs '{"solver":"old","wind":0}' and '{"solver":"old","wind":3}'  (fluid3d.js + windy.js, smagorinsky 0.4, burnTime 3)
+t 5 s: released 133 MJ, in domain 238 MJ, left 60 MJ, accounted 225%
+t 10 s: released 265 MJ, in domain 195 MJ, left 417 MJ, accounted 231%
+t 15 s: released 398 MJ, in domain 196 MJ, left 732 MJ, accounted 233%
+t 20 s: released 530 MJ, in domain 196 MJ, left 1046 MJ, accounted 234%
+t 25 s: released 663 MJ, in domain 195 MJ, left 1361 MJ, accounted 235%
+t 30 s: released 795 MJ, in domain 195 MJ, left 1675 MJ, accounted 235%
+old wind 0: heat carried up through planes, 15-30 s average (fire releases 26.6 MW after radiation):
+  2 m: 54.2 MW  6 m: 60.4 MW  10 m: 62.6 MW  14 m: 63.4 MW  18 m: 63.4 MW
+  113 s
+t 5 s: released 133 MJ, in domain 215 MJ, left 1 MJ, accounted 162%
+t 10 s: released 265 MJ, in domain 217 MJ, left 186 MJ, accounted 152%
+t 15 s: released 398 MJ, in domain 217 MJ, left 364 MJ, accounted 146%
+t 20 s: released 530 MJ, in domain 217 MJ, left 542 MJ, accounted 143%
+t 25 s: released 663 MJ, in domain 217 MJ, left 719 MJ, accounted 141%
+t 30 s: released 795 MJ, in domain 218 MJ, left 896 MJ, accounted 140%
+old wind 3: heat carried up through planes, 15-30 s average (fire releases 26.6 MW after radiation):
+  2 m: 49.3 MW  6 m: 43.4 MW  10 m: 39.0 MW  14 m: 34.7 MW  18 m: 27.8 MW
+  113 s
+
+
+# node tools/budget.mjs '{"solver":"mac","wind":0,"burnTime":0.5}' and wind 3  (windmac.js, the frozen settings: smagorinsky 0.4, burnTime 0.5)
+t 5 s: released 133 MJ, in domain 102 MJ, left 31 MJ, accounted 100.0%
+t 10 s: released 265 MJ, in domain 89 MJ, left 177 MJ, accounted 100.0%
+t 15 s: released 398 MJ, in domain 89 MJ, left 309 MJ, accounted 100.0%
+t 20 s: released 530 MJ, in domain 89 MJ, left 442 MJ, accounted 100.0%
+t 25 s: released 663 MJ, in domain 89 MJ, left 574 MJ, accounted 100.0%
+t 30 s: released 795 MJ, in domain 89 MJ, left 707 MJ, accounted 100.0%
+mac wind 0: heat carried up through planes, 15-30 s average (fire releases 26.6 MW after radiation):
+  2 m: 27.7 MW  6 m: 26.6 MW  10 m: 26.5 MW  14 m: 26.5 MW  18 m: 26.5 MW
+  72 s
+t 5 s: released 133 MJ, in domain 132 MJ, left 1 MJ, accounted 100.0%
+t 10 s: released 265 MJ, in domain 128 MJ, left 137 MJ, accounted 100.0%
+t 15 s: released 398 MJ, in domain 128 MJ, left 271 MJ, accounted 100.0%
+t 20 s: released 530 MJ, in domain 127 MJ, left 404 MJ, accounted 100.0%
+t 25 s: released 663 MJ, in domain 127 MJ, left 536 MJ, accounted 100.0%
+t 30 s: released 795 MJ, in domain 127 MJ, left 668 MJ, accounted 100.0%
+mac wind 3: heat carried up through planes, 15-30 s average (fire releases 26.6 MW after radiation):
+  2 m: 26.4 MW  6 m: 26.2 MW  10 m: 26.0 MW  14 m: 24.3 MW  18 m: 17.3 MW
+  71 s
