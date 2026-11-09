@@ -1,0 +1,159 @@
+{
+  "_readme": [
+    "Every number is { value, unit, source }. A source that starts with 假设 or [估] is ours, not a measurement; anything else names where it was read.",
+    "Owners after T0: the furniture entries (and their ignition numbers) belong to task B; gas entries to D; water entries to E; doors and windows to whoever takes door burn-through. Change only your own entries, and keep a source on every number.",
+    "Sources: NIST TN 2303 = Hamins et al. 2025, doi 10.6028/NIST.TN.2303. NBSIR 83-2787 = Lawson, Walton, Twilley 1984. NUREG-1805 = 2004, ch. 6 tables 6-2 to 6-5. NIJ 230164 = Wolfe, Mealy, Gottuk 2009. Babrauskas 1981 = NBSIR 81-2271.",
+    "The two measured curves (sofa, queen bed) were tabulated from NIST's calorimetry database (FCD) test040 and test038 CSVs by another session, in 室内建筑/家具着火数据.md; T0 copied them from there and did not re-read the CSVs."
+  ],
+
+  "sofa": {
+    "label": "软垫沙发",
+    "class": "软垫",
+    "reference": "NIST TN 2303 test 40: 180 cm three-seat sofa, polyurethane foam, 49.7 kg (sofa A)",
+    "peakHRR": { "value": 2217e3, "unit": "W", "source": "NIST TN 2303 test 40 (sofa A, three tests: 1.8–2.2 MW)" },
+    "timeToPeak": { "value": 394, "unit": "s", "source": "NIST TN 2303 test 40: 6.57 min from a 128 W flame on the seat" },
+    "totalHeat": { "value": 891e6, "unit": "J", "source": "NIST TN 2303 test 40 (sofa A: 811–891 MJ)" },
+    "curve": {
+      "value": [[0, 0], [120, 118], [180, 290], [240, 349], [300, 463], [360, 1488], [390, 2068], [450, 1727], [600, 841], [900, 535], [1200, 230], [1500, 138], [1800, 102]],
+      "unit": "[s, kW]",
+      "source": "NIST FCD test040 CSV, as tabulated in 家具着火数据.md. Time 0 is a small flame lit on the item; ignited by radiation, the smouldering start may be shorter (no data)."
+    },
+    "radiantFraction": { "value": 0.4, "unit": "", "source": "NIST TN 2303: sofas 0.32–0.50; 0.4 is the middle (假设 which value)" },
+    "sootYield": { "value": 0.015, "unit": "kg/kg", "source": "NIST TN 2303: sofas 0.014–0.017" },
+    "heatOfCombustion": { "value": 17e6, "unit": "J/kg", "source": "NIST TN 2303: sofas 15.6–18.5 MJ/kg" },
+    "coYield": { "value": 0.033, "unit": "kg/kg", "source": "NIST TN 2303: sofas 0.030–0.037" },
+    "ignitionTemp": { "value": 390, "unit": "°C", "source": "家具着火数据.md: fabric over polyurethane foam, fitted to Villa & Babrauskas 1991 (NISTIR 4652) ignition times" },
+    "krc": { "value": 0.1, "unit": "(kW/m²K)²s", "source": "[估] back-calculated from T_ig 390 °C, range 0.04–0.22 (家具着火数据.md); bare foam 0.32 (NUREG-1805)" },
+    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "NUREG-1805 / 家具着火数据.md: 16; easily ignited fabrics down to 10 (Babrauskas 1981)" }
+  },
+
+  "bed_queen": {
+    "label": "床（Queen，铺床品）",
+    "class": "软垫",
+    "reference": "NIST TN 2303 test 38: 30 cm foam mattress with bedding and pillows, 29.4 kg (mattress C with bedclothes)",
+    "peakHRR": { "value": 4563e3, "unit": "W", "source": "NIST TN 2303 test 38" },
+    "timeToPeak": { "value": 766, "unit": "s", "source": "NIST TN 2303 test 38: 12.77 min" },
+    "totalHeat": { "value": 737e6, "unit": "J", "source": "NIST TN 2303 test 38" },
+    "curve": {
+      "value": [[0, 0], [120, 39], [300, 254], [450, 161], [600, 330], [650, 583], [700, 1150], [750, 3765], [770, 4321], [800, 3965], [850, 2261], [900, 471], [1000, 111], [1200, 0]],
+      "unit": "[s, kW]",
+      "source": "NIST FCD test038 CSV, as tabulated in 家具着火数据.md. Time 0 is a 128 W flame on the pillow."
+    },
+    "radiantFraction": { "value": 0.4, "unit": "", "source": "NIST TN 2303: mattresses 0.34–0.50 (假设 which value)" },
+    "sootYield": { "value": 0.03, "unit": "kg/kg", "source": "NIST TN 2303: mattresses 0.025–0.038" },
+    "heatOfCombustion": { "value": 18e6, "unit": "J/kg", "source": "NIST TN 2303: mattresses 11–25 MJ/kg (假设 which value)" },
+    "coYield": { "value": 0.03, "unit": "kg/kg", "source": "NIST TN 2303: mattresses 0.018–0.076 (假设 which value)" },
+    "ignitionTemp": { "value": 390, "unit": "°C", "source": "as sofa" },
+    "krc": { "value": 0.1, "unit": "(kW/m²K)²s", "source": "as sofa ([估])" },
+    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "as sofa" }
+  },
+
+  "bed_king": {
+    "label": "床（King，铺床品）",
+    "class": "软垫",
+    "reference": "no test; the queen bed scaled by mattress area",
+    "scaleFrom": { "value": "bed_queen", "factor": 1.31, "unit": "area ratio", "source": "[估] King 1981×2032 mm over Queen 1525×2007 mm; peak and total heat scaled, times kept" },
+    "radiantFraction": { "value": 0.4, "unit": "", "source": "as queen" },
+    "sootYield": { "value": 0.03, "unit": "kg/kg", "source": "as queen" },
+    "heatOfCombustion": { "value": 18e6, "unit": "J/kg", "source": "as queen" },
+    "coYield": { "value": 0.03, "unit": "kg/kg", "source": "as queen" },
+    "ignitionTemp": { "value": 390, "unit": "°C", "source": "as sofa" },
+    "krc": { "value": 0.1, "unit": "(kW/m²K)²s", "source": "as sofa ([估])" },
+    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "as sofa" }
+  },
+
+  "cabinet_run": {
+    "label": "木柜（地柜、吊柜、洗手台柜）",
+    "class": "木柜",
+    "reference": "NIJ 230164 CAL2: four oak-framed plywood wall cabinets in a 1.84 m row, holding paper and cups",
+    "peakHRRPerMetre": { "value": 0.35e6, "unit": "W/m", "source": "[估] 家具着火数据.md: NIJ 230164 fig. 5-3/5-4, 600–670 kW for 1.84 m [读图], divided by length" },
+    "totalHeatPerMetre": { "value": 300e6, "unit": "J/m", "source": "[估] 家具着火数据.md, from NIJ 230164 (fig. 5-3/5-4, table 5-1), divided by length" },
+    "timeToPeak": { "value": 600, "unit": "s", "source": "假设: the test shows several peaks between 10 and 45 min after ignition" },
+    "radiantFraction": { "value": 0.35, "unit": "", "source": "假设: no wood value measured here; the engine's old default" },
+    "sootYield": { "value": 0.015, "unit": "kg/kg", "source": "假设: no measurement for wood here" },
+    "heatOfCombustion": { "value": 15e6, "unit": "J/kg", "source": "假设: typical for wood products" },
+    "ignitionTemp": { "value": 412, "unit": "°C", "source": "NUREG-1805 table 6: particleboard (effective value)" },
+    "krc": { "value": 0.93, "unit": "(kW/m²K)²s", "source": "NUREG-1805 table 6: particleboard (effective value)" },
+    "criticalFlux": { "value": 18, "unit": "kW/m²", "source": "NUREG-1805 table 6: particleboard" },
+    "note": "Wood does not keep burning from a small flame: NBSIR 83-2787's plywood bookcase reached 28 kW under a 50 kW burner and went out 60 s after it stopped. Babrauskas 1981: veneered plywood cabinets did not ignite at 20 kW/m², took 110–236 s at 40 kW/m²."
+  },
+
+  "wardrobe": {
+    "label": "高柜（衣柜）",
+    "class": "木柜",
+    "reference": "NBSIR 83-2787 test 61: particleboard wardrobe 1.23×0.40×1.83 m, 120 kg, with clothing (1983 furniture)",
+    "peakHRR": { "value": 1.9e6, "unit": "W", "source": "NBSIR 83-2787 test 61, fig. 121 [读图]: peaks about 1.9 MW and 1.2 MW" },
+    "timeToPeak": { "value": 280, "unit": "s", "source": "NBSIR 83-2787 test 61 [读图]" },
+    "totalHeat": { "value": 1349e6, "unit": "J", "source": "NBSIR 83-2787 test 61" },
+    "radiantFraction": { "value": 0.35, "unit": "", "source": "假设" },
+    "sootYield": { "value": 0.015, "unit": "kg/kg", "source": "假设" },
+    "heatOfCombustion": { "value": 15e6, "unit": "J/kg", "source": "假设: typical for wood products" },
+    "ignitionTemp": { "value": 412, "unit": "°C", "source": "NUREG-1805 table 6: particleboard" },
+    "krc": { "value": 0.93, "unit": "(kW/m²K)²s", "source": "NUREG-1805 table 6: particleboard" },
+    "criticalFlux": { "value": 18, "unit": "kW/m²", "source": "NUREG-1805 table 6: particleboard" },
+    "note": "The Duplex tall cabinets (0.8×2.0×0.55 m) are close in size, but whether they hold clothing is unknown; the test's MW came largely from the clothing."
+  },
+
+  "coffee_table": {
+    "label": "茶几（实木）",
+    "class": "桌子",
+    "reference": "no free-burn test found",
+    "totalHeat": { "value": 225e6, "unit": "J", "source": "[估] UL lists 36.9 lb (16.7 kg) for a coffee table; times a wood heat of combustion; range 200–250 MJ" },
+    "peakHRR": { "value": null, "unit": "W", "source": "no data; task B chooses and marks it 假设" },
+    "radiantFraction": { "value": 0.35, "unit": "", "source": "假设" },
+    "sootYield": { "value": 0.015, "unit": "kg/kg", "source": "假设" },
+    "heatOfCombustion": { "value": 15e6, "unit": "J/kg", "source": "假设: typical for wood" },
+    "ignitionTemp": { "value": 305, "unit": "°C", "source": "NUREG-1805 / 家具着火数据.md: oak, piloted" },
+    "krc": { "value": 0.23, "unit": "(kW/m²K)²s", "source": "[估] 家具着火数据.md" },
+    "criticalFlux": { "value": 10, "unit": "kW/m²", "source": "NUREG-1805: wood" }
+  },
+
+  "countertop": {
+    "label": "台面",
+    "class": "台面",
+    "reference": "material not given in the IFC",
+    "combustible": { "value": false, "source": "假设: treated as non-combustible (stone or laminate on board is unknown)" }
+  },
+
+  "door_wood": {
+    "label": "木门",
+    "class": "门",
+    "reference": "not looked up yet (架构.md 待查: door burn-through time)",
+    "combustible": { "value": true, "source": "假设" }
+  },
+
+  "window": {
+    "label": "窗",
+    "class": "窗",
+    "reference": "not looked up yet (架构.md 待查: glass breakage temperature)",
+    "combustible": { "value": false, "source": "glass" }
+  },
+
+  "gas_pipe": {
+    "label": "燃气管",
+    "class": "燃气管",
+    "reference": "IFC: 'Pipe Types:Mechanical Pipe', systems Unit A / Unit B Natural Gas; the model has no gas meter or regulator",
+    "combustible": { "value": false, "source": "steel pipe (假设: the IFC gives no material)" }
+  },
+
+  "water_pipe": {
+    "label": "给水管",
+    "class": "水管",
+    "reference": "IFC: 'Pipe Types:Cold Water' / 'Hot Water'; material not given",
+    "combustible": { "value": false, "source": "假设: material unknown; task E decides plastic or copper" }
+  },
+
+  "drain_pipe": {
+    "label": "排水管",
+    "class": "排水管",
+    "reference": "IFC: 'Pipe Types:Waste' and 'Pipe Types:PVC' (storm)",
+    "combustible": { "value": true, "source": "PVC for storm (IFC type name); waste pipe material not given (假设 plastic)" }
+  },
+
+  "appliance": {
+    "label": "设备",
+    "class": "设备",
+    "reference": "boilers, ranges, fans, panels, detectors from the IFC; not burning items here",
+    "combustible": { "value": false, "source": "假设" }
+  }
+}

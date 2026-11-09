@@ -7,6 +7,8 @@ import { SmokePass } from './smoke-pass.js';
 import { dressDuplex } from './dressing.js';
 import { Doors } from './doors.js';
 import { thickenPipes } from './pipes.js';
+import { buildObjects } from './objects.js';
+import { World } from './world.js';
 
 const DATA = '../duplex-overlay/data';
 // A storey on its own is shown cut just under its own ceiling; 'all' shows
@@ -101,6 +103,12 @@ scene.add(fireMarker);
 
 const doors = new Doors({ scene, building, grid, fire, rooms, dressedDoors: dressed.groups.door, cut, renderer });
 
+// The object table and the mechanisms that act on it (world.js). The
+// mechanism files are loaded further down, once the page is set up.
+const materials = await (await fetch(new URL('./materials.json', import.meta.url))).json();
+const objects = buildObjects(meta, grid, materials);
+const world = new World({ fire, grid, objects, rooms, materials });
+
 let fireLevel = 1;
 /** Move the fire and start again from nothing: a design fire grows from t = 0. */
 function placeFire(x, z, lvl) {
@@ -108,6 +116,7 @@ function placeFire(x, z, lvl) {
   if (pool.length === 0) return false;
   firePos.x = x; firePos.z = z; fireLevel = lvl;
   fire.reset();
+  world.reset();
   fire.setPool(pool);
   simTime = 0;
   return true;
@@ -411,6 +420,11 @@ addEventListener('resize', resize);
 resize();
 showLevel('all');
 
+// --- mechanisms -------------------------------------------------------------------
+// What a mechanism that draws or picks may need from the page.
+world.view = { scene, camera, renderer, controls, cut, dressed, doors, meta, extras, extraMeshes, services, serviceMeshes, smoke, rayAt, roomAt, LEVELS };
+await world.load();
+
 // --- loop ------------------------------------------------------------------------
 let simTime = 0, stepMs = 0, wallSeconds = 0;
 const clock = new THREE.Clock();
@@ -418,7 +432,7 @@ function frame() {
   const dt = Math.min(clock.getDelta(), 0.1);
   if (running) {
     const s = performance.now();
-    fire.step();
+    world.step();
     stepMs = stepMs ? stepMs * 0.9 + (performance.now() - s) * 0.1 : performance.now() - s;
     simTime = fire.time;
     wallSeconds += dt;
@@ -443,4 +457,4 @@ function frame() {
 renderer.setAnimationLoop(frame);
 
 // For poking at it from the console; frame() draws once even in a hidden tab.
-window.duplexFire = { fire, grid, placeFire, showLevel, camera, meta, frame, dressed, serviceMeshes, serviceMaterial, doors };
+window.duplexFire = { fire, grid, placeFire, showLevel, camera, meta, frame, dressed, serviceMeshes, serviceMaterial, doors, world, objects };

@@ -52,6 +52,10 @@ export class MacFire {
     this.temp = F(); this.temp0 = F();
     this.dens = F(); this.dens0 = F();
     this.fuel = F(); this.fuel0 = F();
+    // Other things the air carries (gas, water), added with addScalar;
+    // scalars holds each one's field by name.
+    this.extras = [];
+    this.scalars = {};
     this.p = F(); this.eddy = F();
     this.fx = F(); this.fy = F(); this.fz = F();
     // Wind at cell centres in cells per second, only for drawing (smoke-pass.js).
@@ -96,8 +100,26 @@ export class MacFire {
       if (!this.openX[c]) this.uf[c] = 0;
       if (!this.openY[c]) this.vf[c] = 0;
       if (!this.openZ[c]) this.wf[c] = 0;
-      if (solid[c]) { this.temp[c] = this.dens[c] = this.fuel[c] = this.p[c] = 0; }
+      if (solid[c]) {
+        this.temp[c] = this.dens[c] = this.fuel[c] = this.p[c] = 0;
+        for (const x of this.extras) x.field[c] = 0;
+      }
     }
+  }
+
+  /**
+   * Have the air carry one more thing, moved and mixed exactly as soot is, so
+   * its total is kept and walls stop it. Returns its field: one value per
+   * cell, in whatever unit the caller writes into it. Nothing else is done to
+   * it here: what makes or removes it, and any buoyancy of its own, belong to
+   * the module that added it.
+   */
+  addScalar(name) {
+    if (this.scalars[name]) return this.scalars[name];
+    const field = new Float32Array(this.size);
+    this.extras.push({ name, field, scratch: new Float32Array(this.size) });
+    this.scalars[name] = field;
+    return field;
   }
 
   step() {
@@ -112,6 +134,7 @@ export class MacFire {
       this.mixScalar(this.temp, this.temp0, dt);
       this.mixScalar(this.fuel, this.fuel0, dt);
       this.mixScalar(this.dens, this.dens0, dt);
+      for (const x of this.extras) this.mixScalar(x.field, x.scratch, dt);
     }
     this.cellVelocities();
     this.time += dt;
@@ -272,7 +295,7 @@ export class MacFire {
       const limiter = r > 0 ? 2 * r / (1 + r) : 0;   // van Leer
       return qa + 0.5 * limiter * (1 - cfl) * jump;
     };
-    for (const q of [this.temp, this.dens, this.fuel]) {
+    for (const q of [this.temp, this.dens, this.fuel, ...this.extras.map((x) => x.field)]) {
       for (let part = 0; part < parts; part++) {
         for (let n = 0; n < fluid.length; n++) {
           const c = fluid[n];
@@ -369,7 +392,7 @@ export class MacFire {
 
   reset() {
     for (const a of [this.uf, this.vf, this.wf, this.uf0, this.vf0, this.wf0, this.temp, this.temp0, this.dens, this.dens0,
-      this.fuel, this.fuel0, this.p, this.eddy, this.u, this.v, this.w]) a.fill(0);
+      this.fuel, this.fuel0, this.p, this.eddy, this.u, this.v, this.w, ...this.extras.map((x) => x.field)]) a.fill(0);
     this.time = 0;
   }
 
