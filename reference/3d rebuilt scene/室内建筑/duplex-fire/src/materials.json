@@ -199,5 +199,30 @@
     "class": "设备",
     "reference": "boilers, ranges, fans, panels, detectors from the IFC; not burning items here",
     "combustible": { "value": false, "source": "假设" }
+  },
+
+  "leakage": {
+    "label": "漏烟通道（门缝、插座、穿墙孔、墙体）",
+    "class": "通道",
+    "reference": "Task F (leaks.js). Areas are effective leakage areas at 4 Pa with Cd 1 and flow exponent 0.65 (the ASHRAE / NIST CONTAM convention), so q = ELA·sqrt(2·4/ρ)·(ΔP/4)^0.65. IFV 2020 (Smoke propagation in residential buildings, field experiments, 16 Sept 2020) measured 60–170 Pa in a closed fire room, 340–1010 Pa in an airtight one, and smoke through a party-wall socket 2.5–3 min after ignition; it gives no flow per socket.",
+    "flowExponent": { "value": 0.65, "source": "ASHRAE 1997 Fundamentals ch. 25, read through NIST CONTAM library ASHRAELA.LB3: component leakage at 4 Pa, n = 0.65" },
+    "outlet": { "value": 2.5, "unit": "cm²", "source": "ASHRAE 1997 Fundamentals ch. 25 table 3 (via CONTAM ASHRAELA.LB3): electrical outlet or switch, no gasket, 2.5 cm² (0.5–6.2). Two back-to-back outlets are two such holes in series, A/√2 (假设)" },
+    "penetration": { "value": 6, "unit": "cm²", "source": "ASHRAE 1997 Fundamentals ch. 25 table 3 (via CONTAM ASHRAELA.LB3): pipe or wiring penetration, uncaulked, 6 cm² (2–24)" },
+    "doorClosed": { "value": 250, "unit": "cm²", "source": "NIST CONTAM RESMISC.LB3 (NISTIR 6585): interior door closed, with frame and undercut, 250 cm²" },
+    "interiorWall": { "value": 2, "unit": "cm²/m²", "source": "NIST CONTAM RESMISC.LB3 (NISTIR 6585): interior wall 2 cm² per m²" },
+    "partyShare": { "value": 0.46, "source": "Bohac et al. 2020 (ASHRAE IAQ 2020): in separate-entry units, leakage to outdoors averaged 54% of each unit's total, the rest to neighbours. The party wall's area leakage is set so that it, with the back-to-back outlets, is this share of the unit's total. At CONTAM's 2 cm²/m² it would be 66% here" },
+    "envelopeACH50": { "value": 3, "unit": "1/h", "source": "IECC limit for climate zones 3–8, as given in Bohac et al. 2020 (ASHRAE IAQ 2020, Exterior and Total Envelope Leakage of New U.S. Low-Rise Multifamily Buildings); that the Duplex meets it is 假设. A unit's total minus its leaks to the other unit goes outdoors" },
+    "pressureSmoothing": { "value": 0.5, "unit": "s", "source": "假设: the expansion flow is eased over this long so the pressure does not flicker step to step" },
+    "doorStuckPressure": { "value": 150, "unit": "Pa", "source": "Brohez & Duhamel 2018, Chem. Eng. Trans. 67: above 150 Pa most people cannot open an inward-opening door" },
+    "smokeVisible": { "value": 0.01, "unit": "g/m³", "source": "[估] soot at which smoke starts to show: 8.7 m²/g specific extinction (Mulholland & Croarkin 2000) gives 0.087 /m, about 35 m visibility; the threshold itself is 假设" }
+  },
+
+  "exhaust_fan": {
+    "label": "屋顶排风机",
+    "class": "设备",
+    "reference": "Task F (sources.js, leaks.js). The IFC's two rooftop upblast fans are on 'Unit A/B Mechanical Exhaust Air', a round duct that starts on top of the boiler in the utility room; so the fan draws there (假设: the boiler is open to the room air at that point).",
+    "flow": { "value": 0.991, "unit": "m³/s", "source": "IFC type name '991-1905 LPS'; the low end taken (假设)" },
+    "shutoffPressure": { "value": 250, "unit": "Pa", "source": "假设: a straight fan curve, no flow against 250 Pa" },
+    "defaultOn": { "value": false, "source": "假设: off until you switch it on" }
   }
 }
