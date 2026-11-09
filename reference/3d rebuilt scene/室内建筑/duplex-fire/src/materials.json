@@ -137,6 +137,7 @@
     "innerDiameter": { "value": 0.0266, "unit": "m", "source": "[估] the IFC pipe boxes are 33 mm across, the outer diameter of 1 in steel pipe (33.4 mm); 1 in Schedule 40 is 26.6 mm inside (ASME B36.10, from memory, not re-read)" },
     "frictionFactor": { "value": 0.03, "source": "假设: Darcy factor for 1 in steel at Re about 1e4 (Moody chart, roughness 0.045 mm)" },
     "fittingLoss": { "value": 1, "source": "假设: K per elbow; handbooks give 0.3–2 (as water_supply)" },
+    "radiantFraction": { "value": 0.2, "source": "假设: share of a gas fire's heat (burning at a cut or failed pipe) lost as radiation; methane flames are among the least sooty, nothing looked up. radiation.js reads it from here, gas.js too" },
     "dischargeCoefficient": { "value": 0.6, "source": "DNV GL Report 630650 Rev. 3 (Hy4Heat WP7, 2020): a 7.2 mm hole at 20 mbar let out 6.4 m³/h of methane, which gives Cd about 0.57 (read by a research sub-session; the Cd is our arithmetic)" }
   },
 
@@ -165,7 +166,6 @@
     "doorFailure": { "value": 3000, "unit": "Pa", "source": "假设: an interior door's latch gives at the same pressure as a window; building elements fail one after another at 100–200 mbar (Kiwa 2021, citing the King inquiry), walls not modelled" },
     "eventVolume": { "value": 0.05, "unit": "m³", "source": "假设: a burn of less gas than this (1.7 MJ) is not reported as a deflagration and pushes nothing open" },
     "flameHeight": { "value": "L = 0.235 Q^0.4 − 1.02 D (m, Q in kW)", "source": "Heskestad's flame height correlation as given in the SFPE Handbook (from memory, not re-read). A lit outlet's flame lights gas in the cells straight above it up to L: about 2 m for a cut line (200 kW), 0.4 m for the leaking boiler valve (5 kW)" },
-    "radiantFraction": { "value": 0.2, "source": "假设: a share of the gas flame's heat lost as radiation; methane flames are among the least sooty, nothing looked up" },
     "sootYield": { "value": 0, "source": "假设: methane makes almost no soot at atmospheric pressure (Cranfield, Brookes 1996, summary); taken as none" }
   },
 

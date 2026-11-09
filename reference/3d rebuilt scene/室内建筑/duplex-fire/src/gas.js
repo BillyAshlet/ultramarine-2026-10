@@ -95,7 +95,7 @@ export default function gas(world) {
     windowPa: v(mix, 'windowFailure'),
     doorPa: v(mix, 'doorFailure'),
     eventM3: v(mix, 'eventVolume'),
-    chiR: v(mix, 'radiantFraction'),
+    chiR: v(pipeM, 'radiantFraction'),
     leakC: v(valveM, 'leakTemp'),
     leakFlow: v(valveM, 'leakFlow') / 3600,
     meltC: v(valveM, 'meltTemp'),
