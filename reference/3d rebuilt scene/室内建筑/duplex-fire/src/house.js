@@ -7,6 +7,7 @@
 import * as THREE from 'three';
 import { voxelize } from './voxelize.js';
 import { WindyFire } from './windy.js';
+import { WallLoss } from './walls.js';
 
 export const CELL = 0.2;
 
@@ -156,7 +157,9 @@ export class HouseFire extends WindyFire {
     this.vorticity = 0;
     this.dt = 0.05;
     this.sootMade = 0;   // grams
+    this.heatMade = 0;   // J put into the air (the radiated share is not)
     this.setPool(pool);
+    this.walls = new WallLoss(this);
   }
 
   // Called by WindyFire's constructor: a house has no open sides.
@@ -176,6 +179,7 @@ export class HouseFire extends WindyFire {
       // Fuel is counted in the degrees it will give the air it burns in.
       const fuelRate = q * (1 - this.radiantFraction) / (1.2 * 1005 * this.poolVolume);
       const sootRate = q / HEAT_OF_COMBUSTION * SOOT_YIELD * 1000 / this.poolVolume;   // g/m3 per s
+      this.heatMade += q * (1 - this.radiantFraction) * dt;
       for (const c of firePool) {
         // Slightly uneven, as in WindyFire: an even source stays symmetrical.
         this.seed = (this.seed * 1103515245 + 12345) & 0x7fffffff;
@@ -187,6 +191,7 @@ export class HouseFire extends WindyFire {
     }
     super.step();
     this.keepSoot();
+    this.walls.apply(dt);
   }
 
   /**
@@ -217,6 +222,8 @@ export class HouseFire extends WindyFire {
     this.fuel.fill(0); this.fuel0.fill(0); this.eddy.fill(0);
     this.time = 0;
     this.sootMade = 0;
+    this.heatMade = 0;
+    this.walls?.reset();
   }
 }
 
