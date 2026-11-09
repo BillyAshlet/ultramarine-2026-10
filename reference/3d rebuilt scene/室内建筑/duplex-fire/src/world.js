@@ -21,6 +21,11 @@
 //   report(world, dt)    6  what changed becomes events and drawing
 // If a module throws, it is switched off and the error is printed; the rest
 // keeps running.
+//
+// Every module is timed: world.timings() gives each one's milliseconds per
+// step (all its phases together, smoothed), and the solver's. The budget in
+// 开工顺序.md is 10 ms per step for all the mechanisms together; the solver
+// alone is about 43 ms, which is already about as fast as real time.
 
 import { Events } from './events.js';
 
@@ -52,6 +57,7 @@ export class World {
     this.view = view;
     this.events = new Events(() => this.fire.time);
     this.modules = [];
+    this.solverMs = 0;
   }
 
   get time() { return this.fire.time; }
@@ -104,21 +110,35 @@ export class World {
   run(phase, dt) {
     for (const m of this.modules) {
       if (m.off || typeof m[phase] !== 'function') continue;
+      const t = performance.now();
       try {
         m[phase](this, dt);
       } catch (err) {
         m.off = true;
         console.error(`[world] ${m.name}.${phase} threw; ${m.name} is switched off`, err);
       }
+      m.stepMs = (m.stepMs ?? 0) + performance.now() - t;
     }
   }
 
   /** One step of everything, dt = the solver's step. */
   step() {
     const dt = this.fire.dt;
+    for (const m of this.modules) m.stepMs = 0;
     for (const p of PHASES_BEFORE) this.run(p, dt);
+    const t = performance.now();
     this.fire.step();
+    this.solverMs = smooth(this.solverMs, performance.now() - t);
     for (const p of PHASES_AFTER) this.run(p, dt);
+    for (const m of this.modules) m.ms = smooth(m.ms, m.stepMs);
+  }
+
+  /** Milliseconds per step, smoothed: the solver, then each module that does work in the step. */
+  timings() {
+    return [
+      { name: 'solver', ms: this.solverMs },
+      ...this.modules.filter((m) => m.ms != null).map((m) => ({ name: m.name, ms: m.ms, off: !!m.off })),
+    ];
   }
 
   /** Start over: fields (the caller resets the fire), objects, events, every module. */
@@ -131,6 +151,8 @@ export class World {
     }
   }
 }
+
+const smooth = (old, now) => (old ? old * 0.9 + now * 0.1 : now);
 
 /** An object's box centre, [x, y, z]. */
 export function centreOf(o) {

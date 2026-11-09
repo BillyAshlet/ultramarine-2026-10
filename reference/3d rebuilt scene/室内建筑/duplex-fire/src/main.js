@@ -452,7 +452,9 @@ function frame() {
     (note ? ` · ${note}` : '');
   status.textContent = `t ${Math.floor(simTime / 60)}:${String(Math.floor(simTime % 60)).padStart(2, '0')} · ` +
     `${grid.nx}×${grid.ny}×${grid.nz} grid, ${fire.fluid.length} air cells · step ${stepMs.toFixed(0)} ms · ` +
-    `${(fire.dt / (stepMs / 1000 || 1)).toFixed(1)}× real time at most`;
+    `${(fire.dt / (stepMs / 1000 || 1)).toFixed(1)}× real time at most` +
+    // Each mechanism's share of the step (world.js), against the 10 ms budget.
+    world.timings().slice(1).map((t) => ` · ${t.name} ${t.ms.toFixed(1)} ms${t.off ? ' (off)' : ''}`).join('');
 }
 renderer.setAnimationLoop(frame);
 
