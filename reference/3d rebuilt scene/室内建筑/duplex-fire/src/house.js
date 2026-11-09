@@ -6,7 +6,7 @@
 // tools/bench.mjs under node.
 import * as THREE from 'three';
 import { voxelize } from './voxelize.js';
-import { WindyFire } from './windy.js';
+import { MacFire } from './mac3d.js';
 import { WallLoss } from './walls.js';
 
 export const CELL = 0.2;
@@ -132,10 +132,9 @@ export function buildGrid(building, cell = CELL) {
  * a peak, then holds. This is how fire engineering stands in for a fire it
  * cannot predict: the growth rate is chosen, not computed.
  *
- * The burning and real units are WindyFire's (../../交通工具/wind-plume),
- * sealed: no open boundaries, no wind. Heat is not lost to walls yet, so
- * temperatures far from the fire run high; smoke movement is the point of
- * this first step.
+ * The solver is mac3d.js: burning and real units as wind-plume's WindyFire,
+ * but on a staggered grid and moving heat, soot and fuel so their totals are
+ * kept (see its top for why). The walls take heat out of the air (walls.js).
  */
 export const GROWTH = { slow: 0.00293e3, medium: 0.01172e3, fast: 0.0469e3, ultrafast: 0.1876e3 }; // W/s^2
 
@@ -145,25 +144,25 @@ export const GROWTH = { slow: 0.00293e3, medium: 0.01172e3, fast: 0.0469e3, ultr
 const HEAT_OF_COMBUSTION = 25e6;  // J per kg of fuel
 const SOOT_YIELD = 0.05;          // kg of soot per kg of fuel
 
-export class HouseFire extends WindyFire {
-  constructor({ grid, pool, growth = GROWTH.medium, peak = 1e6, radiantFraction = 0.35, burnTime = 1.5, smagorinsky = 0.2 }) {
-    // WindyFire gets no pool of its own: it marks its pool cells as smoke = 1,
-    // a tracer that thinned to nothing within a room. Fuel and soot are added
-    // here instead, in step().
-    super({ nx: grid.nx, ny: grid.ny, nz: grid.nz, cell: grid.cell, solid: grid.solid, wind: { x: 0, z: 0 }, pool: new Int32Array(0), heatRelease: 0, radiantFraction, burnTime, smagorinsky });
+export class HouseFire extends MacFire {
+  // burnTime: fuel burns over this long. 1.5 s (WindyFire's value) spread the
+  // heat up the whole plume to the ceiling; 0.5 s, chosen against
+  // Heskestad's free plume at 150 kW and checked at 60 kW before any Duplex
+  // run, puts it in the flame. 1 m or more above the flame the centreline
+  // is then within about 15% of Heskestad; nearer the flame it is too cool
+  // and slow, because a 20 cm grid gives these fires only 1.5 to 2 cells
+  // across (FDS advises 4 or more).
+  constructor({ grid, pool, growth = GROWTH.medium, peak = 1e6, radiantFraction = 0.35, burnTime = 0.5, smagorinsky = 0.2 }) {
+    super({ nx: grid.nx, ny: grid.ny, nz: grid.nz, cell: grid.cell, solid: grid.solid, burnTime, smagorinsky });
     this.growth = growth;
     this.peak = peak;
     this.radiantFraction = radiantFraction;
-    this.vorticity = 0;
-    this.dt = 0.05;
+    this.seed = 12345;
     this.sootMade = 0;   // grams
     this.heatMade = 0;   // J put into the air (the radiated share is not)
     this.setPool(pool);
     this.walls = new WallLoss(this);
   }
-
-  // Called by WindyFire's constructor: a house has no open sides.
-  openBoundaries() { this.open = []; }
 
   setPool(cells) {
     this.firePool = cells;
@@ -172,6 +171,13 @@ export class HouseFire extends WindyFire {
 
   heatRelease() { return Math.min(this.growth * this.time * this.time, this.peak); }
 
+  /**
+   * The fire adds fuel and soot on its patch of floor, in proportion to what
+   * burns. Soot used to be a tracer held at 1 in the fire's cells, as in
+   * WindyFire, which thinned to nothing within a room; and while the old
+   * solver lost three quarters of it at the ceiling, it was scaled back up to
+   * the amount made every step. mac3d.js keeps it, so that is gone.
+   */
   step() {
     const { firePool, fuel, dens, dt } = this;
     if (firePool.length) {
@@ -190,37 +196,11 @@ export class HouseFire extends WindyFire {
       }
     }
     super.step();
-    this.keepSoot();
     this.walls.apply(dt);
-  }
-
-  /**
-   * Two things lost soot that heat did not lose:
-   *  - the row of cells under a ceiling has no upward wind (the ceiling stops
-   *    it), and the solver fills a cell only from where its own wind came
-   *    from, so soot never got into that row. Heat did, because WindyFire
-   *    stirs it with the eddies. Soot is now stirred the same way.
-   *  - tracing back along the wind does not keep totals, and where the plume
-   *    hits the ceiling a lot goes missing: after 60 s only a quarter of the
-   *    soot made was still in the house. All of it is now scaled back up to
-   *    what the fire has made, the simplest fix that keeps the amount right.
-   */
-  keepSoot() {
-    const { fluid, dens } = this;
-    if (this.smagorinsky > 0) this.mix(dens, this.dens0, 2);
-    let total = 0;
-    for (let n = 0; n < fluid.length; n++) total += dens[fluid[n]];
-    total *= this.cell ** 3;
-    if (total > 0 && this.sootMade > 0) {
-      const scale = this.sootMade / total;
-      for (let n = 0; n < fluid.length; n++) dens[fluid[n]] *= scale;
-    }
   }
 
   reset() {
     super.reset();
-    this.fuel.fill(0); this.fuel0.fill(0); this.eddy.fill(0);
-    this.time = 0;
     this.sootMade = 0;
     this.heatMade = 0;
     this.walls?.reset();

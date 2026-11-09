@@ -37,17 +37,19 @@ The look (floorboards, tiles, skirting, low afternoon sun through the windows, s
 | Doors | Duplex Architecture IFC | inside doors open, the four outside doors shut |
 | Stairs, railings, furniture | not solid | thinner than a cell, they would plug the stairwell |
 | Fire | **assumed** | a t² design fire (slow 2.93, medium 11.72, fast 46.9, ultra-fast 187.6 W/s², the standard values) up to 1 MW, on 0.6 × 0.6 m of floor |
-| Burning, real units, turbulence | `windy.js` from wind-plume, unchanged | sealed instead of open: no wind, no open sides |
+| Solver | `mac3d.js` | wind on cell faces (a staggered grid); heat, soot and fuel moved face by face so their totals are kept and nothing crosses a wall. Burning, real units and eddy mixing as wind-plume's `windy.js`, sealed; fuel burns over 0.5 s |
+| Walls taking heat | `walls.js` | every face as 12.7 mm gypsum board: EN 1991-1-2's convection and radiation to the surface, MQH's sqrt(kρc/t) into it |
 | Smoke | **assumed** | soot in g/m³, made in proportion to what burns: heat of combustion 25 MJ/kg, soot yield 0.05. Both are placeholders, not looked up; soot yield varies about tenfold between wood and foam |
 
-`fluid3d.js`, `voxelize.js` and `windy.js` are unchanged copies. `smoke-pass.js` is a copy with two changes, listed at its top.
+`voxelize.js` is an unchanged copy. `fluid3d.js` and `windy.js` are unchanged copies no longer used here: they made heat out of nothing (see Known problems, and the top of `mac3d.js`). `smoke-pass.js` is a copy with two changes, listed at its top.
 
 ## Checked
 
 - **Grid**: 44 × 32 × 89 cells at 20 cm, 82,355 of them air.
 - **The two units are sealed from each other**: flood-filling the air gives one region per unit, each holding all ten of its rooms and nothing of the other's.
-- **Speed**: about 36 ms a step under node, 35–52 ms in the browser while drawing (the upper end with see-through walls and shadows). At 0.05 s a step that is 1.0–1.4 times real time.
-- **Soot is kept**: after 60 s of a fast fire the house holds 6.74 g, against 6.75 g made.
+- **Speed**: about 43 ms a step under node, 41 ms in the browser, 44–60 ms while drawing. At 0.05 s a step that is 0.8–1.2 times real time.
+- **Heat and soot are kept**: a fast fire in A102, walls off, after 60 s: the heat in the air plus the fuel not yet burned is 99.7% of the heat the fire put in (the old solver: 315%), and the house holds 6.72 g of soot of 6.72 g made. With walls on, after 90 s (380 kW): air, unburned fuel and walls together 99.6%, the walls having taken 47%. (A measured 1 MW room fire put about 74% into its walls, Hamins et al. 2008, over a longer burn.) The leftover net outflow of a cell after the pressure solve is about 10⁻⁷ m/s.
+- **The plume against Heskestad**: a 150 kW fire held steady in A102, centreline averaged over 15 s. From 1.7 to 2.3 m it is 77–111% of Heskestad's temperature and 81–110% of his speed; at 1.3 m, just over the flame, 55% and 81%. At 60 kW the same: within about 15% from 1 m above the flame, too cool and slow nearer it. A 20 cm grid gives these fires 1.5–2 cells across, where FDS advises 4 or more.
 - **Smoke goes where hot gas goes**: a fast fire in A102 Living Room after 90 s (380 kW), soot in g/m³ by height above each floor:
 
 | Room | 0.3 m | 1.0 m | 1.5 m | 2.0 m | 2.4 m |
@@ -63,10 +65,11 @@ A layer under the ceiling of the fire room, spreading through the open plan and 
 
 ## Known problems
 
-- **Walls do not absorb heat.** Far from the fire the air stays too hot: the upstairs hallway reaches about 100 K above ambient at 2.4 m after 90 s. Smoke movement is the point of this step; temperatures are not to be read off yet.
+- **Fixed: the old solver made heat.** With walls off, after 60 s the air held three times the heat the fire had made, nearly all of it in the row of cells under the ceiling: fluid3d.js zeroed the updraft there after the pressure solve (blockWalls), and its look-back advection then copied the plume into that row. The same solver lost three quarters of the soot at the ceiling, which was being scaled back up every step. `mac3d.js` replaces it. The wind-plume experiment uses the old solver, so its plume being 50–70% too hot higher up may have the same cause.
+- **Walls take heat but have no temperature of their own.** The radiation part takes the wall surface as ambient, and every face is gypsum board.
 - **No oxygen.** The fire keeps growing to 1 MW in a sealed house, where a real one would run short of air.
-- **The engine has not been compared with a room fire.** In wind-plume, against a textbook plume, it was within about 10% near the flame tip and 50–70% too hot higher up, on a 0.5 m grid.
-- Soot is kept by scaling all of it back to the amount made each step. This keeps the total right but not where it is lost from.
+- **The engine has not been compared with a room fire**, only with Heskestad's free plume (above).
+- Gas does not expand when heated (the solver is incompressible), so a fire does not push smoke out of a room by its own volume.
 
 ## Next
 
