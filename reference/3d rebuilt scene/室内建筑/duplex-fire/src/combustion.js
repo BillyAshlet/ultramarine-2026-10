@@ -127,7 +127,9 @@ export function burnModel(materials, key, o) {
   let peak = val(m, 'peakHRR');
   if (peak == null && val(m, 'peakHRRPerMetre') != null) peak = val(m, 'peakHRRPerMetre') * length;
   if (peak == null && val(m, 'peakHRRPerArea') != null) peak = val(m, 'peakHRRPerArea') * plan;
-  const total = (o.fuelMJ ?? 0) * 1e6;
+  // A total per m² of plan (coffee tables) is per item, which objects.js's
+  // fuelOf does not know about; the caller writes it back to o.fuelMJ.
+  const total = val(m, 'totalHeatPerArea') != null ? val(m, 'totalHeatPerArea') * plan : (o.fuelMJ ?? 0) * 1e6;
   let tp = val(m, 'timeToPeak');
   if (!(peak > 0) || !(total > 0) || !(tp > 0)) return null;
   // A peak that would release more than the total while growing: grow faster.
@@ -154,6 +156,10 @@ export default function combustion(world) {
     if (!o.combustible) continue;
     const model = burnModel(materials, o.material, o);
     if (!model) continue;
+    // What this one holds, as it burns here (differs from objects.js only for
+    // totals per area, and by a few MJ where a measured curve's sum differs
+    // from the reported total).
+    if (val(materials[o.material], 'totalHeatPerArea') != null) o.fuelMJ = model.total / 1e6;
     const m = materials[o.material];
     const mm = m.scaleFrom ? { ...materials[m.scaleFrom.value], ...m } : m;
     const tig = val(mm, 'ignitionTemp'), krc = val(mm, 'krc'), qcr = val(mm, 'criticalFlux');
