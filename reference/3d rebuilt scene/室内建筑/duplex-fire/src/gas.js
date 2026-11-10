@@ -55,6 +55,7 @@
 // that list is rebuilt from the whole grid every few steps, and only once
 // gas has been released.
 import * as THREE from 'three';
+import { DRAW_DIAMETER } from './pipes.js';
 
 const G = 9.81;
 const T_AMBIENT = 293;              // K: the solver's zero (mac3d.js T0)
@@ -407,10 +408,8 @@ export default function gas(world) {
     draw.group = new THREE.Group();
     draw.group.name = 'gas';
     draw.group.add(draw.points, draw.markers);
-    draw.geom = { meter: new THREE.BoxGeometry(0.14, 0.14, 0.14), part: new THREE.CylinderGeometry(0.06, 0.06, 0.1, 12), outlet: new THREE.SphereGeometry(0.08, 12, 8), flame: new THREE.ConeGeometry(0.1, 0.35, 12) };
+    draw.geom = { part: new THREE.CylinderGeometry(0.06, 0.06, 0.1, 12), outlet: new THREE.SphereGeometry(0.08, 12, 8), flame: new THREE.ConeGeometry(0.1, 0.35, 12) };
     draw.mat = {
-      meter: new THREE.MeshBasicMaterial({ color: 0xffc400, clippingPlanes: clip }),
-      shut: new THREE.MeshBasicMaterial({ color: 0x777777, clippingPlanes: clip }),
       part: new THREE.MeshBasicMaterial({ color: 0xffc400, clippingPlanes: clip }),
       outlet: new THREE.MeshBasicMaterial({ color: 0xffe066, clippingPlanes: clip }),
       flame: new THREE.MeshBasicMaterial({ color: 0xff6a1a, clippingPlanes: clip }),
@@ -424,8 +423,8 @@ export default function gas(world) {
     if (!draw.markers) return;
     draw.markers.clear();
     const add = (geom, m, pos) => { const mesh = new THREE.Mesh(geom, m); mesh.position.set(...pos); draw.markers.add(mesh); };
+    // The meters and valves are drawn by actions.js (task F), as handles at u.meterPos.
     for (const u of Object.values(units)) {
-      add(draw.geom.meter, u.open ? draw.mat.meter : draw.mat.shut, u.meterPos);
       if (u.part && !u.part.outlet) add(draw.geom.part, draw.mat.part, centre(u.part.node.o));
     }
     for (const o of outlets) {
@@ -456,6 +455,195 @@ export default function gas(world) {
     g.setDrawRange(0, n);
     g.attributes.position.needsUpdate = true;
     g.attributes.color.needsUpdate = true;
+  }
+
+  // --- the tank and the gas view (page only) ---------------------------------------------
+  // The gas network drawn as a tank outside the west wall, where both units'
+  // lines come in: the network is an infinite supply (架构.md ④), so the tank
+  // never empties; it only stands for "the network" so there is something to
+  // see and to click. Each unit's line is drawn on from its entry end (under
+  // the ground, where the meter and valve are, 假设) out to the tank. Drawing
+  // only: none of it is in the grid or the flow sums.
+  //
+  // Clicking the tank turns on the gas view: everything else in the scene
+  // loses its colour, and what has to do with gas (the pipes, the tank, the
+  // boilers and their gas valves, the gas in the air, the breaks and gas
+  // fires) is drawn opaque and bright. Click it again or press Esc to leave.
+  // The greying is a uniform (uGasFocus, 0 = off) added to the other
+  // materials' shaders when the view is first turned on; at 0 it changes
+  // nothing. Those materials belong to main.js, dressing.js and the other
+  // tasks; their files are not touched (Billy, 2026-11-10).
+  const GAS_COLOUR = 0xffc400;
+  const focus = { on: false, uniform: { value: 0 }, patched: new WeakSet(), saved: null, ease: null };
+  const tank = { group: null, meshes: [], boilers: [] };
+
+  function buildTank() {
+    const clip = view.cut ? [view.cut] : [];
+    const list = Object.values(units);
+    const zc = list.reduce((s, u) => s + u.meterPos[2], 0) / list.length;
+    const T = { x: -1.6, z: zc, r: 0.42, base: -0.2, height: 1.5 };
+    tank.group = new THREE.Group();
+    tank.group.name = 'gas tank';
+    tank.group.userData.gasFocus = true;
+    const tankMat = new THREE.MeshLambertMaterial({ color: GAS_COLOUR, emissive: 0x3a2800, clippingPlanes: clip });
+    const pipeMat = new THREE.MeshLambertMaterial({ color: GAS_COLOUR, emissive: 0x3a2800, clippingPlanes: clip });
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(T.r, T.r, T.height - 2 * T.r, 32), tankMat);
+    body.position.set(T.x, T.base + T.height / 2, T.z);
+    const top = new THREE.Mesh(new THREE.SphereGeometry(T.r, 32, 12, 0, Math.PI * 2, 0, Math.PI / 2), tankMat);
+    top.position.set(T.x, T.base + T.height - T.r, T.z);
+    const bottom = new THREE.Mesh(new THREE.SphereGeometry(T.r, 32, 12, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), tankMat);
+    bottom.position.set(T.x, T.base + T.r, T.z);
+    tank.group.add(body, top, bottom);
+    // Each time the page draws, move the gas view's grey on (see setFocus).
+    body.onBeforeRender = () => {
+      const e = focus.ease;
+      if (!e) return;
+      const k = Math.min(1, (performance.now() - e.t0) / 400);
+      focus.uniform.value = e.from + (e.to - e.from) * k * (2 - k);
+      if (k === 1) focus.ease = null;
+    };
+    tank.meshes.push(body, top, bottom);
+    // A straight pipe between two points on one axis, as thick as pipes.js draws them.
+    const pipe = (a, b) => {
+      const d = new THREE.Vector3(...b).sub(new THREE.Vector3(...a));
+      const m = new THREE.Mesh(new THREE.CylinderGeometry(DRAW_DIAMETER / 2, DRAW_DIAMETER / 2, d.length() + DRAW_DIAMETER, 12), pipeMat);
+      m.position.set(...a).addScaledVector(d, 0.5);
+      m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize());
+      tank.group.add(m);
+    };
+    for (const u of list) {
+      const [x, y, z] = u.meterPos;
+      pipe([x, y, z], [T.x, y, z]);
+      pipe([T.x, y, z], [T.x, T.base + 0.15, z]);
+    }
+    // The label: what the tank stands for.
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 128;
+    const g = canvas.getContext('2d');
+    g.fillStyle = 'rgba(20, 20, 24, 0.78)';
+    g.fillRect(0, 0, 512, 128);
+    g.fillStyle = '#ffc400';
+    g.font = 'bold 50px "Heiti SC", "PingFang SC", sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText('∞ 燃气网 Gas mains', 256, 46);
+    g.font = '30px "Heiti SC", "PingFang SC", sans-serif';
+    g.fillStyle = '#e6e6ea';
+    g.fillText('无限供应 · 点击看燃气 click', 256, 98);
+    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(canvas), depthTest: false, clippingPlanes: clip }));
+    label.scale.set(1.6, 0.4, 1);
+    label.position.set(T.x, T.base + T.height + 0.35, T.z);
+    label.renderOrder = 11;
+    tank.group.add(label);
+    tank.meshes.push(label);
+    view.scene.add(tank.group);
+    // The boilers burn the gas: copies drawn bright over them in the gas view.
+    // Drawn through the walls in the gas view, like the pipes (setFocus).
+    // transparent (at full opacity) puts them in the last pass, after the
+    // see-through walls, which otherwise lay over them layer upon layer.
+    const boilerMat = new THREE.MeshLambertMaterial({ color: 0xffb020, emissive: 0x402800, clippingPlanes: clip, depthTest: false, transparent: true, opacity: 1 });
+    for (const m of view.extras?.fixtures?.elements ?? []) {
+      if (!/Boiler/.test(m.userData.element?.name ?? '')) continue;
+      const copy = new THREE.Mesh(m.geometry, boilerMat);
+      copy.visible = false;
+      copy.renderOrder = 9;
+      copy.userData.gasFocus = true;
+      view.scene.add(copy);
+      tank.boilers.push(copy);
+    }
+    draw.group.userData.gasFocus = true;
+  }
+
+  /** Add the greying uniform to a material's shader (once; at 0 it does nothing). */
+  function patch(m) {
+    if (!m || focus.patched.has(m) || m.isShaderMaterial || m.isRawShaderMaterial) return;
+    focus.patched.add(m);
+    const before = m.onBeforeCompile;
+    // Read the key the material has now: the default one is built from
+    // onBeforeCompile's text, which is about to become this wrapper's for all.
+    const key = m.customProgramCacheKey();
+    m.onBeforeCompile = function (shader, renderer) {
+      before.call(this, shader, renderer);
+      const anchor = ['#include <dithering_fragment>', '#include <premultiplied_alpha_fragment>'].find((a) => shader.fragmentShader.includes(a));
+      if (!anchor) return;
+      shader.uniforms.uGasFocus = focus.uniform;
+      shader.fragmentShader = 'uniform float uGasFocus;\n' + shader.fragmentShader.replace(anchor, `${anchor}
+      { float grey = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114));
+        gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(grey) * 0.8 + 0.1, 0.9 * uGasFocus); }`);
+    };
+    m.customProgramCacheKey = () => `${key}|gasFocus`;
+    m.needsUpdate = true;
+  }
+
+  function setFocus(on) {
+    if (!view?.scene || on === focus.on) return focus.on;
+    focus.on = on;
+    const gasMesh = view.serviceMeshes?.gas;
+    if (on) {
+      // Groups holding something gas-yellow (actions.js's gas valve handles) keep their colour.
+      const isGas = (o) => [o.material].flat().some((m) => m?.color?.getHex?.() === GAS_COLOUR);
+      view.scene.traverse((o) => { if (o.isGroup && o.children.some(isGas)) o.userData.gasFocus = true; });
+      view.scene.traverse((o) => {
+        if (o.userData.gasFocus) return;
+        for (let p = o.parent; p; p = p.parent) if (p.userData.gasFocus) return;
+        if (o === gasMesh) return;
+        for (const m of Array.isArray(o.material) ? o.material : [o.material]) patch(m);
+      });
+      if (gasMesh) {
+        focus.saved = { material: gasMesh.material, visible: gasMesh.visible };
+        // Opaque, brighter, and drawn through the walls: most of the line is inside them.
+        // transparent at full opacity: drawn after the see-through walls (as boilerMat).
+        focus.gasMat ??= new THREE.MeshLambertMaterial({ vertexColors: true, emissive: 0x2a1c00, side: THREE.DoubleSide, depthTest: false, transparent: true, opacity: 1, clippingPlanes: view.cut ? [view.cut] : [] });
+        focus.saved.renderOrder = gasMesh.renderOrder;
+        gasMesh.material = focus.gasMat;
+        gasMesh.renderOrder = 9;
+        gasMesh.visible = true;
+      }
+    } else if (gasMesh && focus.saved) {
+      gasMesh.material = focus.saved.material;
+      gasMesh.visible = focus.saved.visible;
+      gasMesh.renderOrder = focus.saved.renderOrder;
+      focus.saved = null;
+    }
+    for (const b of tank.boilers) b.visible = on;
+    if (draw.points) draw.points.material.opacity = on ? 1 : 0.85;
+    badge(on);
+    // Ease the grey in and out over 0.4 s; the tank moves it on each time it is drawn.
+    focus.ease = { from: focus.uniform.value, to: on ? 1 : 0, t0: performance.now() };
+    return on;
+  }
+
+  function badge(on) {
+    if (typeof document === 'undefined') return;
+    focus.badge ??= Object.assign(document.createElement('div'), {
+      innerHTML: '燃气视图 Gas view · 再点燃气筒或按 Esc 退出 click the tank or Esc to leave',
+    });
+    Object.assign(focus.badge.style, {
+      position: 'fixed', top: '12px', left: '50%', transform: 'translateX(-50%)', padding: '6px 12px', borderRadius: '6px',
+      background: 'rgba(20,20,24,0.85)', color: '#ffc400', font: '12px "Heiti SC", "PingFang SC", sans-serif', pointerEvents: 'none', zIndex: 20,
+    });
+    if (on) document.body.appendChild(focus.badge); else focus.badge.remove();
+  }
+
+  if (view?.scene && typeof document !== 'undefined') {
+    buildTank();
+    const host = view.renderer.domElement.parentElement ?? view.renderer.domElement;
+    const rc = new THREE.Raycaster();
+    rc.camera = view.camera;   // a sprite (the label) cannot be hit without it
+    const onTank = (ev) => { rc.ray.copy(view.rayAt(ev)); return rc.intersectObjects(tank.meshes, false).length > 0; };
+    let downAt = null, hovering = false;
+    host.addEventListener('pointerdown', (ev) => { downAt = [ev.clientX, ev.clientY]; }, { capture: true });
+    host.addEventListener('pointerup', (ev) => {
+      if (!downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
+      if (!onTank(ev)) return;
+      ev.stopPropagation();   // not a click on whatever is behind it (card.js)
+      setFocus(!focus.on);
+    }, { capture: true });
+    host.addEventListener('pointermove', (ev) => {
+      if (ev.buttons) return;
+      const over = onTank(ev);
+      if (over !== hovering) { hovering = over; view.renderer.domElement.style.cursor = over ? 'pointer' : ''; }
+    });
+    addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && focus.on) setFocus(false); });
   }
 
   // --- each step ---------------------------------------------------------------------
@@ -650,6 +838,8 @@ export default function gas(world) {
       for (let s = 0; s < activeCount; s++) { const x = X[active[s]]; if (x > peak) peak = x; if (flammable(x)) burnable++; }
       return { peakPercent: +(peak * 100).toFixed(2), burnableM3: +(burnable * V).toFixed(2) };
     },
+    /** The gas view: focus(true) greys everything but the gas; focus() toggles. Same as clicking the tank. */
+    focus(on = !focus.on) { return setFocus(on); },
     show(on = !draw.show) { draw.show = on; if (draw.points) { draw.points.visible = on; if (on) redrawCloud(); } return on; },
     field: X,
     units,
