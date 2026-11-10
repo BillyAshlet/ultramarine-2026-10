@@ -175,9 +175,19 @@ export function buildGrid(building, cell = CELL) {
 }
 
 /**
- * A t-squared design fire: heat release grows as alpha * t^2 until it reaches
- * a peak, then holds. This is how fire engineering stands in for a fire it
- * cannot predict: the growth rate is chosen, not computed.
+ * The fire you drag into place is an igniter, not a design fire: a 50 kW gas
+ * burner that burns for 200 s and goes out, as NBS lit chairs, sofas and a
+ * bookcase (NBSIR 83-2787 §3.2.2: "designed to simulate the peak burning rate
+ * of a wastebasket"). What burns after that is furniture it has set alight
+ * (combustion.js), each on its own measured or estimated curve. The numbers,
+ * with their sources, are materials.json `igniter`; combustion.js hands them
+ * over with setIgniter, and the defaults below are the same so tools that run
+ * the solver alone (bench.mjs) get the same burner.
+ *
+ * It used to be a t-squared design fire growing to 1 MW and holding: that is
+ * how fire engineering stands in for a fire it cannot predict, but here the
+ * fire is meant to come from the furniture. GROWTH stays for the page's
+ * growth menu, which no longer changes anything (main.js is not B's file).
  *
  * The solver is mac3d.js: burning and real units as wind-plume's WindyFire,
  * but on a staggered grid and moving heat, soot and fuel so their totals are
@@ -185,11 +195,17 @@ export function buildGrid(building, cell = CELL) {
  */
 export const GROWTH = { slow: 0.00293e3, medium: 0.01172e3, fast: 0.0469e3, ultrafast: 0.1876e3 }; // W/s^2
 
-// Smoke is soot, in grams per cubic metre, made in proportion to what burns.
-// Both numbers are placeholders for "burning furniture", not yet looked up:
-// soot yield varies about tenfold between wood and foam.
-const HEAT_OF_COMBUSTION = 25e6;  // J per kg of fuel
-const SOOT_YIELD = 0.05;          // kg of soot per kg of fuel
+// The old design fire's placeholders for "burning furniture", kept so the
+// checks that still ask for it get what they were written against; each
+// burning item now uses its own numbers (materials.json).
+const DESIGN_FIRE = { radiantFraction: 0.35, heatOfCombustion: 25e6, sootYield: 0.05 };
+const IGNITER = {
+  power: 50e3,             // W, NBSIR 83-2787 §3.2.2
+  duration: 200,           // s, same
+  radiantFraction: 0.2,    // 假设, a natural gas flame; see materials.json igniter
+  heatOfCombustion: 50e6,  // J/kg, methane
+  sootYield: 0,            // 假设: a natural gas burner makes next to no soot
+};
 
 export class HouseFire extends MacFire {
   // burnTime: fuel burns over this long. 1.5 s (WindyFire's value) spread the
@@ -199,11 +215,16 @@ export class HouseFire extends MacFire {
   // is then within about 15% of Heskestad; nearer the flame it is too cool
   // and slow, because a 20 cm grid gives these fires only 1.5 to 2 cells
   // across (FDS advises 4 or more).
-  constructor({ grid, pool, growth = GROWTH.medium, peak = 1e6, radiantFraction = 0.35, burnTime = 0.5, smagorinsky = 0.2 }) {
+  constructor({ grid, pool, growth, peak = 1e6, burnTime = 0.5, smagorinsky = 0.2 }) {
     super({ nx: grid.nx, ny: grid.ny, nz: grid.nz, cell: grid.cell, solid: grid.solid, burnTime, smagorinsky });
-    this.growth = growth;
+    // Passing a growth rate asks for the old t-squared design fire (growing to
+    // `peak` and holding): the other tasks' checks in tools/ were written
+    // against it and still pass one. The page does not, and gets the igniter.
+    this.designFire = growth !== undefined;
+    this.growth = growth ?? GROWTH.medium;
     this.peak = peak;
-    this.radiantFraction = radiantFraction;
+    this.igniter = { ...IGNITER };
+    this.radiantFraction = this.burner().radiantFraction;   // radiation.js reads it
     this.seed = 12345;
     this.sootMade = 0;   // grams
     this.heatMade = 0;   // J put into the air (the radiated share is not)
@@ -216,23 +237,40 @@ export class HouseFire extends MacFire {
     this.poolVolume = cells.length * this.cell ** 3;
   }
 
-  heatRelease() { return Math.min(this.growth * this.time * this.time, this.peak); }
+  /** The burner's numbers from materials.json `igniter` ({value} fields). */
+  setIgniter(entry) {
+    for (const k of Object.keys(IGNITER)) {
+      const v = entry?.[k]?.value;
+      if (typeof v === 'number') this.igniter[k] = v;
+    }
+    this.radiantFraction = this.burner().radiantFraction;
+  }
+
+  /** What the drag-placed fire burns as: the igniter, or the old design fire's placeholders. */
+  burner() { return this.designFire ? DESIGN_FIRE : this.igniter; }
+
+  /** The burner: full power from the moment it is placed, out after its duration. */
+  heatRelease() {
+    if (this.designFire) return Math.min(this.growth * this.time * this.time, this.peak);
+    return this.time < this.igniter.duration ? this.igniter.power : 0;
+  }
 
   /**
-   * The fire adds fuel and soot on its patch of floor, in proportion to what
-   * burns. Soot used to be a tracer held at 1 in the fire's cells, as in
+   * The igniter adds fuel and soot on its patch of floor, in proportion to
+   * what burns. Soot used to be a tracer held at 1 in the fire's cells, as in
    * WindyFire, which thinned to nothing within a room; and while the old
    * solver lost three quarters of it at the ceiling, it was scaled back up to
    * the amount made every step. mac3d.js keeps it, so that is gone.
    */
   step() {
     const { firePool, fuel, dens, dt } = this;
-    if (firePool.length) {
-      const q = this.heatRelease();
+    const q = firePool.length ? this.heatRelease() : 0;
+    if (q > 0) {
+      const { radiantFraction, heatOfCombustion, sootYield } = this.burner();
       // Fuel is counted in the degrees it will give the air it burns in.
-      const fuelRate = q * (1 - this.radiantFraction) / (1.2 * 1005 * this.poolVolume);
-      const sootRate = q / HEAT_OF_COMBUSTION * SOOT_YIELD * 1000 / this.poolVolume;   // g/m3 per s
-      this.heatMade += q * (1 - this.radiantFraction) * dt;
+      const fuelRate = q * (1 - radiantFraction) / (1.2 * 1005 * this.poolVolume);
+      const sootRate = q / heatOfCombustion * sootYield * 1000 / this.poolVolume;   // g/m3 per s
+      this.heatMade += q * (1 - radiantFraction) * dt;
       for (const c of firePool) {
         // Slightly uneven, as in WindyFire: an even source stays symmetrical.
         this.seed = (this.seed * 1103515245 + 12345) & 0x7fffffff;

@@ -24,7 +24,8 @@
     "coYield": { "value": 0.033, "unit": "kg/kg", "source": "NIST TN 2303: sofas 0.030–0.037" },
     "ignitionTemp": { "value": 390, "unit": "°C", "source": "家具着火数据.md: fabric over polyurethane foam, fitted to Villa & Babrauskas 1991 (NISTIR 4652) ignition times" },
     "krc": { "value": 0.1, "unit": "(kW/m²K)²s", "source": "[估] back-calculated from T_ig 390 °C, range 0.04–0.22 (家具着火数据.md); bare foam 0.32 (NUREG-1805)" },
-    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "NUREG-1805 / 家具着火数据.md: 16; easily ignited fabrics down to 10 (Babrauskas 1981)" }
+    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "NUREG-1805 / 家具着火数据.md: 16; easily ignited fabrics down to 10 (Babrauskas 1981)" },
+    "pyrolysisTemp": { "value": 250, "unit": "°C", "source": "Günther, Levchik & Schartel 2020 (Polym. Adv. Technol., table 3): flexible PU foam loses its first 5% at 234–256 °C; it then collapses into a burning liquid (进度/B/燃烧蔓延与材料损坏.md §5.2)" }
   },
 
   "bed_queen": {
@@ -45,7 +46,8 @@
     "coYield": { "value": 0.03, "unit": "kg/kg", "source": "NIST TN 2303: mattresses 0.018–0.076 (假设 which value)" },
     "ignitionTemp": { "value": 390, "unit": "°C", "source": "as sofa" },
     "krc": { "value": 0.1, "unit": "(kW/m²K)²s", "source": "as sofa ([估])" },
-    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "as sofa" }
+    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "as sofa" },
+    "pyrolysisTemp": { "value": 250, "unit": "°C", "source": "Günther, Levchik & Schartel 2020 (Polym. Adv. Technol., table 3): flexible PU foam loses its first 5% at 234–256 °C; it then collapses into a burning liquid (进度/B/燃烧蔓延与材料损坏.md §5.2)" }
   },
 
   "bed_king": {
@@ -59,7 +61,8 @@
     "coYield": { "value": 0.03, "unit": "kg/kg", "source": "as queen" },
     "ignitionTemp": { "value": 390, "unit": "°C", "source": "as sofa" },
     "krc": { "value": 0.1, "unit": "(kW/m²K)²s", "source": "as sofa ([估])" },
-    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "as sofa" }
+    "criticalFlux": { "value": 16, "unit": "kW/m²", "source": "as sofa" },
+    "pyrolysisTemp": { "value": 250, "unit": "°C", "source": "Günther, Levchik & Schartel 2020 (Polym. Adv. Technol., table 3): flexible PU foam loses its first 5% at 234–256 °C; it then collapses into a burning liquid (进度/B/燃烧蔓延与材料损坏.md §5.2)" }
   },
 
   "cabinet_run": {
@@ -75,6 +78,10 @@
     "ignitionTemp": { "value": 412, "unit": "°C", "source": "NUREG-1805 table 6: particleboard (effective value)" },
     "krc": { "value": 0.93, "unit": "(kW/m²K)²s", "source": "NUREG-1805 table 6: particleboard (effective value)" },
     "criticalFlux": { "value": 18, "unit": "kW/m²", "source": "NUREG-1805 table 6: particleboard" },
+    "pyrolysisTemp": { "value": 250, "unit": "°C", "source": "Frangi 2012 (JRC Eurocodes workshop, slide 9): wood starts giving off combustible gas from about 250 °C (进度/B/燃烧蔓延与材料损坏.md §5.1)" },
+    "extinctionFlux": { "value": 30, "unit": "kW/m²", "source": "Wood stops flaming when the flux from outside falls under about 30–45 kW/m²: Bartlett et al. 2017 (Fire Safety J. 91) 31 kW/m² at large scale [转引]; Emberley et al. 2017 (Fire Safety J. 91) 45 ± 1 kW/m² at steady state [原文]. The lower end is taken (假设)" },
+    "extinctionDelay": { "value": 60, "unit": "s", "source": "NBSIR 83-2787 §7.2.4: the open 12.7 mm plywood bookcase stopped flaming 60 s after the 50 kW burner was taken away. Used for every wood item (假设); the bookcase check in 进度/B therefore shows the rule works, it does not test this number" },
+    "extinctionUntil": { "value": "peak", "source": "假设: a closed box can go out only while its fire is still on the outside, before its peak; the NBS wardrobes (closed boxes with clothing) burned out once going (NBSIR 83-2787 §7.2)" },
     "note": "Wood does not keep burning from a small flame: NBSIR 83-2787's plywood bookcase reached 28 kW under a 50 kW burner and went out 60 s after it stopped. Babrauskas 1981: veneered plywood cabinets did not ignite at 20 kW/m², took 110–236 s at 40 kW/m²."
   },
 
@@ -91,6 +98,10 @@
     "ignitionTemp": { "value": 412, "unit": "°C", "source": "NUREG-1805 table 6: particleboard" },
     "krc": { "value": 0.93, "unit": "(kW/m²K)²s", "source": "NUREG-1805 table 6: particleboard" },
     "criticalFlux": { "value": 18, "unit": "kW/m²", "source": "NUREG-1805 table 6: particleboard" },
+    "pyrolysisTemp": { "value": 250, "unit": "°C", "source": "Frangi 2012 (JRC Eurocodes workshop, slide 9): wood starts giving off combustible gas from about 250 °C (进度/B/燃烧蔓延与材料损坏.md §5.1)" },
+    "extinctionFlux": { "value": 30, "unit": "kW/m²", "source": "Wood stops flaming when the flux from outside falls under about 30–45 kW/m²: Bartlett et al. 2017 (Fire Safety J. 91) 31 kW/m² at large scale [转引]; Emberley et al. 2017 (Fire Safety J. 91) 45 ± 1 kW/m² at steady state [原文]. The lower end is taken (假设)" },
+    "extinctionDelay": { "value": 60, "unit": "s", "source": "NBSIR 83-2787 §7.2.4: the open 12.7 mm plywood bookcase stopped flaming 60 s after the 50 kW burner was taken away. Used for every wood item (假设); the bookcase check in 进度/B therefore shows the rule works, it does not test this number" },
+    "extinctionUntil": { "value": "peak", "source": "假设: a closed box can go out only while its fire is still on the outside, before its peak; the NBS wardrobes (closed boxes with clothing) burned out once going (NBSIR 83-2787 §7.2)" },
     "note": "The Duplex tall cabinets (0.8×2.0×0.55 m) are close in size, but whether they hold clothing is unknown; the test's MW came largely from the clothing."
   },
 
@@ -99,13 +110,30 @@
     "class": "桌子",
     "reference": "no free-burn test found",
     "totalHeat": { "value": 225e6, "unit": "J", "source": "[估] UL lists 36.9 lb (16.7 kg) for a coffee table; times a wood heat of combustion; range 200–250 MJ" },
-    "peakHRR": { "value": null, "unit": "W", "source": "no data; task B chooses and marks it 假设" },
+    "peakHRRPerArea": { "value": 168e3, "unit": "W/m² of plan", "source": "[估] cone calorimeter peak of a spruce panel at 50 kW/m², 168 kW/m² (North et al. 2001, Lund LUTVDG/TVBB-7014, appendix A), times the table's plan area, as if its top burned all at once at that peak (假设). Small 0.61 m table about 63 kW, large 1.83 × 0.92 m about 280 kW" },
+    "timeToPeak": { "value": 600, "unit": "s", "source": "假设: as cabinet_run" },
     "radiantFraction": { "value": 0.35, "unit": "", "source": "假设" },
     "sootYield": { "value": 0.015, "unit": "kg/kg", "source": "假设" },
     "heatOfCombustion": { "value": 15e6, "unit": "J/kg", "source": "假设: typical for wood" },
     "ignitionTemp": { "value": 305, "unit": "°C", "source": "NUREG-1805 / 家具着火数据.md: oak, piloted" },
     "krc": { "value": 0.23, "unit": "(kW/m²K)²s", "source": "[估] 家具着火数据.md" },
-    "criticalFlux": { "value": 10, "unit": "kW/m²", "source": "NUREG-1805: wood" }
+    "criticalFlux": { "value": 10, "unit": "kW/m²", "source": "NUREG-1805: wood" },
+    "pyrolysisTemp": { "value": 250, "unit": "°C", "source": "Frangi 2012 (JRC Eurocodes workshop, slide 9): wood starts giving off combustible gas from about 250 °C (进度/B/燃烧蔓延与材料损坏.md §5.1)" },
+    "extinctionFlux": { "value": 30, "unit": "kW/m²", "source": "Wood stops flaming when the flux from outside falls under about 30–45 kW/m²: Bartlett et al. 2017 (Fire Safety J. 91) 31 kW/m² at large scale [转引]; Emberley et al. 2017 (Fire Safety J. 91) 45 ± 1 kW/m² at steady state [原文]. The lower end is taken (假设)" },
+    "extinctionDelay": { "value": 60, "unit": "s", "source": "NBSIR 83-2787 §7.2.4: the open 12.7 mm plywood bookcase stopped flaming 60 s after the 50 kW burner was taken away. Used for every wood item (假设); the bookcase check in 进度/B therefore shows the rule works, it does not test this number" },
+    "extinctionUntil": { "value": "always", "source": "假设: an open table has nothing round it to keep it hot, like the open bookcase of NBSIR 83-2787 test 62" }
+  },
+
+  "igniter": {
+    "label": "引火源（燃气燃烧器）",
+    "class": "引火源",
+    "reference": "NBSIR 83-2787 §3.2.2: chairs, sofas and the bookcase were lit by a natural gas burner set to a constant 50 kW, 'designed to simulate the peak burning rate of a wastebasket', 25 mm from the item's side and 250 mm above the platform, left 200 s and then taken away",
+    "power": { "value": 50e3, "unit": "W", "source": "NBSIR 83-2787 §3.2.2" },
+    "duration": { "value": 200, "unit": "s", "source": "NBSIR 83-2787 §3.2.2" },
+    "radiantFraction": { "value": 0.2, "unit": "", "source": "假设: a small natural gas flame radiates little; not looked up" },
+    "heatOfCombustion": { "value": 50e6, "unit": "J/kg", "source": "methane, lower heating value" },
+    "sootYield": { "value": 0, "unit": "kg/kg", "source": "假设: a natural gas burner makes next to no soot" },
+    "note": "NIST TN 2303 lit its sofas and mattresses with a 128 W propane flame (1.5 cm long) on a pillow for about 30 s (table 5). A flame that small does not show on 20 cm cells, so the NBS burner is used: big enough to light furniture by touching it, small enough that what follows is the furniture's own fire."
   },
 
   "countertop": {
