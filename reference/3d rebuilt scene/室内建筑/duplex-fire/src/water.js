@@ -394,6 +394,179 @@ export default function water(world) {
     draw.points.geometry.attributes.position.needsUpdate = true;
   }
 
+  // --- the mains as a tank, and the water view ------------------------------------------
+  // The town's mains is drawn as a big tank outside the west wall, with each
+  // unit's service line running from it to where that unit's cold water comes
+  // in. Drawing only: the mains is still a fixed pressure, so the tank never
+  // runs low; and the line drawn is a metre or so long, where the flows take
+  // water_supply.serviceLength. Its label counts the litres drawn so far.
+  // Clicking the tank turns the water view on or off (so does focus()). The
+  // house goes grey (main.js's uFocus) and the water is drawn over it in strong
+  // colours: the supply pipes through the walls (cold blue, hot orange), the
+  // tank, the spray, and each piece of furniture tinted by the water on it.
+  // m; sized to be seen, not a real tank. The gap keeps it clear of gas.js's
+  // gas tank, which stands between the wall and here (x -2.4 to 0, z 9.6 to 10.4).
+  const TANK = { radius: 1.3, height: 3.2, gap: 2.6, ground: -0.5 };
+  const WET_FULL = 2;   // kg/m^2 (mm) of water on a top drawn at full tint
+  const focus = { on: false, label: '', wet: new Map() };
+  let supplied = 0;     // litres drawn from the mains so far
+  if (view?.scene) {
+    const clip = view.cut ? [view.cut] : [];
+    const R = TANK.radius, H = TANK.height;
+    const entries = Object.values(units).map((u) => [u.entry.o.min[0], u.entry.y, centre(u.entry.o)[2]]);
+    const tankX = Math.min(...entries.map((p) => p[0])) - TANK.gap - R;
+    const tankZ = entries.reduce((s, p) => s + p[2], 0) / entries.length;
+    const tank = new THREE.Group();
+    tank.name = 'water mains';
+    tank.position.set(tankX, TANK.ground, tankZ);
+    // Unlit: the house's light (a hemisphere at 2.2) washes a lit blue out to near white.
+    focus.mat = {
+      shell: new THREE.MeshBasicMaterial({ color: 0xa8d0ff, transparent: true, opacity: 0.15, depthWrite: false, side: THREE.DoubleSide, clippingPlanes: clip }),
+      water: new THREE.MeshBasicMaterial({ color: 0x2f8cff, transparent: true, opacity: 0.55, depthWrite: false, clippingPlanes: clip }),
+      line: new THREE.MeshBasicMaterial({ color: 0x2f8cff, clippingPlanes: clip }),
+    };
+    const shell = new THREE.Mesh(new THREE.CylinderGeometry(R, R, H, 48, 1, true), focus.mat.shell);
+    shell.position.y = H / 2;
+    const level = 0.85 * H;
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(R * 0.97, R * 0.97, level, 48), focus.mat.water);
+    body.position.y = level / 2;
+    tank.add(shell, body);
+    for (const y of [0, H]) {
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(R, 0.03, 8, 64).rotateX(Math.PI / 2), focus.mat.line);
+      rim.position.y = y;
+      tank.add(rim);
+    }
+    view.scene.add(tank);
+    focus.hit = [shell, body];
+    // One service line per unit, from the tank's side to its entry.
+    for (const p of entries) {
+      const from = new THREE.Vector3(tankX + R, p[1], p[2]), to = new THREE.Vector3(...p);
+      const line = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, from.distanceTo(to), 12), focus.mat.line);
+      line.position.copy(from).add(to).multiplyScalar(0.5);
+      line.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), to.clone().sub(from).normalize());
+      view.scene.add(line);
+    }
+    // The label: a canvas on a sprite over the tank, redrawn when its text changes.
+    const canvas = document.createElement('canvas');
+    canvas.width = 640; canvas.height = 200;
+    focus.ctx = canvas.getContext('2d');
+    focus.texture = new THREE.CanvasTexture(canvas);
+    focus.texture.colorSpace = THREE.SRGBColorSpace;
+    const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: focus.texture, depthTest: false, transparent: true }));
+    sprite.scale.set(3.2, 1.0, 1);
+    sprite.position.set(tankX, TANK.ground + H + 0.8, tankZ);
+    sprite.renderOrder = 10;
+    view.scene.add(sprite);
+
+    // The supply pipes for the water view: the pipe layer's own triangles,
+    // as drawn (thickened by pipes.js), in two plain colours, through walls.
+    const layer = view.services?.water;
+    if (layer) {
+      const meshOf = new Map(layer.elements.map((m) => [m.userData.element, m]));
+      const merged = (list) => {
+        const parts = list.map((n) => meshOf.get(n.o.element)?.geometry.index.array).filter(Boolean);
+        const idx = new Uint32Array(parts.reduce((s, a) => s + a.length, 0));
+        let at = 0;
+        for (const a of parts) { idx.set(a, at); at += a.length; }
+        const g = new THREE.BufferGeometry();
+        g.setAttribute('position', layer.geometry.attributes.position);
+        g.setIndex(new THREE.BufferAttribute(idx, 1));
+        return g;
+      };
+      focus.pipes = new THREE.Group();
+      for (const [hot, color] of [[false, 0x2f8cff], [true, 0xff7a2f]]) {
+        const m = new THREE.Mesh(merged(nodes.filter((n) => n.hot === hot)),
+          new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false, clippingPlanes: clip }));
+        m.renderOrder = 5;
+        m.frustumCulled = false;
+        focus.pipes.add(m);
+      }
+      focus.pipes.visible = false;
+      view.scene.add(focus.pipes);
+    }
+    // Furniture, for the wet tint: its own triangles again.
+    focus.furniture = new Map((view.extras?.furniture?.elements ?? []).map((m) => [m.userData.element, m]));
+
+    // Click on the tank: a click, not a drag, and not while a tool is in hand
+    // (actions.js) or the fire is being placed (read on pointerdown, as
+    // card.js does: main.js has left that mode by pointerup).
+    const el = view.renderer.domElement;
+    const ray = new THREE.Raycaster();
+    let downAt = null, busyAtDown = false;
+    el.addEventListener('pointerdown', (ev) => {
+      downAt = [ev.clientX, ev.clientY];
+      busyAtDown = !!world.actions?.tool || !!document.querySelector('[data-place].on');
+    });
+    el.addEventListener('pointerup', (ev) => {
+      if (!downAt || busyAtDown || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
+      ray.ray.copy(view.rayAt(ev));
+      if (!ray.intersectObjects(focus.hit, false).length) return;
+      ev.stopImmediatePropagation();   // card.js listens after this: no card for what is behind the tank
+      setFocus(!focus.on);
+    });
+    addEventListener('keydown', (ev) => { if (ev.key === 'Escape' && focus.on) setFocus(false); });
+    drawLabel();
+  }
+
+  function drawLabel() {
+    if (!focus.ctx) return;
+    const lines = [
+      'Mains 水网 · ∞',
+      `${Math.round(supplied).toLocaleString('en')} L drawn 已流出`,
+      Object.values(units).map((u) => `${u.name} ${u.open ? `${((u.flow ?? 0) * 60000).toFixed(0)} L/min` : 'shut 关'}`).join('   '),
+      focus.on ? 'click: back 点击：退出' : 'click: water view 点击：水视图',
+    ];
+    const text = lines.join('\n');
+    if (text === focus.label) return;
+    focus.label = text;
+    const g = focus.ctx, { width: w, height: h } = g.canvas;
+    g.clearRect(0, 0, w, h);
+    g.fillStyle = 'rgba(16,19,23,0.82)';
+    g.beginPath(); g.roundRect(4, 4, w - 8, h - 8, 14); g.fill();
+    g.textAlign = 'center';
+    g.fillStyle = '#7fb8ff'; g.font = '600 38px -apple-system, system-ui, sans-serif'; g.fillText(lines[0], w / 2, 48);
+    g.fillStyle = '#e6e6ea'; g.font = '32px -apple-system, system-ui, sans-serif'; g.fillText(lines[1], w / 2, 94);
+    g.fillText(lines[2], w / 2, 136);
+    g.fillStyle = '#9a9aa6'; g.font = '26px -apple-system, system-ui, sans-serif'; g.fillText(lines[3], w / 2, 178);
+    focus.texture.needsUpdate = true;
+  }
+
+  /** Tint each piece of furniture by the water on its top; only in the water view. */
+  function updateWet() {
+    if (!focus.furniture) return;
+    for (const k of catchers) {
+      const o = k.o;
+      let m = focus.wet.get(o);
+      if (!m) {
+        if (!(o.wet > 0) || !focus.on) continue;
+        const src = focus.furniture.get(o.element);
+        if (!src) continue;
+        m = new THREE.Mesh(src.geometry, new THREE.MeshBasicMaterial({
+          color: 0x2f8cff, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
+          clippingPlanes: view.cut ? [view.cut] : [],
+        }));
+        m.frustumCulled = false;
+        view.scene.add(m);
+        focus.wet.set(o, m);
+      }
+      m.visible = focus.on && o.wet > 0;
+      m.material.opacity = Math.min(0.85, 0.25 + 0.6 * (o.wet / k.top) / WET_FULL);
+    }
+  }
+
+  function setFocus(on) {
+    focus.on = on;
+    if (!view?.scene) return;
+    if (view.focus) view.focus.value = on ? 1 : 0;
+    if (focus.pipes) focus.pipes.visible = on;
+    draw.points.material.size = on ? 0.16 : 0.12;
+    draw.points.material.opacity = on ? 1 : 0.9;
+    focus.mat.shell.opacity = on ? 0.3 : 0.15;
+    focus.mat.water.opacity = on ? 0.85 : 0.55;
+    updateWet();
+    drawLabel();
+  }
+
   // --- each step ---------------------------------------------------------------------
 
   /** 1. Flows follow the valves and the outlets that are open. */
@@ -406,6 +579,8 @@ export default function water(world) {
   function source(w, dt) {
     for (const x of outlets) {
       if (!x.q) continue;
+      supplied += x.q * 1000 * dt;   // litres, crawl-space breaks included
+
       const cells = x.kind === 'break' ? x.cells : x.spray;
       if (!cells.length) continue;   // a pipe in the crawl space: outside the grid
       const kg = x.q * RHO_WATER * dt;
@@ -496,6 +671,7 @@ export default function water(world) {
   function report() {
     if (draw.dirty) redrawMarkers();
     if (cost.steps % draw.every === 0) redrawSpray();
+    if (cost.steps % 20 === 0) { drawLabel(); if (focus.on) updateWet(); }   // once a simulated second
     if (typeof window !== 'undefined' && window.duplexFire && !window.duplexFire.water) window.duplexFire.water = api;
   }
 
@@ -506,7 +682,10 @@ export default function water(world) {
     for (const o of objects.list) { o.wetRate = 0; }
     for (const key of Object.keys(books)) books[key] = 0;
     for (const key of Object.keys(cost)) cost[key] = 0;
+    supplied = 0;
     dirty = true; draw.dirty = true;
+    updateWet();
+    drawLabel();
   }
 
   // --- console -------------------------------------------------------------------------
@@ -549,6 +728,7 @@ export default function water(world) {
       return {
         units: Object.values(units).map((u) => ({ unit: u.name, open: u.open, kPaAfterMeter: +(u.pm / 1000).toFixed(0), litresPerMinute: +((u.flow ?? 0) * 60000).toFixed(1) })),
         outlets: [...outlets].map((x) => ({ kind: x.kind, id: x.id, unit: x.unit.name, litresPerMinute: +(x.q * 60000).toFixed(1) })),
+        litresDrawn: +supplied.toFixed(1),
       };
     },
     /** Where every kg went, and the heat evaporation took (J). */
@@ -568,6 +748,8 @@ export default function water(world) {
       return failing.map((n) => ({ id: n.o.id, unit: n.unit, c: +(n.tj + T_AMBIENT - 273).toFixed(1), broken: !!n.broken }))
         .sort((a, b) => b.c - a.c).slice(0, count);
     },
+    /** The water view: the house grey, the water strong. focus() toggles. */
+    focus(on = !focus.on) { setFocus(on); return on; },
     show(on = !draw.show) { draw.show = on; if (draw.points) { draw.points.visible = on; if (on) redrawSpray(); } return on; },
     /** Milliseconds this module spends per step, by phase. */
     cost() {

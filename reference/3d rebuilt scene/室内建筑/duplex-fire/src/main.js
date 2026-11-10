@@ -261,7 +261,9 @@ document.getElementById('view').addEventListener('wheel', (ev) => {
 // The split is by height: Level 1 up to its ceiling, Level 2 from its floor.
 const FADE_ABOVE = 2.6;   // placing on Level 1: thin out from its ceiling up
 const FADE_BELOW = 2.7;   // placing on Level 2: thin out below its floor slab
-const fade = { uFadeMode: { value: 0 }, uFadeDist: { value: 0 } };   // mode: 0 off, 1 above, 2 below
+// uFocus (0..1) greys the whole house out, so that what a mechanism draws with
+// its own materials stands out (water.js's water view). Set through world.view.focus.
+const fade = { uFadeMode: { value: 0 }, uFadeDist: { value: 0 }, uFocus: { value: 0 } };   // mode: 0 off, 1 above, 2 below
 const fadeMaterials = [
   ...Object.values(dressed.groups).map((m) => m.material),
   material, serviceMaterial, doors.material,
@@ -271,8 +273,10 @@ for (const m of fadeMaterials) {
     Object.assign(shader.uniforms, fade);
     shader.vertexShader = 'varying float vFadeY;\n' + shader.vertexShader.replace('#include <project_vertex>',
       '#include <project_vertex>\n  vFadeY = (modelMatrix * vec4(transformed, 1.0)).y;');
-    shader.fragmentShader = 'uniform int uFadeMode;\nuniform float uFadeDist;\nvarying float vFadeY;\n' +
+    shader.fragmentShader = 'uniform int uFadeMode;\nuniform float uFadeDist;\nuniform float uFocus;\nvarying float vFadeY;\n' +
       shader.fragmentShader.replace('#include <dithering_fragment>', `#include <dithering_fragment>
+      float grey = dot(gl_FragColor.rgb, vec3(0.299, 0.587, 0.114)) * 0.6;
+      gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(grey), uFocus);
       bool other = (uFadeMode == 1 && vFadeY > ${FADE_ABOVE.toFixed(2)}) || (uFadeMode == 2 && vFadeY < ${FADE_BELOW.toFixed(2)});
       bool inFront = uFadeMode > 0 && length(vViewPosition) < uFadeDist;
       if ((other || inFront) && mod(floor(gl_FragCoord.x) + floor(gl_FragCoord.y), 2.0) < 1.0) discard;`);
@@ -422,7 +426,7 @@ showLevel('all');
 
 // --- mechanisms -------------------------------------------------------------------
 // What a mechanism that draws or picks may need from the page.
-world.view = { scene, camera, renderer, controls, cut, dressed, doors, meta, extras, extraMeshes, services, serviceMeshes, smoke, rayAt, roomAt, LEVELS };
+world.view = { scene, camera, renderer, controls, cut, dressed, doors, meta, extras, extraMeshes, services, serviceMeshes, smoke, rayAt, roomAt, LEVELS, focus: fade.uFocus };
 await world.load();
 
 // --- loop ------------------------------------------------------------------------
