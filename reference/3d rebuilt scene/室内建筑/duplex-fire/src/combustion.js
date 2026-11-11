@@ -280,14 +280,32 @@ export default function combustion(world) {
     const [a, b] = P('flameHeight');
     return Math.max(0, a * Math.pow(Q / 1e3, 0.4) - b * D);
   };
-  function addFlame(min, max, Q, owner) {
+  /**
+   * Height (m) of the ceiling over (x, z), walking up the grid from y: the
+   * bottom of the first solid cell, as radiation.js's column() finds it.
+   */
+  function ceilingOver(x, y, z) {
+    const { origin, cell } = grid;
+    const i = Math.floor((x - origin.x) / cell) + 1, k = Math.floor((z - origin.z) / cell) + 1;
+    let j = Math.floor((y + 1e-3 - origin.y) / cell) + 1;
+    if (i < 1 || i > grid.nx || k < 1 || k > grid.nz || j < 1 || j > grid.ny) return Infinity;
+    // A top that ends inside a solid cell (a floor slab's edge) starts one cell up.
+    if (grid.solid[grid.index(i, j, k)]) j++;
+    for (; j <= grid.ny; j++) if (grid.solid[grid.index(i, j, k)]) return origin.y + (j - 1) * cell;
+    return Infinity;
+  }
+  // The box stops at the ceiling over the fire. Without that, a 1.9 MW sofa's
+  // 3.5 m flame reached through the A102 ceiling and floor slab and lit the
+  // king bed in B202 upstairs (coupling run, 2026-11-10: 进度/耦合/耦合.md).
+  function addFlame(min, max, Q, owner, ceilY) {
     if (nFlames >= 128 || !(Q > 0)) return;
     const r = P('flameReach');
     const D = Math.sqrt((4 * (max[0] - min[0]) * (max[2] - min[2])) / Math.PI);
     const k = 7 * nFlames++;
     FL[k] = min[0] - r; FL[k + 1] = max[0] + r; FL[k + 2] = min[2] - r; FL[k + 3] = max[2] + r;
-    FL[k + 4] = min[1]; FL[k + 5] = min[1] + Math.max(max[1] - min[1], flameHeight(Q, D)); FL[k + 6] = owner;
+    FL[k + 4] = min[1]; FL[k + 5] = Math.min(ceilY, min[1] + Math.max(max[1] - min[1], flameHeight(Q, D))); FL[k + 6] = owner;
   }
+  let igniterCeilY = Infinity;
   function gatherFlames() {
     nFlames = 0;
     // The igniter: its patch of floor.
@@ -304,12 +322,16 @@ export default function combustion(world) {
           for (let a = 0; a < 3; a++) { lo[a] = Math.min(lo[a], p[a]); hi[a] = Math.max(hi[a], p[a] + cell); }
         }
         igniterBox = [lo, [hi[0], lo[1] + cell, hi[2]]];
+        igniterCeilY = ceilingOver((lo[0] + hi[0]) / 2, lo[1], (lo[2] + hi[2]) / 2);
       }
-      addFlame(igniterBox[0], igniterBox[1], q, -1);
+      addFlame(igniterBox[0], igniterBox[1], q, -1, igniterCeilY);
     }
     for (let n = 0; n < items.length; n++) {
-      const o = items[n].o;
-      if (o.hrr > 0) addFlame(o.min, o.max, o.hrr, n);
+      const it = items[n], o = it.o;
+      if (!(o.hrr > 0)) continue;
+      // The grid does not change; found once per item, over its middle.
+      if (it.ceilY === undefined) it.ceilY = ceilingOver((o.min[0] + o.max[0]) / 2, o.max[1], (o.min[2] + o.max[2]) / 2);
+      addFlame(o.min, o.max, o.hrr, n, it.ceilY);
     }
   }
   /** True if the item's box is inside some other fire's flame. */
