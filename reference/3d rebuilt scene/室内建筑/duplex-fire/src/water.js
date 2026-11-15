@@ -101,11 +101,12 @@ export default function water(world) {
   const nodes = [];
   for (const o of objects.list) {
     if (o.class !== '水管') continue;
-    const m = /^Unit (A|B) Domestic (Cold|Hot) Water$/.exec(o.element.system ?? '');
-    if (!m) continue;   // the four backflow preventers belong to the heating
+    const m = /^Unit (A|B) (?:Domestic (Cold|Hot) Water|(Hydronic) Supply In)$/.exec(o.element.system ?? '');
+    if (!m) continue;
+    const hydronic = !!m[3];
     const dims = [...o.size].sort((a, b) => b - a);
     const node = {
-      o, unit: m[1], hot: m[2] === 'Hot', fitting: o.type !== 'IfcFlowSegment',
+      o, unit: m[1], hot: m[2] === 'Hot' || hydronic, hydronic, fitting: o.type !== 'IfcFlowSegment',
       length: dims[0], d: Math.min(0.05, Math.max(0.01, dims[1])) * P.innerRatio,
       y: centre(o)[1], next: [], r: 0, path: Infinity, tj: 0, broken: null,
     };
@@ -193,31 +194,6 @@ export default function water(world) {
     dirty = false;
   }
 
-  /** Open a pipe: share = the part of its bore that is open (1 when cut through). */
-  function breakPipe(node, share, why) {
-    if (node.broken) return node.broken;
-    const open = area(node.d) * share;
-    const x = {
-      kind: 'break', id: node.o.id, unit: units[node.unit], node, why,
-      r: node.path + RHO_WATER / (2 * (P.cd * open) ** 2),
-      y: node.y, cells: node.o.cells, q: 0, since: world.time,
-    };
-    node.broken = x;
-    node.o.state = '失效';
-    outlets.add(x);
-    dirty = true;
-    world.events.emit({
-      type: why === 'cut' ? '水管剪断' : '水管失效', objectId: node.o.id, pos: centre(node.o),
-      data: { unit: node.unit, hot: node.hot, jointTempC: why === 'cut' ? undefined : +(node.tj + T_AMBIENT - 273).toFixed(0) },
-    });
-    draw.dirty = true;
-    return x;
-  }
-
-  // --- sprinklers --------------------------------------------------------------------
-  const heads = [];
-  let headCount = 0;
-
   const cellOf = (x, y, z) => {
     const i = Math.floor((x - origin.x) / cell) + 1, j = Math.floor((y - origin.y) / cell) + 1, k = Math.floor((z - origin.z) / cell) + 1;
     if (i < 1 || j < 1 || k < 1 || i > grid.nx || j > grid.ny || k > grid.nz) return -1;
@@ -227,6 +203,80 @@ export default function water(world) {
     const i = c % W, j = Math.floor(c / W) % H, k = Math.floor(c / (W * H));
     return [origin.x + (i - 0.5) * cell, origin.y + (j - 0.5) * cell, origin.z + (k - 0.5) * cell];
   };
+  const floorBelow = (c0, fallbackY) => {
+    let c = c0;
+    while (c - sy > 0 && !grid.solid[c - sy]) c -= sy;
+    const j = Math.floor(c / W) % H;
+    return c > 0 ? origin.y + (j - 1) * cell : fallbackY;
+  };
+
+  /**
+   * Pressurized spray reach around a pipe break (~350 kPa mains): arcs up and
+   * outward into connected room air (up to ~1.35 m horizontally and +1.15 m
+   * vertically without crossing walls), so baseboard hydronic pipe breaks can
+   * physically wet adjacent sofas and beds instead of dripping only into their
+   * 20 cm wall-base cell.
+   */
+  function breakSprayInfo(node) {
+    const pos = centre(node.o);
+    const base = [...node.o.cells].filter((c) => !grid.solid[c]);
+    if (!base.length) return { spray: node.o.cells, pos, aim: [0, 1, 0], floorY: Math.max(0, pos[1]) };
+    const reach = [...base], seen = new Set(base);
+    const R_HORIZ = 1.35, UP = 1.15, DOWN = 0.25;
+    for (let q = 0; q < reach.length; q++) {
+      const a = reach[q];
+      const step = [
+        [a - 1, fire.openX[a]], [a + 1, fire.openX[a + 1]],
+        [a - sy, fire.openY[a]], [a + sy, fire.openY[a + sy]],
+        [a - sz, fire.openZ[a]], [a + sz, fire.openZ[a + sz]],
+      ];
+      for (const [b, open] of step) {
+        if (!open || seen.has(b) || grid.solid[b]) continue;
+        const p = cellCentre(b);
+        if (Math.hypot(p[0] - pos[0], p[2] - pos[2]) > R_HORIZ) continue;
+        if (p[1] > pos[1] + UP || p[1] < pos[1] - DOWN) continue;
+        seen.add(b);
+        reach.push(b);
+      }
+    }
+    let ax = 0, az = 0;
+    for (const c of reach) {
+      const p = cellCentre(c);
+      ax += p[0] - pos[0];
+      az += p[2] - pos[2];
+    }
+    const len = Math.hypot(ax, az);
+    const aim = len > 1e-3 ? [ax / len, 0, az / len] : [1, 0, 0];
+    return { spray: Int32Array.from(reach), pos, aim, floorY: floorBelow(base[0], pos[1] > 2.9 ? 3.12 : 0.02) };
+  }
+
+  /** Open a pipe: share = the part of its bore that is open (1 when cut through). */
+  function breakPipe(node, share, why) {
+    if (node.broken) return node.broken;
+    const open = area(node.d) * share;
+    const info = breakSprayInfo(node);
+    const x = {
+      kind: 'break', id: node.o.id, unit: units[node.unit], node, why,
+      r: node.path + RHO_WATER / (2 * (P.cd * open) ** 2),
+      y: node.y, cells: node.o.cells, sprayCells: info.spray,
+      pos: info.pos, aim: info.aim, floorY: info.floorY, litres: 0,
+      q: 0, since: world.time,
+    };
+    node.broken = x;
+    node.o.state = '失效';
+    outlets.add(x);
+    dirty = true;
+    world.events.emit({
+      type: why === 'cut' ? '水管剪断' : '水管失效', objectId: node.o.id, pos: info.pos,
+      data: { unit: node.unit, hot: node.hot, hydronic: !!node.hydronic, jointTempC: why === 'cut' ? undefined : +(node.tj + T_AMBIENT - 273).toFixed(0) },
+    });
+    draw.dirty = true;
+    return x;
+  }
+
+  // --- sprinklers --------------------------------------------------------------------
+  const heads = [];
+  let headCount = 0;
 
   /**
    * Put a sprinkler head under the ceiling above (x, y, z), fed from the
@@ -269,7 +319,8 @@ export default function water(world) {
     objects.list.push(o);
     objects.byId.set(id, o);
     const head = {
-      kind: 'sprinkler', id, o, cell: c, pos, feed, gap, unit: units[feed.unit], spray: Int32Array.from(reach),
+      kind: 'sprinkler', id, o, cell: c, pos, aim: [0, -1, 0], floorY: floorBelow(c, pos[1] > 2.9 ? 3.12 : 0.02), litres: 0,
+      feed, gap, unit: units[feed.unit], spray: Int32Array.from(reach),
       r: feed.path + rPipe(gap, P.branchD) + 1 / P.kHead ** 2, y: pos[1], te: 0, on: false, q: 0,
     };
     heads.push(head);
@@ -329,7 +380,101 @@ export default function water(world) {
   };
 
   // --- drawing (page only) ------------------------------------------------------------
-  const draw = { dirty: true, group: null, points: null, every: 3, show: true };
+  const SPRAY_VERT = /* glsl */ `
+    attribute vec3 aRand;
+    uniform float uTime;
+    uniform float uViewH;
+    uniform vec3 uOrigin;
+    uniform vec3 uAim;
+    uniform float uFlow;
+    uniform float uFloorY;
+    uniform float uKind;
+    varying float vLife;
+    varying float vSplash;
+    varying float vAlpha;
+    #include <clipping_planes_pars_vertex>
+    void main() {
+      float flight = uKind > 0.5 ? 0.62 : 0.56;
+      float rate = 1.0 / flight;
+      float life = fract(uTime * rate * (0.85 + 0.3 * aRand.z) + aRand.x);
+      float t = life * flight;
+      vLife = life;
+      vSplash = 0.0;
+      vec3 p;
+      if (uKind > 0.5) {
+        float ang = aRand.y * 6.2831853;
+        float rad = (0.35 + 1.35 * sqrt(aRand.z)) * uFlow;
+        vec3 v0 = vec3(cos(ang) * rad * 1.6, -0.8 - 1.2 * aRand.z, sin(ang) * rad * 1.6);
+        p = uOrigin + v0 * t + vec3(0.0, -4.9 * t * t, 0.0);
+      } else {
+        vec2 f = length(uAim.xz) > 1e-3 ? normalize(uAim.xz) : vec2(1.0, 0.0);
+        float fan = (aRand.y - 0.5) * 1.45;
+        float ca = cos(fan), sa = sin(fan);
+        vec2 dir = vec2(f.x * ca - f.y * sa, f.x * sa + f.y * ca);
+        float spd = (1.15 + 1.25 * aRand.z) * (0.45 + 0.55 * uFlow);
+        float vy = (1.35 + 1.15 * fract(aRand.z * 7.13)) * (0.45 + 0.55 * uFlow);
+        vec3 v0 = vec3(dir.x * spd, vy, dir.y * spd);
+        p = uOrigin + v0 * t + vec3(0.0, -4.9 * t * t, 0.0);
+      }
+      if (p.y <= uFloorY + 0.025) {
+        float over = clamp((uFloorY + 0.025 - p.y) * 1.8, 0.0, 1.0);
+        p.y = uFloorY + 0.02 + 0.06 * sin(over * 3.14159);
+        vSplash = over;
+      }
+      vAlpha = step(0.01, uFlow) * (1.0 - 0.75 * vSplash) * smoothstep(0.0, 0.08, life) * (1.0 - smoothstep(0.82, 1.0, life));
+      vec4 mvPosition = viewMatrix * vec4(p, 1.0);
+      gl_Position = projectionMatrix * mvPosition;
+      float worldSize = mix(0.055, 0.095, vSplash) * (0.7 + 0.3 * aRand.z);
+      gl_PointSize = vAlpha > 0.005 ? max(2.0, worldSize * projectionMatrix[1][1] * uViewH * 0.5 / max(-mvPosition.z, 0.1)) : 0.0;
+      #include <clipping_planes_vertex>
+    }
+  `;
+  const SPRAY_FRAG = /* glsl */ `
+    varying float vLife;
+    varying float vSplash;
+    varying float vAlpha;
+    #include <clipping_planes_pars_fragment>
+    void main() {
+      #include <clipping_planes_fragment>
+      float d = length(gl_PointCoord - 0.5) * 2.0;
+      float soft = 1.0 - smoothstep(0.18, 1.0, d);
+      float a = soft * vAlpha * 0.88;
+      if (a < 0.008) discard;
+      vec3 core = mix(vec3(0.28, 0.68, 1.0), vec3(0.82, 0.95, 1.0), (1.0 - d * 0.55) * (0.55 + 0.45 * vSplash));
+      gl_FragColor = vec4(core, a);
+      #include <colorspace_fragment>
+    }
+  `;
+  const PUDDLE_VERT = /* glsl */ `
+    varying vec2 vUv2;
+    #include <clipping_planes_pars_vertex>
+    void main() {
+      vUv2 = uv * 2.0 - 1.0;
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * mvPosition;
+      #include <clipping_planes_vertex>
+    }
+  `;
+  const PUDDLE_FRAG = /* glsl */ `
+    uniform float uOpacity;
+    uniform float uSeed;
+    varying vec2 vUv2;
+    #include <clipping_planes_pars_fragment>
+    void main() {
+      #include <clipping_planes_fragment>
+      float ang = atan(vUv2.y, vUv2.x);
+      float wobble = 1.0 + 0.12 * sin(ang * 3.0 + uSeed) + 0.07 * cos(ang * 5.0 - uSeed * 1.7);
+      float r = length(vUv2) / wobble;
+      if (r > 1.0) discard;
+      float edge = 1.0 - smoothstep(0.58, 1.0, r);
+      float rim = smoothstep(0.55, 0.86, r) * (1.0 - smoothstep(0.86, 1.0, r));
+      vec3 col = mix(vec3(0.11, 0.28, 0.46), vec3(0.36, 0.68, 0.95), rim * 0.65);
+      gl_FragColor = vec4(col, edge * uOpacity);
+      #include <colorspace_fragment>
+    }
+  `;
+
+  const draw = { dirty: true, group: null, points: null, streams: [], puddles: [], every: 3, show: true };
   const view = world.view;
   if (view?.scene) {
     const clip = view.cut ? [view.cut] : [];
@@ -340,18 +485,70 @@ export default function water(world) {
     geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAX * 3), 3));
     geom.setDrawRange(0, 0);
     draw.points = new THREE.Points(geom, new THREE.PointsMaterial({
-      color: 0x2f8cff, size: 0.12, transparent: true, opacity: 0.9, depthWrite: false, clippingPlanes: clip,
+      color: 0x2f8cff, size: 0.14, transparent: true, opacity: 0.9, depthWrite: false, clippingPlanes: clip,
     }));
     draw.points.frustumCulled = false;
+    draw.points.visible = false;   // field lattice dots shown only in grey water-focus view
     draw.max = MAX;
     draw.markers = new THREE.Group();
-    draw.group.add(draw.points, draw.markers);
+    draw.streamGroup = new THREE.Group();
+    draw.puddleGroup = new THREE.Group();
+    draw.group.add(draw.puddleGroup, draw.points, draw.streamGroup, draw.markers);
+
+    const uTime = { value: 0 }, uViewH = { value: 800 };
+    const bufSize = new THREE.Vector2();
+    const tickSpray = (renderer) => {
+      uTime.value = performance.now() / 1000;
+      renderer.getDrawingBufferSize(bufSize);
+      uViewH.value = bufSize.y;
+    };
+    const DROPS = 110, SLOTS = 12;
+    const puddleGeom = new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2);
+    for (let s = 0; s < SLOTS; s++) {
+      const posArr = new Float32Array(DROPS * 3), rndArr = new Float32Array(DROPS * 3);
+      let seed = (s + 1) * 7919;
+      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      for (let i = 0; i < DROPS * 3; i++) rndArr[i] = rnd();
+      const sg = new THREE.BufferGeometry();
+      sg.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+      sg.setAttribute('aRand', new THREE.BufferAttribute(rndArr, 3));
+      sg.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e6);
+      const u = {
+        uTime, uViewH,
+        uOrigin: { value: new THREE.Vector3() },
+        uAim: { value: new THREE.Vector3(1, 0, 0) },
+        uFlow: { value: 0 },
+        uFloorY: { value: 0 },
+        uKind: { value: 0 },
+      };
+      const pts = new THREE.Points(sg, new THREE.ShaderMaterial({
+        uniforms: u, vertexShader: SPRAY_VERT, fragmentShader: SPRAY_FRAG,
+        transparent: true, depthWrite: false, clipping: true, clippingPlanes: clip,
+      }));
+      pts.frustumCulled = false;
+      pts.visible = false;
+      pts.renderOrder = 7;
+      pts.onBeforeRender = tickSpray;
+      draw.streamGroup.add(pts);
+      draw.streams.push({ pts, u });
+
+      const pu = { uOpacity: { value: 0 }, uSeed: { value: s * 2.17 + 0.5 } };
+      const puddle = new THREE.Mesh(puddleGeom, new THREE.ShaderMaterial({
+        uniforms: pu, vertexShader: PUDDLE_VERT, fragmentShader: PUDDLE_FRAG,
+        transparent: true, depthWrite: false, side: THREE.DoubleSide, clipping: true, clippingPlanes: clip,
+      }));
+      puddle.visible = false;
+      puddle.renderOrder = 1.8;
+      draw.puddleGroup.add(puddle);
+      draw.puddles.push({ mesh: puddle, u: pu });
+    }
+
     draw.headGeom = new THREE.CylinderGeometry(0.07, 0.07, 0.04, 16);
-    draw.breakGeom = new THREE.SphereGeometry(0.09, 12, 8);
+    draw.breakGeom = new THREE.SphereGeometry(0.085, 12, 8);
     draw.mat = {
       head: new THREE.MeshBasicMaterial({ color: 0xd23c3c, clippingPlanes: clip }),
       headOn: new THREE.MeshBasicMaterial({ color: 0x3ca0ff, clippingPlanes: clip }),
-      break: new THREE.MeshBasicMaterial({ color: 0x3ca0ff, clippingPlanes: clip }),
+      break: new THREE.MeshBasicMaterial({ color: 0x5cc0ff, depthTest: false, transparent: true, opacity: 0.95, clippingPlanes: clip }),
     };
     view.scene.add(draw.group);
   }
@@ -361,30 +558,69 @@ export default function water(world) {
     draw.markers.clear();
     for (const h of heads) {
       const m = new THREE.Mesh(draw.headGeom, h.on ? draw.mat.headOn : draw.mat.head);
-      // At the head cell's centre, not at the ceiling: a storey is shown cut
-      // a little under its ceiling, which would hide it.
       m.position.set(...h.pos);
       draw.markers.add(m);
     }
     for (const x of outlets) {
       if (x.kind !== 'break') continue;
       const m = new THREE.Mesh(draw.breakGeom, draw.mat.break);
-      m.position.set(...centre(x.node.o));
+      m.position.set(...(x.pos ?? centre(x.node.o)));
+      m.renderOrder = 8;
       draw.markers.add(m);
     }
     draw.dirty = false;
   }
 
   function redrawSpray() {
-    if (!draw.points) return;
-    draw.points.visible = draw.show;
+    if (!draw.group) return;
+    draw.streamGroup.visible = draw.show;
+    draw.puddleGroup.visible = draw.show;
+    draw.points.visible = draw.show && focus.on;
     if (!draw.show) return;
+
+    // Animated parabolic streams and floor puddles for active/wetted outlets.
+    let slot = 0;
+    for (const x of outlets) {
+      if (slot >= draw.streams.length) break;
+      if (x.kind === 'break' && !x.cells.length) continue;
+      const st = draw.streams[slot], pd = draw.puddles[slot];
+      const pos = x.pos ?? centre(x.node.o);
+      const lpm = (x.q ?? 0) * 60000;
+      const flowNorm = lpm > 0.05 ? Math.min(1, 0.35 + lpm / 45) : 0;
+      st.u.uOrigin.value.set(pos[0], pos[1], pos[2]);
+      const aim = x.aim ?? [1, 0, 0];
+      st.u.uAim.value.set(aim[0], aim[1], aim[2]);
+      st.u.uFlow.value = flowNorm;
+      st.u.uFloorY.value = x.floorY ?? 0.02;
+      st.u.uKind.value = x.kind === 'sprinkler' ? 1 : 0;
+      st.pts.visible = flowNorm > 0.01;
+
+      const lit = x.litres ?? 0;
+      if (lit > 0.02 || flowNorm > 0.01) {
+        const rad = Math.min(2.3, 0.45 + Math.sqrt(Math.max(lit, 0.15)) * 0.42);
+        const px = pos[0] + (x.kind === 'break' ? aim[0] * Math.min(0.65, rad * 0.35) : 0);
+        const pz = pos[2] + (x.kind === 'break' ? aim[2] * Math.min(0.65, rad * 0.35) : 0);
+        pd.mesh.position.set(px, (x.floorY ?? 0.02) + 0.025, pz);
+        pd.mesh.scale.set(rad, 1, rad);
+        pd.u.uOpacity.value = focus.on ? 0.65 : Math.min(0.36, 0.14 + lit * 0.03);
+        pd.mesh.visible = true;
+      } else {
+        pd.mesh.visible = false;
+      }
+      slot++;
+    }
+    for (; slot < draw.streams.length; slot++) {
+      draw.streams[slot].pts.visible = false;
+      draw.puddles[slot].mesh.visible = false;
+    }
+
+    if (!focus.on) return;
     if (!airborne()) { draw.points.geometry.setDrawRange(0, 0); return; }
     const pos = draw.points.geometry.attributes.position.array;
     const { fluid, fi, fj, fk } = fire;
     let n = 0;
     for (let s = 0; s < fluid.length && n < draw.max; s++) {
-      if (water[fluid[s]] < 2e-3) continue;   // kg/m3: about a tenth of what a sprinkler puts in the air
+      if (water[fluid[s]] < 2e-3) continue;
       pos[3 * n] = origin.x + (fi[s] - 0.5) * cell;
       pos[3 * n + 1] = origin.y + (fj[s] - 0.5) * cell;
       pos[3 * n + 2] = origin.z + (fk[s] - 0.5) * cell;
@@ -458,28 +694,32 @@ export default function water(world) {
     sprite.renderOrder = 10;
     view.scene.add(sprite);
 
-    // The supply pipes for the water view: the pipe layer's own triangles,
+    // The supply pipes for the water view: the pipe layers' own triangles,
     // as drawn (thickened by pipes.js), in two plain colours, through walls.
-    const layer = view.services?.water;
-    if (layer) {
-      const meshOf = new Map(layer.elements.map((m) => [m.userData.element, m]));
-      const merged = (list) => {
-        const parts = list.map((n) => meshOf.get(n.o.element)?.geometry.index.array).filter(Boolean);
-        const idx = new Uint32Array(parts.reduce((s, a) => s + a.length, 0));
-        let at = 0;
-        for (const a of parts) { idx.set(a, at); at += a.length; }
-        const g = new THREE.BufferGeometry();
-        g.setAttribute('position', layer.geometry.attributes.position);
-        g.setIndex(new THREE.BufferAttribute(idx, 1));
-        return g;
-      };
+    const pipeLayers = [view.services?.water, view.services?.heating].filter(Boolean);
+    if (pipeLayers.length) {
       focus.pipes = new THREE.Group();
-      for (const [hot, color] of [[false, 0x2f8cff], [true, 0xff7a2f]]) {
-        const m = new THREE.Mesh(merged(nodes.filter((n) => n.hot === hot)),
-          new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false, clippingPlanes: clip }));
-        m.renderOrder = 5;
-        m.frustumCulled = false;
-        focus.pipes.add(m);
+      for (const layer of pipeLayers) {
+        const meshOf = new Map(layer.elements.map((m) => [m.userData.element, m]));
+        const merged = (list) => {
+          const parts = list.map((n) => meshOf.get(n.o.element)?.geometry.index.array).filter(Boolean);
+          const idx = new Uint32Array(parts.reduce((s, a) => s + a.length, 0));
+          let at = 0;
+          for (const a of parts) { idx.set(a, at); at += a.length; }
+          const g = new THREE.BufferGeometry();
+          g.setAttribute('position', layer.geometry.attributes.position);
+          g.setIndex(new THREE.BufferAttribute(idx, 1));
+          return g;
+        };
+        for (const [hot, color] of [[false, 0x2f8cff], [true, 0xff7a2f]]) {
+          const g = merged(nodes.filter((n) => n.hot === hot));
+          if (!g.index.count) continue;
+          const m = new THREE.Mesh(g,
+            new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, depthTest: false, clippingPlanes: clip }));
+          m.renderOrder = 5;
+          m.frustumCulled = false;
+          focus.pipes.add(m);
+        }
       }
       focus.pipes.visible = false;
       view.scene.add(focus.pipes);
@@ -531,26 +771,37 @@ export default function water(world) {
     focus.texture.needsUpdate = true;
   }
 
-  /** Tint each piece of furniture by the water on its top; only in the water view. */
+  /** Tint each piece of furniture by the water on its top: subtle damp sheen normally, strong in water view. */
   function updateWet() {
     if (!focus.furniture) return;
+    const fOpacity = view?.furnitureOpacity ?? 1;
+    const fShown = view?.extraMeshes?.furniture?.visible !== false && fOpacity > 0.01;
     for (const k of catchers) {
       const o = k.o;
       let m = focus.wet.get(o);
       if (!m) {
-        if (!(o.wet > 0) || !focus.on) continue;
+        if (!(o.wet > 0.02)) continue;
         const src = focus.furniture.get(o.element);
         if (!src) continue;
         m = new THREE.Mesh(src.geometry, new THREE.MeshBasicMaterial({
           color: 0x2f8cff, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2,
           clippingPlanes: view.cut ? [view.cut] : [],
         }));
+        m.renderOrder = 2.5;
         m.frustumCulled = false;
         view.scene.add(m);
         focus.wet.set(o, m);
       }
-      m.visible = focus.on && o.wet > 0;
-      m.material.opacity = Math.min(0.85, 0.25 + 0.6 * (o.wet / k.top) / WET_FULL);
+      const share = Math.min(1, (o.wet / k.top) / WET_FULL);
+      if (focus.on) {
+        m.visible = o.wet > 0;
+        m.material.color.setHex(0x2f8cff);
+        m.material.opacity = Math.min(0.85, 0.25 + 0.6 * share);
+      } else {
+        m.visible = fShown && o.wet > 0.02;
+        m.material.color.setHex(0x245e96);
+        m.material.opacity = Math.min(0.28, 0.08 + 0.22 * share) * fOpacity;
+      }
     }
   }
 
@@ -563,6 +814,7 @@ export default function water(world) {
     draw.points.material.opacity = on ? 1 : 0.9;
     focus.mat.shell.opacity = on ? 0.3 : 0.15;
     focus.mat.water.opacity = on ? 0.85 : 0.55;
+    redrawSpray();
     updateWet();
     drawLabel();
   }
@@ -579,9 +831,11 @@ export default function water(world) {
   function source(w, dt) {
     for (const x of outlets) {
       if (!x.q) continue;
-      supplied += x.q * 1000 * dt;   // litres, crawl-space breaks included
+      const lit = x.q * 1000 * dt;
+      supplied += lit;   // litres, crawl-space breaks included
+      x.litres = (x.litres ?? 0) + lit;
 
-      const cells = x.kind === 'break' ? x.cells : x.spray;
+      const cells = x.kind === 'break' ? x.sprayCells : x.spray;
       if (!cells.length) continue;   // a pipe in the crawl space: outside the grid
       const kg = x.q * RHO_WATER * dt;
       const add = kg / (cells.length * V);
@@ -671,19 +925,22 @@ export default function water(world) {
   function report() {
     if (draw.dirty) redrawMarkers();
     if (cost.steps % draw.every === 0) redrawSpray();
-    if (cost.steps % 20 === 0) { drawLabel(); if (focus.on) updateWet(); }   // once a simulated second
+    if (cost.steps % 20 === 0) { drawLabel(); updateWet(); }   // once a simulated second
     if (typeof window !== 'undefined' && window.duplexFire && !window.duplexFire.water) window.duplexFire.water = api;
   }
 
   function reset() {
+    water.fill(0);
     for (const n of nodes) { n.tj = 0; n.broken = null; }
     for (const x of [...outlets]) if (x.kind === 'break') outlets.delete(x);
-    for (const h of heads) { h.on = false; h.te = 0; h.q = 0; outlets.delete(h); h.o.state = '完好'; }
+    for (const h of heads) { h.on = false; h.te = 0; h.q = 0; h.litres = 0; outlets.delete(h); h.o.state = '完好'; }
     for (const o of objects.list) { o.wetRate = 0; }
     for (const key of Object.keys(books)) books[key] = 0;
     for (const key of Object.keys(cost)) cost[key] = 0;
     supplied = 0;
     dirty = true; draw.dirty = true;
+    redrawMarkers();
+    redrawSpray();
     updateWet();
     drawLabel();
   }
@@ -704,6 +961,9 @@ export default function water(world) {
       if (!n.o.cells.length) console.warn(`[water] ${n.o.id} is in the crawl space, outside the grid: it will flow, but nowhere you can see`);
       const x = breakPipe(n, 1, 'cut');
       if (dirty) solveFlows();
+      redrawMarkers();
+      redrawSpray();
+      drawLabel();
       return { id: x.id, unit: n.unit, litresPerMinute: +(x.q * 60000).toFixed(1) };
     },
     /** valve('A', false) shuts Unit A's main; valve('A') toggles; valve() lists both. */
@@ -714,6 +974,8 @@ export default function water(world) {
       u.open = open ?? !u.open;
       solveFlows();
       world.events.emit({ type: u.open ? '开阀' : '关阀', pos: centre(u.entry.o), data: { unit, what: 'water' } });
+      redrawSpray();
+      drawLabel();
       return u.open;
     },
     addSprinkler,

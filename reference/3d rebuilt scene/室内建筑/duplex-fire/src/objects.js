@@ -44,11 +44,42 @@ export function materialOf(e) {
       // Conduit runs are left out; panels, detectors and outlets stay (cards, leaks).
       return e.kind === 'conduit' ? null : 'appliance';
     case 'heating':
-      // Hundreds of hydronic pipe pieces: only the radiators and valves.
-      return e.type === 'IfcEnergyConversionDevice' || e.type === 'IfcFlowController' ? 'appliance' : null;
+      if (e.type === 'IfcEnergyConversionDevice' || e.type === 'IfcFlowController') return 'appliance';
+      if ((e.type === 'IfcFlowSegment' || e.type === 'IfcFlowFitting') && /Hydronic Supply/.test(e.system ?? '')) return 'water_pipe';
+      return null;
     default:
       return null;
   }
+}
+
+/**
+ * Residential kitchen gas branch spurs (Unit A → A103 Kitchen range,
+ * Unit B → B103 Kitchen range). The NIBS Duplex IFC only routed gas to the
+ * 2nd-floor utility boilers; these branches tee off each unit's crawlspace
+ * gas line, rise behind the 1st-floor kitchen counter, and end at a stove
+ * shut-off/hose fitting behind M_Range. Appended after all IFC elements so
+ * existing e0..eN indices stay unchanged.
+ */
+export const KITCHEN_GAS_PIPES = [
+  // Unit A branch: from crawlspace elbow e1038 [3.967..4.002, -0.688..-0.660, 9.678..9.713] → A103 Kitchen stove
+  { layer: 'gas', type: 'IfcFlowSegment', name: 'Pipe Types:Kitchen Gas Branch', system: 'Unit A Natural Gas', room: null, stoveBranch: true, min: [3.971, -0.691, 9.713], max: [4.004, -0.657, 10.542] },
+  { layer: 'gas', type: 'IfcFlowSegment', name: 'Pipe Types:Kitchen Gas Branch', system: 'Unit A Natural Gas', room: null, stoveBranch: true, min: [4.004, -0.691, 10.508], max: [4.567, -0.657, 10.542] },
+  { layer: 'gas', type: 'IfcFlowSegment', name: 'Pipe Types:Kitchen Gas Riser', system: 'Unit A Natural Gas', room: 'A103 Kitchen', stoveBranch: true, min: [4.533, -0.657, 10.508], max: [4.567, 0.805, 10.542] },
+  { layer: 'gas', type: 'IfcFlowSegment', name: 'Pipe Types:Kitchen Stove Line', system: 'Unit A Natural Gas', room: 'A103 Kitchen', stoveBranch: true, min: [4.567, 0.772, 10.508], max: [5.080, 0.805, 10.542] },
+  { layer: 'gas', type: 'IfcFlowFitting', name: 'M_Stove Gas Valve:Kitchen Cock', system: 'Unit A Natural Gas', room: 'A103 Kitchen', stoveBranch: true, stoveValve: true, min: [5.080, 0.768, 10.504], max: [5.125, 0.809, 10.546] },
+  // Unit B branch: from crawlspace elbow e1033 [4.027..4.062, -0.672..-0.637, 10.234..10.263] → B103 Kitchen stove
+  { layer: 'gas', type: 'IfcFlowSegment', name: 'Pipe Types:Kitchen Gas Branch', system: 'Unit B Natural Gas', room: null, stoveBranch: true, min: [4.031, -0.674, 7.258], max: [4.064, -0.641, 10.234] },
+  { layer: 'gas', type: 'IfcFlowSegment', name: 'Pipe Types:Kitchen Gas Riser', system: 'Unit B Natural Gas', room: 'B103 Kitchen', stoveBranch: true, min: [4.031, -0.641, 7.258], max: [4.064, 0.805, 7.292] },
+  { layer: 'gas', type: 'IfcFlowSegment', name: 'Pipe Types:Kitchen Stove Line', system: 'Unit B Natural Gas', room: 'B103 Kitchen', stoveBranch: true, min: [3.660, 0.772, 7.258], max: [4.031, 0.805, 7.292] },
+  { layer: 'gas', type: 'IfcFlowFitting', name: 'M_Stove Gas Valve:Kitchen Cock', system: 'Unit B Natural Gas', room: 'B103 Kitchen', stoveBranch: true, stoveValve: true, min: [3.615, 0.768, 7.254], max: [3.660, 0.809, 7.296] },
+];
+
+export function ensureKitchenGas(meta) {
+  if (meta._kitchenGasAdded) return meta._kitchenGasAdded;
+  const added = KITCHEN_GAS_PIPES.map((p) => ({ ...p, min: [...p.min], max: [...p.max] }));
+  meta.elements.push(...added);
+  meta._kitchenGasAdded = added;
+  return added;
 }
 
 const value = (m, key) => (m && m[key] && typeof m[key] === 'object' ? m[key].value : undefined);
@@ -96,6 +127,7 @@ function freshState(o) {
  * @returns {{list: object[], byId: Map, byElement: Map, reset: Function}}
  */
 export function buildObjects(meta, grid, materials) {
+  ensureKitchenGas(meta);
   const list = [];
   const byId = new Map();
   const byElement = new Map();

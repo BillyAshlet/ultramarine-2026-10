@@ -1,0 +1,239 @@
+[world] modules: sources, combustion, gas, water, radiation, leaks
+mode norule, 900 s, cell 0.4 m (8513 air cells); modules: sources, combustion, gas, water, radiation, leaks; igniter 1 cells at 2.6,14.6
+t    0  total     0 kW  burning []  hottest -  maxPa 0  valve 20/20°C  joint 20°C  32 ms/step
+t   30  total    18 kW  burning [e159:17.7 e160:0 e162:0.1]  hottest A102 Living Room 36°C 0 kW/m²  maxPa 19.7  valve 20/20°C  joint 20.1°C  6 ms/step
+t   60  total    68 kW  burning [e158:19.4 e159:47.2 e160:0.2 e161:0 e162:1.5]  hottest A102 Living Room 44°C 0 kW/m²  maxPa 19.7  valve 20/20°C  joint 20.4°C  6 ms/step
+t   90  total   131 kW  burning [e158:48.9 e159:76.7 e160:0.7 e161:0.2 e162:4.2]  hottest A102 Living Room 54°C 0 kW/m²  maxPa 27.7  valve 20/20°C  joint 20.9°C  6 ms/step
+t  120  total   195 kW  burning [e158:78.4 e159:106.2 e160:1.5 e161:0.7 e162:8.4]  hottest A102 Living Room 67°C 0 kW/m²  maxPa 37.1  valve 20/20°C  joint 21.6°C  6 ms/step
+t  150  total   296 kW  burning [e158:107.9 e159:169.7 e160:2.6 e161:1.5 e162:14]  hottest A102 Living Room 83°C 0 kW/m²  maxPa 60.9  valve 20/20°C  joint 23°C  6 ms/step
+t  180  total   458 kW  burning [e158:174.6 e159:255.7 e160:4 e161:2.6 e162:20.9]  hottest A102 Living Room 108°C 0.1 kW/m²  maxPa 113.9  valve 20/20°C  joint 25.5°C  6 ms/step
+t  210  total   603 kW  burning [e158:260.6 e159:307.7 e160:5.7 e161:4.1 e162:24.4]  hottest A102 Living Room 133°C 0.2 kW/m²  maxPa 140.5  valve 20/20°C  joint 29.3°C  6 ms/step
+t  240  total   673 kW  burning [e158:309.4 e159:337.2 e160:7.8 e161:5.8 e162:13]  hottest A102 Living Room 152°C 0.4 kW/m²  maxPa 140.5  valve 20/20°C  joint 34.1°C  6 ms/step
+t  270  total   740 kW  burning [e158:338.9 e159:383.3 e160:10.1 e161:7.9]  hottest A102 Living Room 171°C 0.5 kW/m²  maxPa 140.5  valve 20/20.1°C  joint 39.3°C  6 ms/step
+t  300  total   850 kW  burning [e158:386.5 e159:440.3 e160:12.8 e161:10.3]  hottest A102 Living Room 194°C 2.2 kW/m²  maxPa 170.8  valve 20/20.2°C  joint 44.6°C  6 ms/step
+t  330  total  1275 kW  burning [e158:443.5 e159:771.4 e160:15.8 e161:13 e162:31.1]  hottest A102 Living Room 237°C 3.7 kW/m²  maxPa 552.8  valve 20/20.4°C  joint 50.9°C  6 ms/step
+t  360  total  2190 kW  burning [e158:800.4 e159:1283.9 e160:19.1 e161:16 e162:70.9]  hottest A102 Living Room 333°C 8.4 kW/m²  maxPa 1768.8  valve 20/20.6°C  joint 59.7°C  6 ms/step
+t  390  total  3278 kW  burning [e158:1312.9 e159:1837 e160:22.7 e161:19.3 e162:85.8]  hottest A102 Living Room 468°C 15.2 kW/m²  maxPa 3326.6  valve 20.1/21.2°C  joint 73.1°C  6 ms/step
+t  420  total  3987 kW  burning [e158:1869.8 e159:1965.4 e160:26.6 e161:22.9 e162:102]  hottest A102 Living Room 585°C 23.2 kW/m²  maxPa 4030.4  valve 20.4/22.3°C  joint 91.2°C  6 ms/step
+t  450  total  3928 kW  burning [e152:0.1 e158:1955.8 e159:1794.9 e160:30.9 e161:26.9 e162:119.6]  hottest A102 Living Room 642°C 26.4 kW/m²  maxPa 4030.4  valve 20.8/24.3°C  joint 112.1°C  6 ms/step
+t  480  total  3613 kW  burning [e152:1.7 e158:1785.3 e159:1620.4 e160:35.4 e161:31.1 e162:138.7]  hottest A102 Living Room 648°C 25.7 kW/m²  maxPa 4030.4  valve 21.4/27.1°C  joint 133.2°C  6 ms/step
+t  510  total  3296 kW  burning [e151:0.6 e152:5.1 e158:1610.3 e159:1443.2 e160:40.3 e161:35.7 e162:159.2 e167:0.2 e168:0.5 e169:0.6 e170:0.9]  hottest A102 Living Room 640°C 24 kW/m²  maxPa 4030.4  valve 22/30.5°C  joint 152.7°C  6 ms/step
+t  540  total  2989 kW  burning [e151:2.9 e152:10.2 e158:1433.1 e159:1266 e160:45.5 e161:40.6 e162:181 e167:0.5 e168:2.6 e169:3 e170:3.5]  hottest A102 Living Room 627°C 22.1 kW/m²  maxPa 4030.4  valve 22.5/34.5°C  joint 169.9°C  6 ms/step
+t  570  total  2691 kW  burning [e151:7 e152:17 e158:1255.9 e159:1088.8 e160:51 e161:45.8 e162:204.3 e168:6.5 e169:7.1 e170:7.8]  hottest A102 Living Room 609°C 20.1 kW/m²  maxPa 4030.4  valve 22.9/38.8°C  joint 184.8°C  6 ms/step
+t  600  total  2405 kW  burning [e150:0.3 e151:12.8 e152:25.6 e158:1078.7 e159:911.6 e160:56.8 e161:51.3 e162:229 e168:12.1 e169:13 e170:13.9]  hottest A102 Living Room 588°C 16.1 kW/m²  maxPa 4030.4  valve 23.1/43.6°C  joint 197.3°C  6 ms/step
+t  630  total  2219 kW  burning [e150:2.2 e151:20.3 e152:36 e158:901.5 e159:822.6 e160:62.3 e161:57.1 e162:255 e168:19.5 e169:20.6 e170:21.8]  hottest A102 Living Room 562°C 14.5 kW/m²  maxPa 4030.4  valve 23.1/48.9°C  joint 207.4°C  6 ms/step
+t  660  total  2189 kW  burning [e150:5.9 e151:29.7 e152:48.1 e158:820.9 e159:792 e160:59.3 e161:62.2 e162:280.7 e168:28.6 e169:30 e170:31.4]  hottest A102 Living Room 546°C 13.3 kW/m²  maxPa 4030.4  valve 23/53.9°C  joint 214.9°C  6 ms/step
+t  690  total  2176 kW  burning [e150:11.3 e151:40.7 e152:61.9 e158:790.3 e159:761.4 e160:56.4 e161:59.1 e162:267.1 e167:4.2 e168:39.5 e169:41.1 e170:42.7]  hottest A102 Living Room 539°C 13.5 kW/m²  maxPa 4030.4  valve 22.9/58.5°C  joint 220.2°C  6 ms/step
+t  720  total  2168 kW  burning [e148:0.2 e150:18.4 e151:53.5 e152:77.5 e158:759.7 e159:730.8 e160:53.7 e161:56.3 e162:254.1 e167:1.9 e168:52.1 e169:54 e170:55.8]  hottest A102 Living Room 533°C 12.3 kW/m²  maxPa 4030.4  valve 22.8/62.8°C  joint 224.5°C  6 ms/step
+t  750  total  2174 kW  burning [e148:1.8 e150:27.3 e151:68.1 e152:94.9 e158:729.1 e159:700.2 e160:51.1 e161:53.6 e162:241.8 e168:66.5 e169:68.6 e170:70.7]  hottest A102 Living Room 527°C 12.9 kW/m²  maxPa 4030.4  valve 22.6/66.7°C  joint 228.1°C  6 ms/step
+t  780  total  2194 kW  burning [e148:5.2 e150:38 e151:84.4 e152:113.9 e158:698.5 e159:669.6 e160:48.6 e161:51 e162:230.1 e168:82.6 e169:85 e170:87.3]  hottest A102 Living Room 523°C 12.5 kW/m²  maxPa 4030.4  valve 22.5/70.4°C  joint 231.5°C  6 ms/step
+t  810  total  2228 kW  burning [e148:10.3 e150:50.4 e151:102.5 e152:134.8 e158:667.9 e159:639 e160:46.3 e161:48.5 e162:218.9 e168:100.5 e169:103.1 e170:105.6]  hottest A102 Living Room 519°C 12.1 kW/m²  maxPa 4030.4  valve 22.4/73.9°C  joint 233°C  6 ms/step
+t  840  total  2274 kW  burning [e148:17.2 e150:64.5 e151:122.3 e152:157.4 e158:637.3 e159:608.4 e160:44 e161:46.1 e162:208.3 e168:120.2 e169:123 e170:125.7]  hottest A103 Kitchen 523°C 6.6 kW/m²  maxPa 4030.4  valve 22.3/77.2°C  joint 233°C  6 ms/step
+t  870  total  2346 kW  burning [e148:25.8 e150:80.4 e151:143.8 e152:181.7 e158:606.7 e159:577.8 e160:41.9 e161:43.9 e162:198.2 e167:11.7 e168:141.5 e169:144.6 e170:147.6]  hottest A103 Kitchen 528°C 6.6 kW/m²  maxPa 4030.4  valve 22.2/80.3°C  joint 233°C  6 ms/step
+t  900  total  2408 kW  burning [e148:36.2 e150:98.1 e151:167.2 e152:207.8 e158:576.1 e159:547.2 e160:39.9 e161:41.8 e162:188.6 e167:1.7 e168:164.7 e169:168 e170:171.2]  hottest A103 Kitchen 535°C 7.2 kW/m²  maxPa 4030.4  valve 22.2/83.2°C  joint 233°C  6 ms/step
+{
+ "mode": "norule",
+ "seconds": 900,
+ "cell": 0.4,
+ "airCells": 8513,
+ "igniterCells": 1,
+ "steps": 18001,
+ "wallS": 109,
+ "msPerStep": {
+  "sources": 0,
+  "combustion": 0.018,
+  "gas": 0.002,
+  "water": 0.027,
+  "radiation": 0.192,
+  "leaks": 0.055,
+  "solver": 5.741
+ },
+ "ignitions": [
+  {
+   "t": 12,
+   "id": "e159",
+   "by": "flux",
+   "flux": 30,
+   "mat": "sofa"
+  },
+  {
+   "t": 16.4,
+   "id": "e162",
+   "by": "flux",
+   "flux": 30,
+   "mat": "coffee_table"
+  },
+  {
+   "t": 28.3,
+   "id": "e160",
+   "by": "flux",
+   "flux": 30,
+   "mat": "coffee_table"
+  },
+  {
+   "t": 40.2,
+   "id": "e158",
+   "by": "flux",
+   "flux": 30,
+   "mat": "sofa"
+  },
+  {
+   "t": 56.6,
+   "id": "e161",
+   "by": "flux",
+   "flux": 30,
+   "mat": "coffee_table"
+  },
+  {
+   "t": 302.4,
+   "id": "e162",
+   "by": "flux",
+   "flux": 20.5,
+   "mat": "coffee_table"
+  },
+  {
+   "t": 437.7,
+   "id": "e152",
+   "by": "flux",
+   "flux": 42.4,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 480.4,
+   "id": "e170",
+   "by": "flux",
+   "flux": 40.5,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 484.4,
+   "id": "e169",
+   "by": "flux",
+   "flux": 39.6,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 485.4,
+   "id": "e151",
+   "by": "flux",
+   "flux": 30.2,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 488.5,
+   "id": "e168",
+   "by": "flux",
+   "flux": 38.6,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 493.5,
+   "id": "e167",
+   "by": "flux",
+   "flux": 37.1,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 582.4,
+   "id": "e150",
+   "by": "flux",
+   "flux": 30,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 669.5,
+   "id": "e167",
+   "by": "flux",
+   "flux": 30,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 707.1,
+   "id": "e148",
+   "by": "flux",
+   "flux": 30,
+   "mat": "cabinet_run"
+  },
+  {
+   "t": 843.4,
+   "id": "e167",
+   "by": "flux",
+   "flux": 32.3,
+   "mat": "cabinet_run"
+  }
+ ],
+ "flashover": [],
+ "crossed": {
+  "A102 Living Room": {
+   "floor20At": 407,
+   "layer600At": 425
+  },
+  "A103 Kitchen": {
+   "layer600At": 455
+  },
+  "A101 Foyer": {},
+  "A105 Stair": {},
+  "A201 Hallway": {},
+  "A104 Bathroom 1": {},
+  "A204 Bathroom 2": {},
+  "A203 Bedroom 2": {},
+  "A202 Bedroom 1": {},
+  "A205 Utility": {},
+  "B104 Bathroom 1": {},
+  "B204 Bathroom 2": {},
+  "B201 Hallway": {},
+  "B101 Foyer": {},
+  "B105 Room": {},
+  "B103 Kitchen": {},
+  "B205 Utility": {},
+  "B202 Bedroom 1": {},
+  "B203 Bedroom 2": {},
+  "B102 Living Room": {}
+ },
+ "max": {
+  "fluxOnCold": {
+   "kW": 42.6,
+   "id": "e152",
+   "t": 433
+  },
+  "totalKW": {
+   "kW": 4132,
+   "t": 430
+  },
+  "layerC": {
+   "c": 648,
+   "room": "A102 Living Room",
+   "t": 467
+  },
+  "floorFlux": {
+   "q": 26.4,
+   "room": "A102 Living Room",
+   "t": 444
+  },
+  "zonePa": {
+   "pa": 4030.4,
+   "zone": "A102 A203 A202",
+   "t": 403
+  },
+  "valveC": {
+   "c": 83.2,
+   "unit": "A",
+   "t": 900
+  },
+  "jointC": {
+   "c": 233,
+   "id": "e1041",
+   "t": 794
+  },
+  "wetRate": {
+   "v": 0.31407970207395736,
+   "id": "e142",
+   "t": 804
+  }
+ },
+ "thresholds": {
+  "gasValveLeakC": 440,
+  "gasValveMeltC": 660,
+  "waterJointFailC": 233
+ }
+}

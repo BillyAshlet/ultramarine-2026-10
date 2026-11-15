@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flame lab</title>
+<!--
+  A living room with a kitchen corner, to see how fire looks before it goes
+  into the house (task B). Each button plays one scene: lit, spreading from
+  item to item, water, wood going out, a fire reaching the ceiling,
+  flashover, a gas leak catching. It draws with src/flames.js itself, so
+  what you see here is what the page will show.
+  Served: launch.json "duplex-fire", then /duplex-fire/tools/flame-lab.html.
+  One file to double-click: node tools/flame-lab-standalone.mjs.
+  The scenes are scripted (times and sizes picked to show each effect), not
+  simulated; the house does the simulating.
+-->
+<style>
+  :root { color-scheme: dark; --panel: rgba(16, 19, 23, 0.92); --text: #e6e6ea; --dim: #9a9aa6; --accent: #ff8a3a; }
+  html, body { margin: 0; height: 100%; background: #111418; color: var(--text); font: 13px/1.45 -apple-system, system-ui, sans-serif; overflow: hidden; }
+  canvas { display: block; }
+  #panel { position: fixed; top: 12px; left: 12px; width: 270px; max-width: calc(100vw - 24px); max-height: calc(100vh - 24px); overflow: auto; box-sizing: border-box; background: var(--panel); border: 1px solid #2a3038; border-radius: 8px; padding: 12px; }
+  h1 { font-size: 14px; margin: 0 0 4px; }
+  h2 { font-size: 12px; color: var(--dim); font-weight: 600; margin: 12px 0 4px; }
+  .dim { color: var(--dim); font-size: 11px; }
+  .scenes { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0; }
+  button { background: #2a2d36; color: var(--text); border: 0; border-radius: 4px; padding: 6px 8px; font: inherit; cursor: pointer; text-align: left; }
+  button:hover { background: #343844; }
+  button.on { background: #4a6cf7; }
+  .scenes button.playing { background: #6a3a1c; outline: 1px solid var(--accent); }
+  #caption { position: fixed; left: 50%; bottom: 40px; transform: translateX(-50%); max-width: min(640px, calc(100vw - 32px)); background: var(--panel); border: 1px solid #2a3038; border-radius: 8px; padding: 10px 14px; font-size: 14px; text-align: center; }
+  #caption:empty { display: none; }
+  #caption .en { display: block; color: var(--dim); font-size: 12px; margin-top: 2px; }
+  #status { position: fixed; bottom: 10px; left: 12px; right: 12px; color: var(--dim); font-size: 12px; }
+  @media (max-width: 700px) { #panel { top: auto; bottom: 34px; left: 8px; right: 8px; width: auto; max-height: 45vh; } #caption { top: 12px; bottom: auto; } }
+</style>
+<script type="importmap">{ "imports": { "three": "../vendor/three.module.js", "three/addons/OrbitControls.js": "../vendor/OrbitControls.js" } }</script>
+</head>
+<body>
+<div id="panel">
+  <h1>Flame lab 火焰演示</h1>
+  <h2>Scenes 场景（点一个看效果）</h2>
+  <div class="scenes">
+    <button data-scene="ignite">点燃<br><span class="dim">Ignite</span></button>
+    <button data-scene="spread">蔓延（传导）<br><span class="dim">Spread</span></button>
+    <button data-scene="water">浇水<br><span class="dim">Water</span></button>
+    <button data-scene="woodOut">木头自己灭<br><span class="dim">Wood goes out</span></button>
+    <button data-scene="big">大火顶天花板<br><span class="dim">To the ceiling</span></button>
+    <button data-scene="flashover">轰燃<br><span class="dim">Flashover</span></button>
+    <button data-scene="gas">煤气泄漏着火<br><span class="dim">Gas leak</span></button>
+    <button data-scene="clear">清空<br><span class="dim">Clear</span></button>
+  </div>
+  <h2>During a scene 进行中</h2>
+  <div class="row">
+    <button id="waterNow">浇水 Water now</button>
+    <button id="pause">暂停 Pause</button>
+  </div>
+  <h2>View 视图</h2>
+  <div class="row">
+    <button id="smoke" class="on">烟层 Smoke</button>
+  </div>
+  <div class="row" style="align-items:center">
+    <span>火区透视度<br><span class="dim">Fire-zone see-through</span></span>
+    <input id="see" type="range" min="0" max="1" step="0.05" value="0.85" style="flex:1"><span id="seeVal">0.85</span>
+  </div>
+  <div class="dim">着火区域前面挡着的烟和墙会变透明。0 = 和现在一样被烟挡住。Smoke and walls in front of the burning area turn see-through.</div>
+  <div class="row">
+    <button id="top">俯视 Top</button>
+    <button id="side">侧视 Side</button>
+    <button id="cut" class="on">剖切 2.55 m</button>
+  </div>
+  <div class="dim">拖动旋转，滚轮缩放。Drag to turn, scroll to zoom.</div>
+</div>
+<div id="caption"></div>
+<div id="status"></div>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/OrbitControls.js';
+import { makeFlames } from '../src/flames.js';
+import { makeZone, ZONE_GLSL, fadeForZone } from '../src/firezone.js';
+
+const $ = (id) => document.getElementById(id);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.localClippingEnabled = true;
+document.body.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111418);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x505050, 1.6));
+const camera = new THREE.PerspectiveCamera(45, 1, 0.05, 100);
+const controls = new OrbitControls(camera, renderer.domElement);
+const views = {
+  // Aimed a little left of the room's middle, so the panel does not cover the bookshelf.
+  top: () => { camera.position.set(-1.6, 8.5, 5.2); controls.target.set(-1.1, 0.6, 0); },
+  side: () => { camera.position.set(0.2, 1.6, 6.2); controls.target.set(0, 1.0, -0.5); },
+};
+views.top();
+
+// --- the room: a living room and a kitchen corner, ceiling 2.6 m (A102) ------------
+const CEIL = 2.6;
+const cut = new THREE.Plane(new THREE.Vector3(0, -1, 0), 2.55);
+const zone = makeZone();
+const mat = (c) => new THREE.MeshLambertMaterial({ color: c, side: THREE.DoubleSide, clippingPlanes: [cut] });
+// Walls and ceiling fade where they stand in front of the fire zone.
+const wallMat = (c) => fadeForZone(mat(c), zone);
+const block = (w, h, d, x, y, z, c) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat(c)); b.position.set(x, y + h / 2, z); scene.add(b); return b; };
+block(7, 0.02, 5.4, 0, -0.02, 0, 0x8a7058);           // floor
+const wall = (w, h, d, x, y, z, c) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), wallMat(c)); b.position.set(x, y + h / 2, z); scene.add(b); return b; };
+wall(7, CEIL, 0.1, 0, 0, -2.75, 0xd8d4cc);            // back wall
+wall(0.1, CEIL, 5.4, -3.55, 0, 0, 0xd0ccc4);          // left wall
+wall(7, CEIL, 0.1, 0, 0, 2.75, 0xc8c4bc);             // front wall: between you and the room
+wall(7, 0.2, 5.4, 0, CEIL, 0, 0xe0dcd4);              // ceiling (hidden by the cut)
+// The things that burn: plan box [x0, x1, z0, z1] and height.
+const ITEMS = {
+  sofa: { box: [-2.4, -0.57, -2.6, -1.94], h: 0.81, color: 0x5a6a7a },
+  table: { box: [-2.0, -0.8, -1.1, -0.5], h: 0.45, color: 0x6b4a30 },
+  chair: { box: [0.0, 0.85, -2.5, -1.65], h: 0.85, color: 0x7a5a5a },
+  shelf: { box: [-3.5, -3.15, -0.6, 0.6], h: 1.8, color: 0x8a6440 },
+  counter: { box: [1.9, 3.4, 0.6, 2.6], h: 0.9, color: 0x9aa0a8 },
+};
+for (const it of Object.values(ITEMS)) {
+  const [x0, x1, z0, z1] = it.box;
+  block(x1 - x0, it.h, z1 - z0, (x0 + x1) / 2, 0, (z0 + z1) / 2, it.color);
+}
+// The gas pipe at the front of the kitchen counter, and its leaking joint.
+const GAS = { x: 2.6, y: 0.9, z: 0.5 };
+block(0.05, 0.9, 0.05, GAS.x, 0, GAS.z, 0xd4b030);
+
+// Smoke: a dark layer under the ceiling, drawn before the flames (they show
+// through, as if drawn after the smoke) or after them (they are hidden).
+// Smoke: a dark layer under the ceiling, drawn after the flames as in the
+// house (smoke-pass.js), so it hides them, except in front of the fire zone.
+const smoke = new THREE.Mesh(new THREE.BoxGeometry(7, 1.2, 5.4), new THREE.ShaderMaterial({
+  uniforms: zone.uniforms, transparent: true, depthWrite: false, clipping: true, clippingPlanes: [cut],
+  vertexShader: `varying vec3 vWorld;
+    #include <clipping_planes_pars_vertex>
+    void main() { vWorld = (modelMatrix * vec4(position, 1.0)).xyz; vec4 mvPosition = viewMatrix * vec4(vWorld, 1.0); gl_Position = projectionMatrix * mvPosition;
+    #include <clipping_planes_vertex>
+    }`,
+  fragmentShader: `varying vec3 vWorld;
+    ${ZONE_GLSL}
+    #include <clipping_planes_pars_fragment>
+    void main() {
+      #include <clipping_planes_fragment>
+      vec3 d = vWorld - cameraPosition; float t = length(d);
+      float w = inZone(cameraPosition, d / t, t);
+      // A faint warm rim where the smoke is opened, so it reads as a view, not as clear air.
+      float rim = clamp(w * (1.0 - w) * 4.0, 0.0, 1.0) * uZoneSee;
+      gl_FragColor = vec4(mix(vec3(0.08), vec3(0.45, 0.2, 0.08), rim * 0.5), 0.9 * (1.0 - w));
+    }`,
+}));
+smoke.position.set(0, 1.95, 0);
+smoke.renderOrder = 10;
+scene.add(smoke);
+
+// The lab's own clock: real time while you watch, or stepped by lab.advance()
+// (a hidden browser tab barely runs frames, so checks step it by hand).
+let now = 0, paused = false;
+const flames = makeFlames({ scene, cut }, () => now);
+
+// --- fires: each grows as t² to its peak, from where it was lit ---------------------
+let fires = [], timeline = [], sceneStart = 0;
+const centre = (box) => [(box[0] + box[1]) / 2, (box[2] + box[3]) / 2];
+const nearest = (box, x, z) => [Math.min(box[1], Math.max(box[0], x)), Math.min(box[3], Math.max(box[2], z))];
+function light(key, opts) {
+  const it = ITEMS[key] ?? {};
+  const box = opts.box ?? it.box;
+  const f = { key, box, h: opts.h ?? it.h, peak: opts.peak, grow: opts.grow ?? 8, seed: opts.seed ?? centre(box),
+    t0: now, wetAt: null, fadeAt: null, fade: opts.fade ?? 6, kWAt: opts.kWAt ?? null, flat: opts.flat ?? false,
+    embers: opts.embers ?? true };   // a gas burner or a flash of gas leaves nothing glowing
+  fires = fires.filter((g) => g.key !== key);
+  fires.push(f);
+  return f;
+}
+const remove = (key) => {
+  const f = fires.find((g) => g.key === key);
+  if (f && !f.embers) flames.drop(key);
+  fires = fires.filter((g) => g.key !== key);
+};
+function kWOf(f) {
+  const t = now - f.t0;
+  let q = f.kWAt ? f.kWAt(t) : f.peak * Math.min(1, (t / f.grow) ** 2);
+  if (f.fadeAt != null) q *= Math.max(0, 1 - (now - f.fadeAt) / f.fade);
+  if (f.wetAt != null) q *= Math.exp(-(now - f.wetAt) / 3);
+  return q;
+}
+/** The burning patch: plan x heat release / peak, from where it was lit. */
+function patchOf(f) {
+  const [x0, x1, z0, z1] = f.box;
+  const share = f.flat ? 1 : Math.min(1, kWOf(f) / f.peak);
+  const w = Math.min(x1 - x0, Math.max(0.15, (x1 - x0) * Math.sqrt(share)));
+  const d = Math.min(z1 - z0, Math.max(0.15, (z1 - z0) * Math.sqrt(share)));
+  const x = Math.min(x1 - w / 2, Math.max(x0 + w / 2, f.seed[0])), z = Math.min(z1 - d / 2, Math.max(z0 + d / 2, f.seed[1]));
+  return { c: [x, z], w, d };
+}
+/** Light `key` on the side nearest the fire `from`. */
+function lightFrom(key, from, opts) {
+  const g = fires.find((f) => f.key === from);
+  return light(key, { ...opts, seed: g ? nearest(ITEMS[key].box, ...patchOf(g).c) : undefined });
+}
+const at = (s, fn) => timeline.push({ at: s, fn });
+const say = (zh, en) => { $('caption').innerHTML = zh ? `${zh}<span class="en">${en}</span>` : ''; };
+const wetAll = () => { for (const f of fires) if (f.wetAt == null) f.wetAt = now; };
+
+// --- the scenes (scripted: times and sizes picked to show each effect) ---------------
+const IGNITER = (x, z) => ({ box: [x - 0.25, x + 0.25, z - 0.25, z + 0.25], h: 0.02, peak: 50, grow: 0.5, flat: true, embers: false });
+const SCENES = {
+  ignite() {
+    light('igniter', IGNITER(-2.6, -1.65));
+    say('引火源（50 kW）放在沙发左前角', 'A 50 kW burner at the sofa\'s front left corner');
+    at(3, () => { lightFrom('sofa', 'igniter', { peak: 400, grow: 12 }); say('沙发从挨着火的那一角着起来，越烧越大、越铺越开', 'The sofa catches at the corner by the flame and spreads'); });
+    at(15, () => { remove('igniter'); say('引火源撤了，沙发自己烧下去（泡沫不会自己灭）', 'Burner off; the foam sofa keeps burning'); });
+  },
+  spread() {
+    light('sofa', { peak: 1500, grow: 18, seed: [-2.4, -2.3] });
+    say('沙发着火', 'The sofa is burning');
+    at(9, () => { lightFrom('table', 'sofa', { peak: 280, grow: 8 }); say('火焰烤到旁边的茶几，茶几从靠沙发那边着起来', 'Its flames reach the coffee table, which catches on the side facing the sofa'); });
+    at(15, () => { lightFrom('chair', 'sofa', { peak: 900, grow: 10 }); say('辐射把扶手椅也点着了', 'Radiation lights the armchair'); });
+    at(21, () => { lightFrom('shelf', 'table', { peak: 1100, grow: 12 }); say('火传到靠墙的书架', 'The bookshelf by the wall catches'); });
+    at(33, () => say('一件接一件着火：这就是「传导」', 'One thing after another: the fire spreads'));
+  },
+  water() {
+    light('sofa', { peak: 500, grow: 5, seed: [-1.5, -2.3] });
+    say('沙发在烧', 'The sofa is burning');
+    at(7, () => { wetAll(); say('喷淋的水落下：冒出白汽，火一点点变小', 'Water lands: steam, and the flames shrink'); });
+    at(23, () => say('火被浇灭，只剩余烬和几缕烟', 'Out: embers and a few wisps'));
+  },
+  woodOut() {
+    light('igniter', IGNITER(-1.4, -0.8));
+    say('引火源放在实木茶几下面', 'A burner under the wooden coffee table');
+    at(2, () => { lightFrom('table', 'igniter', { peak: 30, grow: 4 }); say('茶几被点着，火不大（约 28 kW，NBS 书架实验）', 'The table catches, small (about 28 kW, as the NBS bookcase)'); });
+    at(10, () => {
+      remove('igniter');
+      const t = fires.find((f) => f.key === 'table');
+      if (t) { t.fadeAt = now; t.fade = 6; }
+      say('引火源一撤，木头自己烧不下去，慢慢灭了（实际约 60 秒）', 'Burner off: the wood can\'t keep going alone and dies down (about 60 s in reality)');
+    });
+  },
+  big() {
+    light('sofa', { peak: 2068, grow: 10, seed: [-1.5, -2.3] });
+    say('沙发烧到峰值 2 MW（NIST 实测）', 'The sofa at its 2 MW peak (NIST test)');
+    at(7, () => say('火焰比房间还高：顶到天花板就沿着天花板往外卷', 'Taller than the room: the flame rolls out along the ceiling'));
+  },
+  flashover() {
+    light('sofa', { peak: 1500, grow: 6, seed: [-1.5, -2.3] });
+    say('沙发大火，热烟积在天花板下', 'A big sofa fire; hot smoke gathers under the ceiling');
+    at(6, () => say('烟层越来越热，往下烤着整个房间……', 'The smoke layer heats everything below it...'));
+    at(9, () => {
+      lightFrom('table', 'sofa', { peak: 600, grow: 2 });
+      lightFrom('chair', 'sofa', { peak: 900, grow: 2.5 });
+      lightFrom('shelf', 'sofa', { peak: 1100, grow: 2.5 });
+      say('轰燃：几秒内屋里所有能烧的一起着了', 'Flashover: everything that can burn catches within seconds');
+    });
+  },
+  gas() {
+    say('厨房台面前的燃气管接头在漏气……', 'Gas leaks at a pipe joint by the kitchen counter...');
+    at(2.5, () => {
+      // The leaked cloud burns in a flash, then a steady flame at the leak.
+      light('gasflash', { box: [1.6, 3.5, -0.2, 2.6], h: 0.9, peak: 2500, flat: true, embers: false, kWAt: (t) => (t < 0.9 ? 2500 * Math.sin(Math.PI * t / 0.9) : 0) });
+      light('gas', { box: [GAS.x - 0.06, GAS.x + 0.06, GAS.z - 0.06, GAS.z + 0.06], h: GAS.y, peak: 40, flat: true, embers: false, kWAt: (t) => (t < 0.4 ? 0 : 40) });
+      say('遇到火源：漏出来的燃气一下子闪燃', 'It meets a spark: the leaked gas flashes');
+    });
+    at(4, () => { remove('gasflash'); say('之后接头处一直喷着火，直到关掉燃气阀', 'Then a flame keeps burning at the leak until the gas is shut off'); });
+  },
+  clear() { say('', ''); },
+};
+
+function play(name) {
+  fires = []; timeline = []; sceneStart = now;
+  for (const b of document.querySelectorAll('[data-scene]')) b.classList.toggle('playing', b.dataset.scene === name && name !== 'clear');
+  flames.clear();
+  SCENES[name]();
+  timeline.sort((a, b) => a.at - b.at);
+  syncButtons();
+}
+for (const b of document.querySelectorAll('[data-scene]')) b.onclick = () => play(b.dataset.scene);
+$('waterNow').onclick = wetAll;
+$('pause').onclick = () => { paused = !paused; $('pause').classList.toggle('on', paused); };
+$('smoke').onclick = () => { smoke.visible = !smoke.visible; syncButtons(); };
+$('see').oninput = () => { zone.see = +$('see').value; $('seeVal').textContent = (+$('see').value).toFixed(2); };
+$('top').onclick = views.top;
+$('side').onclick = views.side;
+$('cut').onclick = () => { cut.constant = cut.constant > 100 ? 2.55 : 1e3; syncButtons(); };
+function syncButtons() {
+  $('smoke').classList.toggle('on', smoke.visible);
+  $('cut').classList.toggle('on', cut.constant < 100);
+}
+
+function resize() {
+  renderer.setSize(innerWidth, innerHeight);
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+}
+addEventListener('resize', resize);
+resize();
+
+// --- each step: run the timeline, report every fire, draw ---------------------------
+let last = performance.now() / 1000, frameMs = 16;
+function update(dt) {
+  if (paused) return;
+  now += dt;
+  const t = now - sceneStart;
+  while (timeline.length && timeline[0].at <= t) {
+    timeline.shift().fn();
+    syncButtons();
+  }
+  flames.begin();
+  zone.begin();
+  for (const f of fires) {
+    const q = kWOf(f);
+    // Out (by water or dying down): stop reporting it, and flames.js shows its embers.
+    if (q < 1) { if (!f.embers) flames.drop(f.key); continue; }
+    const p = patchOf(f);
+    flames.set(f.key, p.c[0], 0, p.c[1], p.w, p.d, q * 1e3, CEIL, f.h, f.wetAt != null ? 1 : 0);
+    // The zone: the whole thing that is burning, up to the top of its flame.
+    const D = Math.sqrt((4 * p.w * p.d) / Math.PI);
+    const top = Math.min(CEIL, 0.6 * f.h + Math.max(0.3, 0.235 * Math.pow(q, 0.4) - 1.02 * D));
+    const [x0, x1, z0, z1] = f.box;
+    zone.add(x0, 0, z0, x1, Math.max(top, f.h + 0.2), z1);
+  }
+  flames.end();
+  zone.end();
+}
+function draw() {
+  const s0 = performance.now();
+  controls.update();
+  renderer.render(scene, camera);
+  frameMs = frameMs * 0.95 + (performance.now() - s0) * 0.05;
+  const total = fires.reduce((a, f) => a + kWOf(f), 0);
+  $('status').textContent = `t ${(now - sceneStart).toFixed(1)} s · ${total.toFixed(0)} kW in all 总热释放 · fires drawn ${flames.count()} · frame ${frameMs.toFixed(1)} ms`;
+}
+function frame() {
+  const t = performance.now() / 1000;
+  update(Math.min(0.1, t - last));
+  last = t;
+  draw();
+}
+renderer.setAnimationLoop(frame);
+window.lab = {
+  play, views,
+  /** Run forward by s seconds at 30 steps a second, then draw once. */
+  advance(s) { for (let k = 0; k < Math.round(s * 30); k++) update(1 / 30); draw(); return `${$('status').textContent} | ${$('caption').textContent}`; },
+};
+play('ignite');
+</script>
+</body>
+</html>

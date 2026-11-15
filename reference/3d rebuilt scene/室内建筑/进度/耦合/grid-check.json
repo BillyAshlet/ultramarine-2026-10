@@ -1,0 +1,10042 @@
+{
+ "0.2": {
+  "dims": [
+   44,
+   32,
+   89
+  ],
+  "air": 81850,
+  "buildMs": 159,
+  "igniter": {
+   "cells": 9,
+   "at": [
+    [
+     2.5,
+     0.1,
+     14.3
+    ],
+    [
+     2.7,
+     0.1,
+     14.3
+    ],
+    [
+     2.9,
+     0.1,
+     14.3
+    ],
+    [
+     2.5,
+     0.1,
+     14.5
+    ],
+    [
+     2.7,
+     0.1,
+     14.5
+    ],
+    [
+     2.9,
+     0.1,
+     14.5
+    ],
+    [
+     2.5,
+     0.1,
+     14.7
+    ],
+    [
+     2.7,
+     0.1,
+     14.7
+    ],
+    [
+     2.9,
+     0.1,
+     14.7
+    ]
+   ],
+   "areaM2": 0.36
+  },
+  "doors": [
+   {
+    "name": "M_Single-Flush:1250mm x 2010mm:1250mm x 2010mm",
+    "room": "A101 Foyer",
+    "outside": true,
+    "open": false,
+    "cells": 140,
+    "leafM": 1.4,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Flush:1250mm x 2010mm:1250mm x 2010mm",
+    "room": "B101 Foyer",
+    "outside": true,
+    "open": false,
+    "cells": 140,
+    "leafM": 1.4,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "A101 Foyer",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 0.91,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "B101 Foyer",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 0.91,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "B203 Bedroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 1.02,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "A203 Bedroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 1.02,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "B202 Bedroom 1",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 1.02,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "A202 Bedroom 1",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 1.02,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "B204 Bathroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 1.02,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "A204 Bathroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 1.02,
+    "airCols": 5,
+    "airM": 1
+   },
+   {
+    "name": "M_Single-Glass 1:0813 x 2420mm:0813 x 2420mm",
+    "room": "B102 Living Room",
+    "outside": true,
+    "open": false,
+    "cells": 120,
+    "leafM": 0.96,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Glass 1:0813 x 2420mm:0813 x 2420mm",
+    "room": "A102 Living Room",
+    "outside": true,
+    "open": false,
+    "cells": 120,
+    "leafM": 0.96,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "B205 Utility",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 0.91,
+    "airCols": 4,
+    "airM": 0.8
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "A205 Utility",
+    "outside": false,
+    "open": true,
+    "cells": 110,
+    "leafM": 0.91,
+    "airCols": 4,
+    "airM": 0.8
+   }
+  ],
+  "objects": {
+   "e91": {
+    "class": "窗",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 325,
+    "wallAir": false
+   },
+   "e92": {
+    "class": "窗",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 325,
+    "wallAir": false
+   },
+   "e93": {
+    "class": "窗",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 60,
+    "wallAir": false
+   },
+   "e94": {
+    "class": "窗",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 60,
+    "wallAir": false
+   },
+   "e95": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 180,
+    "wallAir": false
+   },
+   "e96": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e97": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e98": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e99": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 180,
+    "wallAir": false
+   },
+   "e100": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e101": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e102": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e103": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 180,
+    "wallAir": false
+   },
+   "e104": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e105": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e106": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e107": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 180,
+    "wallAir": false
+   },
+   "e108": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e109": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e110": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e111": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e112": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e113": {
+    "class": "窗",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e114": {
+    "class": "窗",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e123": {
+    "class": "木柜",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 130,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e124": {
+    "class": "木柜",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e125": {
+    "class": "木柜",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e126": {
+    "class": "木柜",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 120,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e127": {
+    "class": "木柜",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 130,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e128": {
+    "class": "木柜",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e129": {
+    "class": "木柜",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e130": {
+    "class": "木柜",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 120,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e131": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 90,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e132": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 90,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e133": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 90,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e134": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 75,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e135": {
+    "class": "台面",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 96,
+    "wallAir": false
+   },
+   "e136": {
+    "class": "台面",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 30,
+    "wallAir": false
+   },
+   "e137": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e138": {
+    "class": "台面",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 210,
+    "wallAir": false
+   },
+   "e139": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e140": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e141": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e142": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 90,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e143": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 90,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e144": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 90,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e145": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 75,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e146": {
+    "class": "台面",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 96,
+    "wallAir": false
+   },
+   "e147": {
+    "class": "台面",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 30,
+    "wallAir": false
+   },
+   "e148": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e149": {
+    "class": "台面",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 210,
+    "wallAir": false
+   },
+   "e150": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e151": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e152": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 150,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e153": {
+    "class": "软垫",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 220,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e154": {
+    "class": "软垫",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 200,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e155": {
+    "class": "桌子",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 64,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e156": {
+    "class": "桌子",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 64,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e157": {
+    "class": "桌子",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 180,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e158": {
+    "class": "软垫",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 250,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e159": {
+    "class": "软垫",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 200,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e160": {
+    "class": "桌子",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 64,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e161": {
+    "class": "桌子",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 80,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e162": {
+    "class": "桌子",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 180,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e163": {
+    "class": "软垫",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 264,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e164": {
+    "class": "软垫",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 363,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e165": {
+    "class": "软垫",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 363,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e166": {
+    "class": "软垫",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 264,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e167": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 50,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e168": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e169": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e170": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e171": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 50,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e172": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e173": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e174": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e175": {
+    "class": "木柜",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e176": {
+    "class": "木柜",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e177": {
+    "class": "木柜",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e178": {
+    "class": "木柜",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e179": {
+    "class": "木柜",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 45,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e180": {
+    "class": "桌子",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e181": {
+    "class": "桌子",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e182": {
+    "class": "桌子",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e183": {
+    "class": "桌子",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e197": {
+    "class": "门",
+    "room": "A101 Foyer",
+    "combustible": true,
+    "cells": 88,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e198": {
+    "class": "门",
+    "room": "B101 Foyer",
+    "combustible": true,
+    "cells": 88,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e199": {
+    "class": "门",
+    "room": "A101 Foyer",
+    "combustible": true,
+    "cells": 40,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e200": {
+    "class": "门",
+    "room": "B101 Foyer",
+    "combustible": true,
+    "cells": 40,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e201": {
+    "class": "门",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 105,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e202": {
+    "class": "门",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 105,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e203": {
+    "class": "门",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 106,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e204": {
+    "class": "门",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 116,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e205": {
+    "class": "门",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 106,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e206": {
+    "class": "门",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 106,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e207": {
+    "class": "门",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 65,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e208": {
+    "class": "门",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 65,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e209": {
+    "class": "门",
+    "room": "B205 Utility",
+    "combustible": true,
+    "cells": 74,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e210": {
+    "class": "门",
+    "room": "A205 Utility",
+    "combustible": true,
+    "cells": 74,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e362": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e363": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e364": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e365": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e366": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e367": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e368": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e369": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e370": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e371": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e372": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e373": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e374": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e375": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e376": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 44,
+    "wallAir": true
+   },
+   "e377": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e378": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e379": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e380": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e381": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e382": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e383": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e384": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e385": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e386": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e387": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e388": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e389": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e390": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e391": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e392": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e393": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e394": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e395": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e396": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e397": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e398": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e399": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e400": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e401": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 29,
+    "wallAir": true
+   },
+   "e402": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e403": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e404": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e405": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e406": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e407": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e408": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e409": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e410": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e411": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e412": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": false,
+    "ceilY": 5.6
+   },
+   "e413": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e414": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e415": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e416": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e417": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e418": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e419": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e420": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e421": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e422": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e423": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e424": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e425": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 43,
+    "wallAir": true
+   },
+   "e426": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": true
+   },
+   "e427": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e428": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e429": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e430": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e431": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e432": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e433": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e434": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e435": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e436": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e437": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e438": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e439": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e440": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e441": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e442": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e443": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e444": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e445": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e446": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 43,
+    "wallAir": true
+   },
+   "e447": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e448": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e449": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e450": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e451": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e452": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e453": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e454": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e455": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e456": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e457": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e458": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e459": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e460": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e461": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e462": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e463": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e464": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e465": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e466": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e467": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e468": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e469": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e470": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e471": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e472": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e473": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e474": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e475": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e476": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e477": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e478": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e479": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e480": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e481": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e482": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e483": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e484": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e485": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e486": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e487": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e488": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e489": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e490": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e491": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e492": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e493": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e494": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e495": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e496": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e497": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e498": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e499": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e500": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e501": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e502": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e503": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e504": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 33,
+    "wallAir": true
+   },
+   "e505": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e506": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e507": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e508": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e509": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e510": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e511": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e512": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e513": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e514": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e515": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e516": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e517": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e518": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e519": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e520": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 33,
+    "wallAir": true
+   },
+   "e521": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e522": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e523": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e524": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e525": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e526": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 52,
+    "wallAir": true
+   },
+   "e527": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e528": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e529": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e530": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 52,
+    "wallAir": true
+   },
+   "e531": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e532": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e533": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e534": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e535": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e536": {
+    "class": "排水管",
+    "room": "B205 Utility",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": null
+   },
+   "e537": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e538": {
+    "class": "排水管",
+    "room": "A205 Utility",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": null
+   },
+   "e539": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e540": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e541": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e545": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e546": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e552": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e553": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e556": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e561": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e562": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e563": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e564": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e565": {
+    "class": "燃气管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 46,
+    "wallAir": true
+   },
+   "e566": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e567": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e568": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e569": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e570": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e571": {
+    "class": "燃气管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 46,
+    "wallAir": true
+   },
+   "e572": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e573": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e574": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e575": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e576": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e577": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e578": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e579": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e580": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e581": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e620": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 36,
+    "wallAir": true
+   },
+   "e621": {
+    "class": "排水管",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 13,
+    "wallAir": false,
+    "ceilY": null
+   },
+   "e622": {
+    "class": "排水管",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 13,
+    "wallAir": false,
+    "ceilY": null
+   },
+   "e623": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": true
+   },
+   "e624": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e625": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e626": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e627": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e628": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e629": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e630": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e631": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e632": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 78,
+    "wallAir": true
+   },
+   "e633": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e634": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 57,
+    "wallAir": true
+   },
+   "e635": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e636": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e637": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 39,
+    "wallAir": true
+   },
+   "e638": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e639": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e642": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e643": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e644": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e645": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e646": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e647": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e648": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e649": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e650": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e651": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e652": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e653": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e654": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e655": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e656": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e657": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e658": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 240,
+    "wallAir": false
+   },
+   "e659": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 200,
+    "wallAir": false
+   },
+   "e660": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": false
+   },
+   "e661": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": false
+   },
+   "e662": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e663": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e664": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e665": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 36,
+    "wallAir": false
+   },
+   "e666": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 36,
+    "wallAir": false
+   },
+   "e667": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e668": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": false
+   },
+   "e669": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": false
+   },
+   "e670": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e671": {
+    "class": "设备",
+    "room": "B105 Room",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e672": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e673": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e674": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e675": {
+    "class": "设备",
+    "room": "A105 Stair",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e676": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e677": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e678": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e679": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 36,
+    "wallAir": true
+   },
+   "e680": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e681": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e682": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e683": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e684": {
+    "class": "设备",
+    "room": "B105 Room",
+    "combustible": false,
+    "cells": 28,
+    "wallAir": true
+   },
+   "e685": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e686": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e687": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e688": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e689": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e690": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e691": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e692": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e693": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 36,
+    "wallAir": true
+   },
+   "e694": {
+    "class": "设备",
+    "room": "A105 Stair",
+    "combustible": false,
+    "cells": 32,
+    "wallAir": true
+   },
+   "e695": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e696": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e697": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e698": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e699": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e700": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e701": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e702": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e703": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e704": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e705": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e706": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e707": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e708": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e709": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e710": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e711": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e712": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e713": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e714": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e715": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e716": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e717": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e718": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 32,
+    "wallAir": false
+   },
+   "e719": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 32,
+    "wallAir": false
+   },
+   "e720": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e721": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 36,
+    "wallAir": true
+   },
+   "e722": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 28,
+    "wallAir": true
+   },
+   "e723": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e724": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e725": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": false
+   },
+   "e726": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": false
+   },
+   "e727": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 120,
+    "wallAir": false
+   },
+   "e728": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 120,
+    "wallAir": false
+   },
+   "e729": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e730": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e731": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e732": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e733": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 36,
+    "wallAir": false
+   },
+   "e734": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e735": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 250,
+    "wallAir": false
+   },
+   "e736": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 64,
+    "wallAir": false
+   },
+   "e737": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": false
+   },
+   "e738": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 250,
+    "wallAir": false
+   },
+   "e739": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 64,
+    "wallAir": false
+   },
+   "e740": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": false
+   },
+   "e741": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 27,
+    "wallAir": false
+   },
+   "e742": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 27,
+    "wallAir": false
+   },
+   "e743": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 84,
+    "wallAir": false
+   },
+   "e744": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e745": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": false
+   },
+   "e746": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": false
+   },
+   "e747": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": false
+   },
+   "e748": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": false
+   },
+   "e749": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": false
+   },
+   "e750": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 105,
+    "wallAir": false
+   },
+   "e751": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e752": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e753": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e754": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e755": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e756": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e757": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 40,
+    "wallAir": false
+   },
+   "e758": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 40,
+    "wallAir": false
+   },
+   "e759": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e760": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e761": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e762": {
+    "class": "设备",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e859": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e860": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e861": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e862": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e863": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e864": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e865": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e866": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 1,
+    "wallAir": true
+   },
+   "e867": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e868": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e869": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e870": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e871": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e872": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e873": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e874": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e875": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e876": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e877": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e878": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e879": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e880": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e881": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e882": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e883": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e884": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e885": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e886": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e887": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e888": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e889": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e890": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e891": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e892": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e893": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e894": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e895": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e896": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e897": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e898": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e899": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e900": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e901": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e902": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e903": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e904": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e905": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e906": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e907": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e908": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e909": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e910": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e911": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e912": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e913": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e914": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e915": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e916": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e917": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e918": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e919": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e920": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e921": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e922": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e923": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e924": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e925": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e926": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e927": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e928": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e929": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e930": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e931": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e932": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e933": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e934": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e935": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e936": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e937": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e938": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e939": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e940": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e941": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e942": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e943": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e944": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e945": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e946": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e947": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e948": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e949": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e950": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e951": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e952": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e953": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e954": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e955": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e956": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e957": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e958": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e959": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e960": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e961": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e962": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e963": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e964": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e965": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e966": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e967": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e968": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e969": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e970": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e971": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e972": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e973": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e974": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e975": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e976": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e977": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e978": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e979": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e980": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e981": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e982": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e983": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e984": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e985": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e986": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e987": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e988": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e989": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e990": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e991": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e992": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e993": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e994": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e995": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e996": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e997": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e998": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e999": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1000": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1001": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1002": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1003": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e1004": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1005": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1006": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1007": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e1008": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1009": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e1010": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e1011": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e1012": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e1013": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e1014": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e1021": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e1022": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e1025": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e1027": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e1030": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1031": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e1032": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1033": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1034": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e1035": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1036": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1037": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1038": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1039": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1040": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1041": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e1042": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1043": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1044": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1045": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e1046": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e1047": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e1048": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e1049": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1050": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1080": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1081": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1082": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1083": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1084": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1085": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1086": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e1087": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1088": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e1089": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1090": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1091": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1092": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e1093": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1094": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e1095": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1111": {
+    "class": "排水管",
+    "room": "R301 Roof",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e1112": {
+    "class": "排水管",
+    "room": "R301 Roof",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e1113": {
+    "class": "排水管",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e1114": {
+    "class": "排水管",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e1115": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1116": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1117": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1121": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 96,
+    "wallAir": false
+   },
+   "e1122": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": false
+   },
+   "e1123": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": false
+   },
+   "e1124": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e1125": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": false
+   },
+   "e1126": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": false
+   },
+   "e1127": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e1128": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e1129": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 96,
+    "wallAir": false
+   },
+   "e1130": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": false
+   },
+   "e1131": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": false
+   },
+   "e1132": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": false
+   },
+   "e1133": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e1134": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": false
+   },
+   "e1135": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e1136": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e1137": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": false
+   },
+   "e1138": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e1139": {
+    "class": "设备",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1140": {
+    "class": "设备",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   }
+  },
+  "rooms": {
+   "A101": 6332,
+   "A201": 3518,
+   "B104": 1001,
+   "B101": 6332,
+   "B201": 3513,
+   "A205": 366,
+   "B205": 366,
+   "A105": 2585,
+   "B105": 2585,
+   "B102": 9048,
+   "A102": 9048,
+   "A103": 4147,
+   "B103": 4147,
+   "B204": 1344,
+   "A204": 1344,
+   "A104": 1001,
+   "B203": 6962,
+   "A202": 6974,
+   "B202": 6964,
+   "A203": 6962
+  },
+  "zones": [
+   {
+    "rooms": "B102 B202 B203",
+    "unit": "B",
+    "m3": 314.4,
+    "leaks": 7
+   },
+   {
+    "rooms": "A102 A202 A203",
+    "unit": "A",
+    "m3": 314.6,
+    "leaks": 7
+   },
+   {
+    "rooms": "B201",
+    "unit": "B",
+    "m3": 1.8,
+    "leaks": 3
+   },
+   {
+    "rooms": "A201",
+    "unit": "A",
+    "m3": 1.8,
+    "leaks": 3
+   },
+   {
+    "rooms": "R301 B205",
+    "unit": "B",
+    "m3": 1.3,
+    "leaks": 2
+   },
+   {
+    "rooms": "R301 A205",
+    "unit": "A",
+    "m3": 1.3,
+    "leaks": 2
+   }
+  ],
+  "modules": [
+   "sources",
+   "combustion",
+   "gas",
+   "water",
+   "radiation",
+   "leaks"
+  ]
+ },
+ "0.4": {
+  "dims": [
+   22,
+   16,
+   44
+  ],
+  "air": 8513,
+  "buildMs": 46,
+  "igniter": {
+   "cells": 1,
+   "at": [
+    [
+     2.6,
+     0.4,
+     14.6
+    ]
+   ],
+   "areaM2": 0.16
+  },
+  "doors": [
+   {
+    "name": "M_Single-Flush:1250mm x 2010mm:1250mm x 2010mm",
+    "room": "A101 Foyer",
+    "outside": true,
+    "open": false,
+    "cells": 30,
+    "leafM": 1.4,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Flush:1250mm x 2010mm:1250mm x 2010mm",
+    "room": "B101 Foyer",
+    "outside": true,
+    "open": false,
+    "cells": 40,
+    "leafM": 1.4,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "A101 Foyer",
+    "outside": false,
+    "open": true,
+    "cells": 24,
+    "leafM": 0.91,
+    "airCols": 2,
+    "airM": 0.8
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "B101 Foyer",
+    "outside": false,
+    "open": true,
+    "cells": 24,
+    "leafM": 0.91,
+    "airCols": 2,
+    "airM": 0.8
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "B203 Bedroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 24,
+    "leafM": 1.02,
+    "airCols": 2,
+    "airM": 0.8
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "A203 Bedroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 24,
+    "leafM": 1.02,
+    "airCols": 2,
+    "airM": 0.8
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "B202 Bedroom 1",
+    "outside": false,
+    "open": true,
+    "cells": 36,
+    "leafM": 1.02,
+    "airCols": 3,
+    "airM": 1.2
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "A202 Bedroom 1",
+    "outside": false,
+    "open": true,
+    "cells": 36,
+    "leafM": 1.02,
+    "airCols": 3,
+    "airM": 1.2
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "B204 Bathroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 36,
+    "leafM": 1.02,
+    "airCols": 3,
+    "airM": 1.2
+   },
+   {
+    "name": "M_Single-Flush:0864 x 2032mm:0864 x 2032mm",
+    "room": "A204 Bathroom 2",
+    "outside": false,
+    "open": true,
+    "cells": 24,
+    "leafM": 1.02,
+    "airCols": 2,
+    "airM": 0.8
+   },
+   {
+    "name": "M_Single-Glass 1:0813 x 2420mm:0813 x 2420mm",
+    "room": "B102 Living Room",
+    "outside": true,
+    "open": false,
+    "cells": 42,
+    "leafM": 0.96,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Glass 1:0813 x 2420mm:0813 x 2420mm",
+    "room": "A102 Living Room",
+    "outside": true,
+    "open": false,
+    "cells": 21,
+    "leafM": 0.96,
+    "airCols": 0,
+    "airM": 0
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "B205 Utility",
+    "outside": false,
+    "open": true,
+    "cells": 24,
+    "leafM": 0.91,
+    "airCols": 2,
+    "airM": 0.8
+   },
+   {
+    "name": "M_Single-Flush:0762 x 2032mm:0762 x 2032mm",
+    "room": "A205 Utility",
+    "outside": false,
+    "open": true,
+    "cells": 24,
+    "leafM": 0.91,
+    "airCols": 1,
+    "airM": 0.4
+   }
+  ],
+  "objects": {
+   "e91": {
+    "class": "窗",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e92": {
+    "class": "窗",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 84,
+    "wallAir": true
+   },
+   "e93": {
+    "class": "窗",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e94": {
+    "class": "窗",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e95": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 50,
+    "wallAir": true
+   },
+   "e96": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e97": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e98": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e99": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 48,
+    "wallAir": true
+   },
+   "e100": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e101": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e102": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e103": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 50,
+    "wallAir": true
+   },
+   "e104": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e105": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e106": {
+    "class": "窗",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e107": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e108": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e109": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": false
+   },
+   "e110": {
+    "class": "窗",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e111": {
+    "class": "窗",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e112": {
+    "class": "窗",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 38,
+    "wallAir": true
+   },
+   "e113": {
+    "class": "窗",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": true
+   },
+   "e114": {
+    "class": "窗",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": true
+   },
+   "e123": {
+    "class": "木柜",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 30,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e124": {
+    "class": "木柜",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e125": {
+    "class": "木柜",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e126": {
+    "class": "木柜",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 30,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e127": {
+    "class": "木柜",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e128": {
+    "class": "木柜",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e129": {
+    "class": "木柜",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e130": {
+    "class": "木柜",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e131": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e132": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e133": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e134": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e135": {
+    "class": "台面",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": false
+   },
+   "e136": {
+    "class": "台面",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e137": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e138": {
+    "class": "台面",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 66,
+    "wallAir": false
+   },
+   "e139": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e140": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e141": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e142": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e143": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e144": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e145": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e146": {
+    "class": "台面",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 36,
+    "wallAir": false
+   },
+   "e147": {
+    "class": "台面",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": false
+   },
+   "e148": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e149": {
+    "class": "台面",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 66,
+    "wallAir": false
+   },
+   "e150": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e151": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e152": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e153": {
+    "class": "软垫",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e154": {
+    "class": "软垫",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 20,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e155": {
+    "class": "桌子",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e156": {
+    "class": "桌子",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e157": {
+    "class": "桌子",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e158": {
+    "class": "软垫",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 30,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e159": {
+    "class": "软垫",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 20,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e160": {
+    "class": "桌子",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e161": {
+    "class": "桌子",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e162": {
+    "class": "桌子",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e163": {
+    "class": "软垫",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e164": {
+    "class": "软垫",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 72,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e165": {
+    "class": "软垫",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 60,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e166": {
+    "class": "软垫",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 48,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e167": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e168": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e169": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e170": {
+    "class": "木柜",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e171": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e172": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e173": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e174": {
+    "class": "木柜",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e175": {
+    "class": "木柜",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e176": {
+    "class": "木柜",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 18,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e177": {
+    "class": "木柜",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e178": {
+    "class": "木柜",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e179": {
+    "class": "木柜",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e180": {
+    "class": "桌子",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e181": {
+    "class": "桌子",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e182": {
+    "class": "桌子",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e183": {
+    "class": "桌子",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e197": {
+    "class": "门",
+    "room": "A101 Foyer",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e198": {
+    "class": "门",
+    "room": "B101 Foyer",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e199": {
+    "class": "门",
+    "room": "A101 Foyer",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e200": {
+    "class": "门",
+    "room": "B101 Foyer",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": false,
+    "ceilY": 2.2
+   },
+   "e201": {
+    "class": "门",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e202": {
+    "class": "门",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 34,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e203": {
+    "class": "门",
+    "room": "B202 Bedroom 1",
+    "combustible": true,
+    "cells": 28,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e204": {
+    "class": "门",
+    "room": "A202 Bedroom 1",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e205": {
+    "class": "门",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 28,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e206": {
+    "class": "门",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 34,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e207": {
+    "class": "门",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 30,
+    "wallAir": true
+   },
+   "e208": {
+    "class": "门",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e209": {
+    "class": "门",
+    "room": "B205 Utility",
+    "combustible": true,
+    "cells": 22,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e210": {
+    "class": "门",
+    "room": "A205 Utility",
+    "combustible": true,
+    "cells": 5,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e362": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e363": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e364": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e365": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e366": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e367": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e368": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e369": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e370": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e371": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e372": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e373": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e374": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e375": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e376": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 17,
+    "wallAir": true
+   },
+   "e377": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 3,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e378": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e379": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e380": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e381": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e382": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e383": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e384": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e385": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 3,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e386": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e387": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e388": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e389": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e390": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e391": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e392": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e393": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e394": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e395": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e396": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e397": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e398": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e399": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e400": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e401": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e402": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e403": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e404": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e405": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e406": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e407": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e408": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e409": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e410": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e411": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 3,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e412": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 3,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e413": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 5.4
+   },
+   "e414": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e415": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e416": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e417": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e418": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e419": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e420": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e421": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 1,
+    "wallAir": true
+   },
+   "e422": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e423": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e424": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e425": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 17,
+    "wallAir": true
+   },
+   "e426": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e427": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e428": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e429": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e430": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e431": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e432": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e433": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e434": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e435": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e436": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e437": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e438": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e439": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e440": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e441": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e442": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e443": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e444": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e445": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e446": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e447": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e448": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e449": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e450": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e451": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e452": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e453": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e454": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e455": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 1,
+    "wallAir": true
+   },
+   "e456": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e457": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e458": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e459": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e460": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e461": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e462": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e463": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e464": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e465": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e466": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e467": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e468": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e469": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e470": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e471": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e472": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e473": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e474": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e475": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e476": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e477": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e478": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e479": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e480": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e481": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e482": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e483": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e484": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e485": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e486": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e487": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e488": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e489": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e490": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e491": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e492": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e493": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e494": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e495": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e496": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e497": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e498": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e499": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e500": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e501": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e502": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e503": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e504": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e505": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e506": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e507": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e508": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e509": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e510": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e511": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e512": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e513": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e514": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e515": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e516": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e517": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e518": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e519": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e520": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e521": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e522": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e523": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e524": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e525": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e526": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e527": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e528": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e529": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e530": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e531": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e532": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e533": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e534": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e535": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e536": {
+    "class": "排水管",
+    "room": "B205 Utility",
+    "combustible": true,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e537": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e538": {
+    "class": "排水管",
+    "room": "A205 Utility",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e539": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e540": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e541": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e545": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 17,
+    "wallAir": true
+   },
+   "e546": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e552": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e553": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e556": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e561": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e562": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e563": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e564": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e565": {
+    "class": "燃气管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e566": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e567": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 1,
+    "wallAir": true
+   },
+   "e568": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e569": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e570": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e571": {
+    "class": "燃气管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 23,
+    "wallAir": true
+   },
+   "e572": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e573": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e574": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e575": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e576": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e577": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e578": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e579": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e580": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e581": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e620": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 23,
+    "wallAir": true
+   },
+   "e621": {
+    "class": "排水管",
+    "room": "B203 Bedroom 2",
+    "combustible": true,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e622": {
+    "class": "排水管",
+    "room": "A203 Bedroom 2",
+    "combustible": true,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e623": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e624": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e625": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e626": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e627": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e628": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e629": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e630": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 19,
+    "wallAir": true
+   },
+   "e631": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e632": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 36,
+    "wallAir": true
+   },
+   "e633": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e634": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 47,
+    "wallAir": true
+   },
+   "e635": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e636": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e637": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e638": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 2.6
+   },
+   "e639": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e642": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e643": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e644": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e645": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e646": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e647": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e648": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e649": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e650": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e651": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e652": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e653": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e654": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e655": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e656": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e657": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e658": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 30,
+    "wallAir": false
+   },
+   "e659": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 30,
+    "wallAir": false
+   },
+   "e660": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e661": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e662": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e663": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e664": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e665": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e666": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e667": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e668": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e669": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e670": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e671": {
+    "class": "设备",
+    "room": "B105 Room",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e672": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e673": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e674": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e675": {
+    "class": "设备",
+    "room": "A105 Stair",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e676": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e677": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e678": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e679": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e680": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e681": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e682": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e683": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e684": {
+    "class": "设备",
+    "room": "B105 Room",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e685": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e686": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e687": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e688": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e689": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e690": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e691": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e692": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e693": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 27,
+    "wallAir": true
+   },
+   "e694": {
+    "class": "设备",
+    "room": "A105 Stair",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e695": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e696": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e697": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e698": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e699": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e700": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e701": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e702": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e703": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e704": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e705": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e706": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e707": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e708": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e709": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e710": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e711": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e712": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e713": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e714": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e715": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e716": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e717": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e718": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 30,
+    "wallAir": true
+   },
+   "e719": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": false
+   },
+   "e720": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e721": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e722": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e723": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e724": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e725": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e726": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e727": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": false
+   },
+   "e728": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": false
+   },
+   "e729": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e730": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e731": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": false
+   },
+   "e732": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e733": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e734": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e735": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 45,
+    "wallAir": false
+   },
+   "e736": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e737": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e738": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 30,
+    "wallAir": false
+   },
+   "e739": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e740": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e741": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e742": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e743": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": false
+   },
+   "e744": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": false
+   },
+   "e745": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e746": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e747": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e748": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e749": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": false
+   },
+   "e750": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": false
+   },
+   "e751": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e752": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e753": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e754": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e755": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e756": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e757": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e758": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e759": {
+    "class": "设备",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e760": {
+    "class": "设备",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e761": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e762": {
+    "class": "设备",
+    "room": null,
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e859": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e860": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e861": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e862": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e863": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e864": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e865": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e866": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e867": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e868": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e869": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e870": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e871": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e872": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e873": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e874": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e875": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e876": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e877": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e878": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e879": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e880": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e881": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e882": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e883": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e884": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e885": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e886": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 15,
+    "wallAir": true
+   },
+   "e887": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 2,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e888": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e889": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e890": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e891": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e892": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e893": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e894": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e895": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e896": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": true
+   },
+   "e897": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e898": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e899": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e900": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e901": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e902": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e903": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e904": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e905": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e906": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e907": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e908": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e909": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e910": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e911": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e912": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e913": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e914": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e915": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e916": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e917": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e918": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e919": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e920": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e921": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e922": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e923": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e924": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e925": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e926": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e927": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e928": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e929": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e930": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e931": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e932": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e933": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e934": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e935": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e936": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e937": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e938": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e939": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e940": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e941": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e942": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e943": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e944": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e945": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e946": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e947": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e948": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e949": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e950": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e951": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e952": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e953": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e954": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e955": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e956": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e957": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e958": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e959": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e960": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e961": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e962": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e963": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e964": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e965": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e966": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e967": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e968": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e969": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e970": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e971": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e972": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e973": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e974": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e975": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e976": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e977": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e978": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e979": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e980": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e981": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e982": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e983": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e984": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e985": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e986": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e987": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e988": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e989": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e990": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e991": {
+    "class": "水管",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e992": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e993": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e994": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e995": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e996": {
+    "class": "水管",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e997": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e998": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e999": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e1000": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e1001": {
+    "class": "水管",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e1002": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e1003": {
+    "class": "排水管",
+    "room": "B104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e1004": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e1005": {
+    "class": "排水管",
+    "room": "A204 Bathroom 2",
+    "combustible": true,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e1006": {
+    "class": "排水管",
+    "room": "B204 Bathroom 2",
+    "combustible": true,
+    "cells": 7,
+    "wallAir": true
+   },
+   "e1007": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1008": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e1009": {
+    "class": "排水管",
+    "room": "A104 Bathroom 1",
+    "combustible": true,
+    "cells": 1,
+    "wallAir": false,
+    "ceilY": 3
+   },
+   "e1010": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e1011": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e1012": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": true
+   },
+   "e1013": {
+    "class": "水管",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 17,
+    "wallAir": true
+   },
+   "e1014": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 17,
+    "wallAir": true
+   },
+   "e1021": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e1022": {
+    "class": "水管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1025": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 17,
+    "wallAir": true
+   },
+   "e1027": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 14,
+    "wallAir": true
+   },
+   "e1030": {
+    "class": "水管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e1031": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e1032": {
+    "class": "燃气管",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": true
+   },
+   "e1033": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1034": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 1,
+    "wallAir": false
+   },
+   "e1035": {
+    "class": "燃气管",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": true
+   },
+   "e1036": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1037": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1038": {
+    "class": "燃气管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1039": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1040": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1041": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e1042": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1043": {
+    "class": "水管",
+    "room": "A103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1044": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1045": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e1046": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e1047": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": true
+   },
+   "e1048": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1049": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1050": {
+    "class": "水管",
+    "room": "B103 Kitchen",
+    "combustible": false,
+    "cells": 9,
+    "wallAir": true
+   },
+   "e1080": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 6,
+    "wallAir": true
+   },
+   "e1081": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1082": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1083": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1084": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1085": {
+    "class": "水管",
+    "room": null,
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1086": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e1087": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 13,
+    "wallAir": true
+   },
+   "e1088": {
+    "class": "排水管",
+    "room": "B103 Kitchen",
+    "combustible": true,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e1089": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1090": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1091": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1092": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 11,
+    "wallAir": true
+   },
+   "e1093": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 24,
+    "wallAir": true
+   },
+   "e1094": {
+    "class": "排水管",
+    "room": "A103 Kitchen",
+    "combustible": true,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1095": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1111": {
+    "class": "排水管",
+    "room": "R301 Roof",
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1112": {
+    "class": "排水管",
+    "room": "R301 Roof",
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1113": {
+    "class": "排水管",
+    "room": "B102 Living Room",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e1114": {
+    "class": "排水管",
+    "room": "A102 Living Room",
+    "combustible": true,
+    "cells": 16,
+    "wallAir": true
+   },
+   "e1115": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1116": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1117": {
+    "class": "排水管",
+    "room": null,
+    "combustible": true,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1121": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 16,
+    "wallAir": false
+   },
+   "e1122": {
+    "class": "设备",
+    "room": "A203 Bedroom 2",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e1123": {
+    "class": "设备",
+    "room": "A201 Hallway",
+    "combustible": false,
+    "cells": 3,
+    "wallAir": false
+   },
+   "e1124": {
+    "class": "设备",
+    "room": "A102 Living Room",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e1125": {
+    "class": "设备",
+    "room": "A202 Bedroom 1",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e1126": {
+    "class": "设备",
+    "room": "A101 Foyer",
+    "combustible": false,
+    "cells": 10,
+    "wallAir": true
+   },
+   "e1127": {
+    "class": "设备",
+    "room": "A104 Bathroom 1",
+    "combustible": false,
+    "cells": 18,
+    "wallAir": true
+   },
+   "e1128": {
+    "class": "设备",
+    "room": "A204 Bathroom 2",
+    "combustible": false,
+    "cells": 22,
+    "wallAir": true
+   },
+   "e1129": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 8,
+    "wallAir": false
+   },
+   "e1130": {
+    "class": "设备",
+    "room": "B203 Bedroom 2",
+    "combustible": false,
+    "cells": 5,
+    "wallAir": false
+   },
+   "e1131": {
+    "class": "设备",
+    "room": "B201 Hallway",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e1132": {
+    "class": "设备",
+    "room": "B102 Living Room",
+    "combustible": false,
+    "cells": 6,
+    "wallAir": false
+   },
+   "e1133": {
+    "class": "设备",
+    "room": "B202 Bedroom 1",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e1134": {
+    "class": "设备",
+    "room": "B101 Foyer",
+    "combustible": false,
+    "cells": 4,
+    "wallAir": false
+   },
+   "e1135": {
+    "class": "设备",
+    "room": "B104 Bathroom 1",
+    "combustible": false,
+    "cells": 12,
+    "wallAir": true
+   },
+   "e1136": {
+    "class": "设备",
+    "room": "B204 Bathroom 2",
+    "combustible": false,
+    "cells": 20,
+    "wallAir": true
+   },
+   "e1137": {
+    "class": "设备",
+    "room": "A205 Utility",
+    "combustible": false,
+    "cells": 2,
+    "wallAir": false
+   },
+   "e1138": {
+    "class": "设备",
+    "room": "B205 Utility",
+    "combustible": false,
+    "cells": 21,
+    "wallAir": true
+   },
+   "e1139": {
+    "class": "设备",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   },
+   "e1140": {
+    "class": "设备",
+    "room": "R301 Roof",
+    "combustible": false,
+    "cells": 0,
+    "wallAir": true
+   }
+  },
+  "rooms": {
+   "A101": 675,
+   "A201": 401,
+   "B104": 100,
+   "B101": 722,
+   "B201": 401,
+   "A205": 36,
+   "B205": 23,
+   "A105": 360,
+   "B105": 322,
+   "B102": 924,
+   "A102": 936,
+   "A103": 524,
+   "B103": 434,
+   "B204": 154,
+   "A204": 136,
+   "A104": 100,
+   "B203": 758,
+   "A202": 767,
+   "B202": 734,
+   "A203": 778
+  },
+  "zones": [
+   {
+    "rooms": "B102 B101 B203",
+    "unit": "B",
+    "m3": 267,
+    "leaks": 6
+   },
+   {
+    "rooms": "A102 A203 A202",
+    "unit": "A",
+    "m3": 276,
+    "leaks": 6
+   }
+  ],
+  "modules": [
+   "sources",
+   "combustion",
+   "gas",
+   "water",
+   "radiation",
+   "leaks"
+  ]
+ }
+}

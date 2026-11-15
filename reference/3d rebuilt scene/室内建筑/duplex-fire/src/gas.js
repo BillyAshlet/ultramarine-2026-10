@@ -150,13 +150,19 @@ export default function gas(world) {
       if (best.path === Infinity) break;
       for (const m of best.next) if (best.path + m.r < m.path) m.path = best.path + m.r;
     }
-    // The boiler's gas valve: on the last piece of the line that touches air.
-    const reached = list.filter((n) => n.path < Infinity && n.o.cells.length > 0);
+    // The boiler's gas valve: on the last piece of the boiler riser that touches air.
+    const reached = list.filter((n) => n.path < Infinity && n.o.cells.length > 0 && !n.o.element?.stoveBranch);
     u.end = reached.sort((a, b) => b.path - a.path)[0] ?? null;
-    u.part = u.end ? { unit: u, node: u.end, tp: 0, stage: 0, outlet: null } : null;
+    u.part = u.end ? { unit: u, node: u.end, tp: 0, stage: 0, outlet: null, lag: P.lag, kind: 'boiler' } : null;
+    // The 1st-floor kitchen stove gas cock / hose behind M_Range.
+    u.stove = list.find((n) => n.path < Infinity && n.o.cells.length > 0 && n.o.element?.stoveValve) ?? null;
+    u.stovePart = u.stove ? { unit: u, node: u.stove, tp: 0, stage: 0, outlet: null, lag: P.lag * 0.35, kind: 'stove' } : null;
   }
   const byObject = new Map(nodes.map((n) => [n.o, n]));
-  const parts = Object.values(units).map((u) => u.part).filter(Boolean);
+  const parts = [
+    ...Object.values(units).map((u) => u.part).filter(Boolean),
+    ...Object.values(units).map((u) => u.stovePart).filter(Boolean),
+  ];
 
   // --- outlets ---------------------------------------------------------------------
   // kind: 'cut' (full bore), 'leak' (a share of the bore), 'valve' (the boiler's
@@ -366,6 +372,16 @@ export default function gas(world) {
     }
     unmark(zone);
     books.deflagrations++;
+    if (draw.flash) {
+      draw.flash.at = typeof performance !== 'undefined' ? performance.now() / 1000 : 0;
+      draw.flash.pos.set(...cloud.pos);
+      draw.flash.span.set(
+        Math.max(1.2, cloud.hi[0] - cloud.lo[0] + 0.6),
+        Math.max(0.9, cloud.hi[1] - cloud.lo[1] + 0.5),
+        Math.max(1.2, cloud.hi[2] - cloud.lo[2] + 0.6),
+      );
+      draw.flash.mesh.visible = true;
+    }
     world.events.emit({
       type: '燃气爆燃', pos: cloud.pos,
       data: {
@@ -389,72 +405,288 @@ export default function gas(world) {
   }
 
   // --- drawing (page only) ------------------------------------------------------------
-  const draw = { dirty: true, points: null, markers: null, show: true };
+  const CLOUD_VERT = /* glsl */ `
+    attribute vec3 color;
+    attribute float aAlpha;
+    uniform float uTime;
+    uniform float uViewH;
+    varying vec3 vCol;
+    varying float vAlpha;
+    #include <clipping_planes_pars_vertex>
+    void main() {
+      vCol = color;
+      vAlpha = aAlpha;
+      float h = fract(sin(dot(position, vec3(12.9898, 78.233, 37.719))) * 43758.5453);
+      vec3 drift = vec3(
+        sin(uTime * 1.3 + h * 6.283) * 0.06,
+        sin(uTime * 1.9 + h * 9.42) * 0.045,
+        cos(uTime * 1.1 + h * 6.283) * 0.06
+      );
+      vec4 mvPosition = modelViewMatrix * vec4(position + drift, 1.0);
+      gl_Position = projectionMatrix * mvPosition;
+      float worldSize = 0.52;
+      gl_PointSize = aAlpha > 0.002 ? max(3.0, worldSize * projectionMatrix[1][1] * uViewH * 0.5 / max(-mvPosition.z, 0.1)) : 0.0;
+      #include <clipping_planes_vertex>
+    }
+  `;
+  const CLOUD_FRAG = /* glsl */ `
+    uniform float uOpacity;
+    uniform float uTime;
+    varying vec3 vCol;
+    varying float vAlpha;
+    #include <clipping_planes_pars_fragment>
+    void main() {
+      #include <clipping_planes_fragment>
+      float d = length(gl_PointCoord - 0.5) * 2.0;
+      if (d > 1.0) discard;
+      float soft = exp(-d * d * 2.6) * (1.0 - d * d);
+      float pulse = vAlpha > 0.22 ? (1.0 + 0.18 * sin(uTime * 6.0)) : 1.0;
+      float a = soft * vAlpha * uOpacity * pulse;
+      if (a < 0.004) discard;
+      gl_FragColor = vec4(vCol * (0.9 + 0.2 * pulse), a);
+      #include <colorspace_fragment>
+    }
+  `;
+  const JET_VERT = /* glsl */ `
+    attribute vec3 aRand;
+    uniform float uTime;
+    uniform float uViewH;
+    uniform vec3 uOrigin;
+    uniform float uFlow;
+    varying float vLife;
+    varying float vShow;
+    #include <clipping_planes_pars_vertex>
+    void main() {
+      vLife = fract(uTime * (1.35 + 0.5 * aRand.z) + aRand.x);
+      vShow = step(0.01, uFlow);
+      float spread = (0.04 + 0.26 * vLife) * (0.6 + 0.4 * uFlow);
+      float ang = aRand.y * 6.2831853 + uTime * 1.4;
+      vec3 p = uOrigin + vec3(
+        cos(ang) * spread,
+        vLife * (0.65 + 0.65 * uFlow),
+        sin(ang) * spread
+      );
+      vec4 mvPosition = viewMatrix * vec4(p, 1.0);
+      gl_Position = projectionMatrix * mvPosition;
+      float sz = mix(0.09, 0.34, vLife);
+      gl_PointSize = vShow > 0.0 ? max(2.0, sz * projectionMatrix[1][1] * uViewH * 0.5 / max(-mvPosition.z, 0.1)) : 0.0;
+      #include <clipping_planes_vertex>
+    }
+  `;
+  const JET_FRAG = /* glsl */ `
+    varying float vLife;
+    varying float vShow;
+    #include <clipping_planes_pars_fragment>
+    void main() {
+      #include <clipping_planes_fragment>
+      float d = length(gl_PointCoord - 0.5) * 2.0;
+      if (d > 1.0) discard;
+      float soft = (1.0 - smoothstep(0.1, 1.0, d)) * smoothstep(0.0, 0.12, vLife) * (1.0 - vLife);
+      float a = soft * 0.52 * vShow;
+      if (a < 0.005) discard;
+      vec3 col = mix(vec3(1.0, 0.88, 0.35), vec3(1.0, 0.62, 0.14), vLife);
+      gl_FragColor = vec4(col, a);
+      #include <colorspace_fragment>
+    }
+  `;
+  const FLASH_VERT = /* glsl */ `
+    varying vec3 vNormalDir;
+    varying vec3 vPosLocal;
+    #include <clipping_planes_pars_vertex>
+    void main() {
+      vPosLocal = position;
+      vNormalDir = normalize(normalMatrix * normal);
+      vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * mvPosition;
+      #include <clipping_planes_vertex>
+    }
+  `;
+  const FLASH_FRAG = /* glsl */ `
+    uniform float uAge;
+    varying vec3 vNormalDir;
+    varying vec3 vPosLocal;
+    #include <clipping_planes_pars_fragment>
+    void main() {
+      #include <clipping_planes_fragment>
+      if (uAge < 0.0 || uAge > 1.0) discard;
+      float rim = 1.0 - abs(vNormalDir.z);
+      float core = pow(max(0.0, abs(vNormalDir.z)), 0.7);
+      float fade = (1.0 - uAge) * (1.0 - uAge);
+      vec3 col = mix(vec3(1.0, 0.38, 0.04), vec3(1.0, 0.94, 0.72), core * (1.0 - 0.5 * uAge));
+      float a = (0.35 * rim + 0.65 * core) * fade * 0.88;
+      if (a < 0.005) discard;
+      gl_FragColor = vec4(col * (1.4 * fade + 0.3), a);
+      #include <colorspace_fragment>
+    }
+  `;
+
+  const draw = { dirty: true, points: null, jets: [], flash: null, markers: null, show: true };
   const view = world.view;
   if (view?.scene) {
     const clip = view.cut ? [view.cut] : [];
+    const uTime = { value: 0 }, uViewH = { value: 800 }, uOpacity = { value: 0.9 };
+    const bufSize = new THREE.Vector2();
+    const tickGas = (renderer) => {
+      const now = performance.now() / 1000;
+      uTime.value = now;
+      renderer.getDrawingBufferSize(bufSize);
+      uViewH.value = bufSize.y;
+      if (draw.flash && draw.flash.at >= 0) {
+        const age = (now - draw.flash.at) / 0.52;
+        if (age >= 1) {
+          draw.flash.at = -1;
+          draw.flash.mesh.visible = false;
+          draw.flash.light.intensity = 0;
+        } else {
+          const grow = 0.65 + 0.55 * Math.sqrt(age);
+          draw.flash.mesh.position.copy(draw.flash.pos);
+          draw.flash.mesh.scale.copy(draw.flash.span).multiplyScalar(grow * 0.5);
+          draw.flash.uAge.value = age;
+          draw.flash.light.position.copy(draw.flash.pos);
+          draw.flash.light.intensity = 18 * (1 - age) * (1 - age);
+        }
+      }
+    };
+
     const geom = new THREE.BufferGeometry();
     geom.setAttribute('position', new THREE.BufferAttribute(new Float32Array(DRAW_MAX * 3), 3));
     geom.setAttribute('color', new THREE.BufferAttribute(new Float32Array(DRAW_MAX * 3), 3));
+    geom.setAttribute('aAlpha', new THREE.BufferAttribute(new Float32Array(DRAW_MAX), 1));
     geom.setDrawRange(0, 0);
-    draw.points = new THREE.Points(geom, new THREE.PointsMaterial({
-      // Drawn through the see-through walls, as the services are: the gas is
-      // usually in a room the camera looks into from outside.
-      size: 0.16, vertexColors: true, transparent: true, opacity: 0.85, depthWrite: false, depthTest: false, clippingPlanes: clip,
+    draw.points = new THREE.Points(geom, new THREE.ShaderMaterial({
+      uniforms: { uTime, uViewH, uOpacity },
+      vertexShader: CLOUD_VERT, fragmentShader: CLOUD_FRAG,
+      transparent: true, depthWrite: false, depthTest: false, clipping: true, clippingPlanes: clip,
     }));
     draw.points.renderOrder = 10;
     draw.points.frustumCulled = false;
+    draw.points.onBeforeRender = tickGas;
+
+    draw.jetGroup = new THREE.Group();
+    const JET_DROPS = 64, JET_SLOTS = 6;
+    for (let s = 0; s < JET_SLOTS; s++) {
+      const jPos = new Float32Array(JET_DROPS * 3), jRnd = new Float32Array(JET_DROPS * 3);
+      let seed = (s + 3) * 6151;
+      const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      for (let i = 0; i < JET_DROPS * 3; i++) jRnd[i] = rnd();
+      const jg = new THREE.BufferGeometry();
+      jg.setAttribute('position', new THREE.BufferAttribute(jPos, 3));
+      jg.setAttribute('aRand', new THREE.BufferAttribute(jRnd, 3));
+      jg.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e6);
+      const ju = { uTime, uViewH, uOrigin: { value: new THREE.Vector3() }, uFlow: { value: 0 } };
+      const jPts = new THREE.Points(jg, new THREE.ShaderMaterial({
+        uniforms: ju, vertexShader: JET_VERT, fragmentShader: JET_FRAG,
+        transparent: true, depthWrite: false, depthTest: false, clipping: true, clippingPlanes: clip,
+      }));
+      jPts.frustumCulled = false;
+      jPts.visible = false;
+      jPts.renderOrder = 10.5;
+      jPts.onBeforeRender = tickGas;
+      draw.jetGroup.add(jPts);
+      draw.jets.push({ pts: jPts, u: ju });
+    }
+
+    const uAge = { value: -1 };
+    const flashMesh = new THREE.Mesh(
+      new THREE.SphereGeometry(1, 24, 16),
+      new THREE.ShaderMaterial({
+        uniforms: { uAge }, vertexShader: FLASH_VERT, fragmentShader: FLASH_FRAG,
+        transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false,
+        side: THREE.DoubleSide, clipping: true, clippingPlanes: clip,
+      }),
+    );
+    flashMesh.visible = false;
+    flashMesh.frustumCulled = false;
+    flashMesh.renderOrder = 12;
+    flashMesh.onBeforeRender = tickGas;
+    const flashLight = new THREE.PointLight(0xff9438, 0, 12, 2);
+    draw.flash = { at: -1, pos: new THREE.Vector3(), span: new THREE.Vector3(1.5, 1, 1.5), mesh: flashMesh, light: flashLight, uAge };
+
     draw.markers = new THREE.Group();
     draw.group = new THREE.Group();
     draw.group.name = 'gas';
-    draw.group.add(draw.points, draw.markers);
+    draw.group.add(draw.points, draw.jetGroup, flashMesh, flashLight, draw.markers);
     draw.geom = { part: new THREE.CylinderGeometry(0.06, 0.06, 0.1, 12), outlet: new THREE.SphereGeometry(0.08, 12, 8), flame: new THREE.ConeGeometry(0.1, 0.35, 12) };
     draw.mat = {
       part: new THREE.MeshBasicMaterial({ color: 0xffc400, clippingPlanes: clip }),
-      outlet: new THREE.MeshBasicMaterial({ color: 0xffe066, clippingPlanes: clip }),
+      outlet: new THREE.MeshBasicMaterial({ color: 0xffe066, depthTest: false, transparent: true, opacity: 0.95, clippingPlanes: clip }),
       flame: new THREE.MeshBasicMaterial({ color: 0xff6a1a, clippingPlanes: clip }),
     };
     view.scene.add(draw.group);
   }
-  // Below the lower limit: pale yellow; in range: orange; above: magenta.
-  const COLOUR = { lean: [1.0, 0.9, 0.45], burnable: [1.0, 0.5, 0.08], rich: [0.85, 0.2, 0.55] };
+  // Below the lower limit: warm amber haze; in 5–15 % explosive range: bright orange; above: magenta.
+  const COLOUR = { lean: [1.0, 0.86, 0.38], burnable: [1.0, 0.45, 0.06], rich: [0.9, 0.22, 0.52] };
+
+  function redrawJets() {
+    if (!draw.jets.length) return;
+    let slot = 0;
+    for (const o of outlets) {
+      if (slot >= draw.jets.length) break;
+      if (o.lit || !(o.q > 0) || !o.cells.length) continue;
+      const p = centre(o.node.o);
+      const j = draw.jets[slot++];
+      j.u.uOrigin.value.set(p[0], p[1], p[2]);
+      j.u.uFlow.value = Math.min(1, 0.35 + o.q * 3600 / 12);
+      j.pts.visible = draw.show;
+    }
+    for (; slot < draw.jets.length; slot++) draw.jets[slot].pts.visible = false;
+  }
 
   function redrawMarkers() {
     if (!draw.markers) return;
     draw.markers.clear();
-    const add = (geom, m, pos) => { const mesh = new THREE.Mesh(geom, m); mesh.position.set(...pos); draw.markers.add(mesh); };
+    const add = (geom, m, pos, ro = 9) => { const mesh = new THREE.Mesh(geom, m); mesh.position.set(...pos); mesh.renderOrder = ro; draw.markers.add(mesh); };
     // The meters and valves are drawn by actions.js (task F), as handles at u.meterPos.
-    for (const u of Object.values(units)) {
-      if (u.part && !u.part.outlet) add(draw.geom.part, draw.mat.part, centre(u.part.node.o));
+    for (const p of parts) {
+      if (!p.outlet) add(draw.geom.part, draw.mat.part, centre(p.node.o));
     }
+    const haveFlames = !!world.combustion && !world.combustion.off;
     for (const o of outlets) {
       const p = centre(o.node.o);
-      if (o.lit && o.q > 0) add(draw.geom.flame, draw.mat.flame, [p[0], p[1] + 0.15, p[2]]);
-      else add(draw.geom.outlet, draw.mat.outlet, p);
+      if (o.lit && o.q > 0) {
+        if (!haveFlames) add(draw.geom.flame, draw.mat.flame, [p[0], p[1] + 0.15, p[2]]);
+      } else {
+        add(draw.geom.outlet, draw.mat.outlet, p, 11);
+      }
     }
+    redrawJets();
     draw.dirty = false;
   }
 
   function redrawCloud() {
     if (!draw.points) return;
     draw.points.visible = draw.show;
+    draw.jetGroup.visible = draw.show;
     if (!draw.show) return;
+    redrawJets();
     const g = draw.points.geometry;
     if (!any()) { g.setDrawRange(0, 0); return; }
-    const pos = g.attributes.position.array, col = g.attributes.color.array;
+    const pos = g.attributes.position.array, col = g.attributes.color.array, alp = g.attributes.aAlpha.array;
     let n = 0;
     for (let s = 0; s < activeCount && n < DRAW_MAX; s++) {
       const c = active[s], x = X[c];
       if (x < DRAW_MIN) continue;
       const p = cellCentre(c);
       pos[3 * n] = p[0]; pos[3 * n + 1] = p[1]; pos[3 * n + 2] = p[2];
-      const k = x < P.lfl ? COLOUR.lean : x <= P.ufl ? COLOUR.burnable : COLOUR.rich;
+      let k, a;
+      if (x < P.lfl) {
+        k = COLOUR.lean;
+        a = 0.05 + 0.12 * (x / P.lfl);
+      } else if (x <= P.ufl) {
+        k = COLOUR.burnable;
+        a = 0.25 + 0.11 * ((x - P.lfl) / Math.max(1e-3, P.ufl - P.lfl));
+      } else {
+        k = COLOUR.rich;
+        a = 0.30;
+      }
       col[3 * n] = k[0]; col[3 * n + 1] = k[1]; col[3 * n + 2] = k[2];
+      alp[n] = a;
       n++;
     }
     g.setDrawRange(0, n);
     g.attributes.position.needsUpdate = true;
     g.attributes.color.needsUpdate = true;
+    g.attributes.aAlpha.needsUpdate = true;
   }
 
   // --- the tank and the gas view (page only) ---------------------------------------------
@@ -542,7 +774,7 @@ export default function gas(world) {
     // see-through walls, which otherwise lay over them layer upon layer.
     const boilerMat = new THREE.MeshLambertMaterial({ color: 0xffb020, emissive: 0x402800, clippingPlanes: clip, depthTest: false, transparent: true, opacity: 1 });
     for (const m of view.extras?.fixtures?.elements ?? []) {
-      if (!/Boiler/.test(m.userData.element?.name ?? '')) continue;
+      if (!/Boiler|M_Range/.test(m.userData.element?.name ?? '')) continue;
       const copy = new THREE.Mesh(m.geometry, boilerMat);
       copy.visible = false;
       copy.renderOrder = 9;
@@ -605,7 +837,7 @@ export default function gas(world) {
       focus.saved = null;
     }
     for (const b of tank.boilers) b.visible = on;
-    if (draw.points) draw.points.material.opacity = on ? 1 : 0.85;
+    if (draw.points?.material?.uniforms?.uOpacity) draw.points.material.uniforms.uOpacity.value = on ? 1 : 0.9;
     badge(on);
     // Ease the grey in and out over 0.4 s; the tank moves it on each time it is drawn.
     focus.ease = { from: focus.uniform.value, to: on ? 1 : 0, t0: performance.now() };
@@ -714,14 +946,14 @@ export default function gas(world) {
         for (const c of o.cells) if (lightsAt(c)) { light(o, 'flame or hot gas'); break; }
       }
     }
-    // The boiler valves.
+    // The boiler and kitchen-stove valves.
     const leak = P.leakC + 273 - T_AMBIENT, melt = P.meltC + 273 - T_AMBIENT;
-    const ease = 1 - Math.exp(-dt / P.lag);
     for (const p of parts) {
       const cells = p.node.o.cells;
       let tg = 0;
       for (const c of cells) tg += temp[c];
       tg /= cells.length;
+      const ease = 1 - Math.exp(-dt / (p.lag ?? P.lag));
       p.tp += (tg - p.tp) * ease;
       if (p.stage === 0 && p.tp >= leak) fail(p, 1);
       if (p.stage === 1 && p.tp >= melt) fail(p, 2);
@@ -757,7 +989,9 @@ export default function gas(world) {
     delete books.lowestBurned; delete books.highestBurned;
     listed.fill(0);
     activeCount = 0; stepCount = 0; burst = null; lastTotal = 0; lastFluid = fire.fluid;
+    if (draw.flash) { draw.flash.at = -1; draw.flash.mesh.visible = false; draw.flash.light.intensity = 0; }
     dirty = true; draw.dirty = true;
+    redrawMarkers();
     redrawCloud();
   }
 
@@ -776,6 +1010,7 @@ export default function gas(world) {
       const n = pipeOf(id);
       const x = open(n, 'cut', 1);
       world.events.emit({ type: '燃气管剪断', objectId: n.o.id, pos: centre(n.o), data: flowOf(x) });
+      redrawMarkers();
       return flowOf(x);
     },
     /** Open a leak: share = the part of the bore that is open (a loose joint is a few percent). */
@@ -783,7 +1018,40 @@ export default function gas(world) {
       const n = pipeOf(id);
       const x = open(n, 'leak', share);
       world.events.emit({ type: '燃气泄漏', objectId: n.o.id, pos: centre(n.o), data: { ...flowOf(x), share } });
+      redrawMarkers();
       return flowOf(x);
+    },
+    /** Spark at (x, y, z) from the Ignite tool: triggers deflagration in nearby flammable gas or lights a leaking outlet. */
+    sparkAt(x, y, z) {
+      let acted = false;
+      if (any()) {
+        rebuildActive();
+        let seeds = 0;
+        const storeyTop = y < 2.9 ? 2.65 : 5.75;
+        const storeyBot = y < 2.9 ? -0.05 : 2.95;
+        for (let s = 0; s < activeCount; s++) {
+          const c = active[s], xv = X[c];
+          if (!flammable(xv)) continue;
+          const p = cellCentre(c);
+          if (p[1] < storeyBot || p[1] > storeyTop) continue;
+          if (Math.hypot(p[0] - x, p[2] - z) <= 1.5) seedList[seeds++] = c;
+        }
+        if (seeds) {
+          deflagrate(seedList, seeds);
+          acted = true;
+        }
+      }
+      for (const o of outlets) {
+        if (o.lit || !(o.q > 0) || !o.cells.length) continue;
+        const p = centre(o.node.o);
+        if (Math.abs(p[1] - y) < 2.0 && Math.hypot(p[0] - x, p[2] - z) <= 1.2) {
+          light(o, 'lighter');
+          o.node.o.hrr = o.q * P.lhv;
+          acted = true;
+        }
+      }
+      if (acted) { redrawMarkers(); redrawCloud(); }
+      return acted;
     },
     /** valve(false) shuts both units' gas; valve('A', false) one; valve('A') toggles; valve() lists them. */
     valve(unit, open) {
@@ -796,7 +1064,9 @@ export default function gas(world) {
         world.events.emit({ type: u.open ? '开阀' : '关阀', pos: u.meterPos, data: { unit: u.name, what: 'gas' } });
       }
       solveFlows();
+      for (const o of outlets) if (!(o.q > 0) && o.lit) { o.lit = false; o.node.o.hrr = 0; }
       draw.dirty = true;
+      redrawMarkers();
       return Object.fromEntries(Object.values(units).map((u) => [u.name, u.open]));
     },
     /** For testing only: make a unit's boiler valve fail now (stage 1 leaks, 2 is burnt through). */

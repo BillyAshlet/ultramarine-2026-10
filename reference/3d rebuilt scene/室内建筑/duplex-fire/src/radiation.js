@@ -58,6 +58,7 @@
 //
 // Every number below is in PARAMS with its source or marked 假设.
 import * as THREE from 'three';
+import { fadeForZone } from './firezone.js';
 
 export const PARAMS = {
   sigma: { value: 5.67e-8, unit: 'W/m²K⁴', source: 'Stefan–Boltzmann constant' },
@@ -351,6 +352,7 @@ export default function radiation(world) {
         color: 0xffffff, transparent: true, opacity: 0.85, depthWrite: false, side: THREE.DoubleSide,
         clippingPlanes: view.cut ? [view.cut] : [], polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2,
       });
+      if (view.smoke?.zone) fadeForZone(mat, view.smoke.zone, { mode: 2 });
       const mesh = new THREE.Mesh(m.geometry, mat);
       mesh.renderOrder = 3;
       mesh.visible = false;
@@ -375,13 +377,15 @@ export default function radiation(world) {
   const colour = new THREE.Color();
   function paint() {
     if (!tint) return;
-    const furnitureShown = world.view?.extraMeshes?.furniture?.visible !== false;
+    const fOpacity = world.view?.furnitureOpacity ?? 1;
+    const furnitureShown = world.view?.extraMeshes?.furniture?.visible !== false && fOpacity > 0.01;
     tint.group.visible = tint.box.checked && furnitureShown;
     if (!tint.group.visible) return;
     for (const { o, mesh, mat } of tint.items) {
       const burning = o.state === '燃烧';
       mesh.visible = burning || o.flux >= 1;
       if (!mesh.visible) continue;
+      mat.opacity = 0.85 * fOpacity;
       if (burning) mat.color.setRGB(1, 1, 1); else mat.color.copy(fluxColour(o.flux, colour));
     }
   }
@@ -395,6 +399,7 @@ export default function radiation(world) {
     transfer,
     react,
     report,
+    paint,
     reset() {
       steps = 0;
       smoke.fill(0);

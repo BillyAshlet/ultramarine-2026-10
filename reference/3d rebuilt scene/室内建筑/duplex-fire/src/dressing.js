@@ -132,7 +132,7 @@ export function dressDuplex({ renderer, scene, building, clippingPlanes, hemi })
     const mesh = new THREE.Mesh(g, material);
     // The glass must not cast shadows, or the sun would stop at every pane.
     mesh.castShadow = !s.glass;
-    mesh.receiveShadow = !s.glass;
+    mesh.receiveShadow = !s.glass && kind !== 'ceiling';
     mesh.userData.glass = !!s.glass;
     mesh.userData.ceiling = kind === 'ceiling';
     scene.add(mesh);

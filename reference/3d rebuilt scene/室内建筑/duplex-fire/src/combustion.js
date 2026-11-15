@@ -73,8 +73,13 @@
 // LOOK. Burning items glow (dull red to orange with their heat release),
 // pyrolysing ones brown, burnt-out ones go charcoal. These are tinted copies
 // of the furniture meshes, as radiation.js tints by flux: no volume pass, and
-// dressing.js is untouched.
+// dressing.js is untouched. Over them, flames.js draws each flame (and the
+// igniter's). The tint alone did not read as fire: Billy could not tell what
+// was burning. A flame starts where the item was lit and its patch grows with
+// the heat release (平面 x Q/Q峰值, 假设), so a sofa catches at one end first.
 import * as THREE from 'three';
+import { makeFlames } from './flames.js';
+import { fadeForZone } from './firezone.js';
 
 export const PARAMS = {
   ambientC: { value: 20, unit: '°C', source: 'the solver\'s ambient (mac3d.js T0 = 293 K)' },
@@ -182,6 +187,8 @@ export default function combustion(world) {
     fresh(it);
   }
   const byObject = new Map(items.map((it) => [it.o, it]));
+  const gasPipes = objects.list.filter((o) => o.class === '燃气管');
+  const gasCeilY = new Map();
 
   function fresh(it) {
     it.dose = 0; it.t = 0; it.below = 0; it.wetMul = 1; it.lastWet = 0;
@@ -205,13 +212,20 @@ export default function combustion(world) {
     return H * dT + SIG * (T ** 4 - T0K ** 4);
   };
 
-  // --- world.ignite: C's flashover and D's deflagration call this -----------------------
-  world.ignite = (o, why = 'ignite') => {
+  // --- world.ignite: C's flashover, D's deflagration, and the Ignite tool call this ---
+  world.ignite = (o, why = 'ignite', atX = null, atZ = null) => {
     const it = byObject.get(o);
     if (!it || o.state === '燃烧' || o.state === '烧尽') return false;
     it.burning = true;
     it.below = 0;
+    if (why === 'lighter' && it.wetMul < 0.6) it.wetMul = 0.6;
     it.dose = Math.max(it.dose, it.need);
+    if (atX != null && atZ != null) {
+      it.seedX = Math.min(o.max[0], Math.max(o.min[0], atX));
+      it.seedZ = Math.min(o.max[2], Math.max(o.min[2], atZ));
+    } else {
+      seedAt(it);
+    }
     o.state = '燃烧';
     if (o.ignitedAt == null) o.ignitedAt = world.time;
     o.burn.phase = 'burning';
@@ -328,12 +342,37 @@ export default function combustion(world) {
     }
     for (let n = 0; n < items.length; n++) {
       const it = items[n], o = it.o;
-      if (!(o.hrr > 0)) continue;
+      const qItem = o.hrr > 0 ? o.hrr : (it.burning ? 8000 : 0);
+      if (!(qItem > 0)) continue;
       // The grid does not change; found once per item, over its middle.
       if (it.ceilY === undefined) it.ceilY = ceilingOver((o.min[0] + o.max[0]) / 2, o.max[1], (o.min[2] + o.max[2]) / 2);
-      addFlame(o.min, o.max, o.hrr, n, it.ceilY);
+      addFlame(o.min, o.max, qItem, n, it.ceilY);
+    }
+    for (const gp of gasPipes) {
+      if (!(gp.hrr > 0)) continue;
+      let cy = gasCeilY.get(gp);
+      if (cy === undefined) {
+        cy = ceilingOver((gp.min[0] + gp.max[0]) / 2, gp.max[1], (gp.min[2] + gp.max[2]) / 2);
+        gasCeilY.set(gp, cy);
+      }
+      addFlame(gp.min, gp.max, gp.hrr, -2, cy);
     }
   }
+  /** Where on its plan an item starts burning: the point nearest the flame that lit it, else its middle. */
+  function seedAt(it) {
+    const o = it.o, self = items.indexOf(it);
+    let best = Infinity, sx = (o.min[0] + o.max[0]) / 2, sz = (o.min[2] + o.max[2]) / 2;
+    for (let f = 0; f < nFlames; f++) {
+      const k = 7 * f;
+      if (FL[k + 6] === self) continue;
+      const cx = (FL[k] + FL[k + 1]) / 2, cz = (FL[k + 2] + FL[k + 3]) / 2;
+      const px = Math.min(o.max[0], Math.max(o.min[0], cx)), pz = Math.min(o.max[2], Math.max(o.min[2], cz));
+      const d = (px - cx) ** 2 + (pz - cz) ** 2;
+      if (d < best) { best = d; sx = px; sz = pz; }
+    }
+    it.seedX = sx; it.seedZ = sz;
+  }
+
   /** True if the item's box is inside some other fire's flame. */
   function inFlame(o, self) {
     for (let f = 0; f < nFlames; f++) {
@@ -411,6 +450,7 @@ export default function combustion(world) {
         color: 0x000000, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide,
         clippingPlanes: view.cut ? [view.cut] : [], polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1,
       });
+      if (view.smoke?.zone) fadeForZone(mat, view.smoke.zone, { mode: 2 });
       const mesh = new THREE.Mesh(m.geometry, mat);
       mesh.renderOrder = 2;   // under radiation.js's flux tint (3) when that is on
       mesh.visible = false;
@@ -418,30 +458,71 @@ export default function combustion(world) {
       tints.push({ it, mesh, mat });
     }
     view.scene.add(group);
-    return { group, tints };
+    return { group, tints, flames: makeFlames(view) };
   }
-  const EMBER = new THREE.Color(0.55, 0.06, 0.02), FLAME = new THREE.Color(1.0, 0.62, 0.12);
-  const BROWN = new THREE.Color(0.36, 0.2, 0.08), CHAR = new THREE.Color(0.07, 0.06, 0.055);
+
+  function drawFlames() {
+    const fl = look.flames;
+    fl.begin();
+    // The igniter: its patch of floor, the whole of it burning.
+    const q0 = fire.firePool && fire.firePool.length ? fire.heatRelease() : 0;
+    if (q0 > 0 && igniterBox) {
+      const [lo, hi] = igniterBox;
+      const x = (lo[0] + hi[0]) / 2, z = (lo[2] + hi[2]) / 2;
+      // Draw at real NBS gas-burner width (~0.35 m) rather than the 0.6 m 3-cell
+      // solver pad, which subtracted 0.7 m from Heskestad height and halved the flame.
+      const bw = Math.min(0.36, hi[0] - lo[0]), bd = Math.min(0.36, hi[2] - lo[2]);
+      fl.set('igniter', x, lo[1], z, bw, bd, q0, Math.min(igniterCeilY - lo[1], 6), 0.02, 0);
+    }
+    for (const it of items) {
+      const o = it.o;
+      if (!it.burning && !(o.hrr > 0)) continue;
+      const qDraw = Math.max(o.hrr, it.burning ? 8000 : 0);
+      // The burning patch: plan x Q/Q峰值 (假设), from where it was lit.
+      const f = Math.min(1, qDraw / it.model.peak);
+      // Never smaller than 18 cm, so a fire just lit is still a flame you can see.
+      const w = Math.min(o.max[0] - o.min[0], Math.max(0.18, (o.max[0] - o.min[0]) * Math.sqrt(f)));
+      const d = Math.min(o.max[2] - o.min[2], Math.max(0.18, (o.max[2] - o.min[2]) * Math.sqrt(f)));
+      const sx = it.seedX ?? (o.min[0] + o.max[0]) / 2, sz = it.seedZ ?? (o.min[2] + o.max[2]) / 2;
+      const x = Math.min(o.max[0] - w / 2, Math.max(o.min[0] + w / 2, sx));
+      const z = Math.min(o.max[2] - d / 2, Math.max(o.min[2] + d / 2, sz));
+      if (it.ceilY === undefined) it.ceilY = ceilingOver((o.min[0] + o.max[0]) / 2, o.max[1], (o.min[2] + o.max[2]) / 2);
+      const ceil = Math.min((it.ceilY ?? Infinity) - o.min[1], 6);
+      fl.set(it, x, o.min[1], z, w, d, qDraw, ceil, o.max[1] - o.min[1], (o.wetRate ?? 0) > 0 ? 1 : 0);
+    }
+    for (const gp of gasPipes) {
+      if (!(gp.hrr > 0)) continue;
+      const cx = (gp.min[0] + gp.max[0]) / 2, cz = (gp.min[2] + gp.max[2]) / 2;
+      let cy = gasCeilY.get(gp);
+      if (cy === undefined) {
+        cy = ceilingOver(cx, gp.max[1], cz);
+        gasCeilY.set(gp, cy);
+      }
+      const ceil = Math.min((cy ?? Infinity) - gp.min[1], 6);
+      fl.set(gp, cx, gp.min[1], cz, 0.22, 0.22, gp.hrr, ceil, Math.max(0.04, gp.max[1] - gp.min[1]), 0);
+    }
+    fl.end();
+  }
+  // Plan A visual language: keep furniture in its natural colour until burnt;
+  // flames.js shows active fire, and burnt portions darken to charcoal (CHAR).
+  // Temperature and radiant flux stay in the dedicated Heat / Flux modes.
+  const CHAR = new THREE.Color(0.07, 0.06, 0.055);
   function paint() {
     if (!look) return;
-    look.group.visible = world.view?.extraMeshes?.furniture?.visible !== false;
-    const flicker = 0.9 + 0.1 * Math.sin(world.time * 7.3);
+    const fOpacity = world.view?.furnitureOpacity ?? 1;
+    look.group.visible = world.view?.extraMeshes?.furniture?.visible !== false && fOpacity > 0.01;
     for (const { it, mesh, mat } of look.tints) {
       const o = it.o;
       const burnt = Math.min(1, o.burnedMJ * 1e6 / it.model.total);
       if (o.state === '燃烧') {
-        const s = Math.min(1, Math.sqrt(o.hrr / it.model.peak));
-        mat.color.copy(EMBER).lerp(FLAME, s);
-        mat.opacity = (0.55 + 0.35 * s) * flicker;
-        // Under the glow, what has burned is already charred.
-        if (burnt > 0.5) mat.color.lerp(CHAR, (burnt - 0.5));
+        mat.color.copy(CHAR);
+        mat.opacity = Math.min(0.92, burnt * 1.15) * fOpacity;
       } else if (o.state === '烧尽') {
-        mat.color.copy(CHAR); mat.opacity = 0.93;
+        mat.color.copy(CHAR);
+        mat.opacity = 0.93 * fOpacity;
       } else if (o.state === '熄灭') {
-        mat.color.copy(CHAR); mat.opacity = 0.5 + 0.4 * burnt;
-      } else if (o.state === '热分解' || o.state === '受热') {
-        const f = Math.min(1, it.dose / it.need);
-        mat.color.copy(BROWN); mat.opacity = 0.55 * f * f;
+        mat.color.copy(CHAR);
+        mat.opacity = (0.28 + 0.62 * burnt) * fOpacity;
       } else {
         mat.opacity = 0;
       }
@@ -450,6 +531,7 @@ export default function combustion(world) {
   }
   function report() {
     if (!look && world.view && reports === 0) look = buildLook();
+    if (look) drawFlames();
     if (reports++ % 3 === 0) paint();
   }
 
@@ -461,11 +543,79 @@ export default function combustion(world) {
     reset() {
       for (const it of items) fresh(it);
       sootMadeG = 0; heatMadeJ = 0;
+      gatherFlames();
       paint();
+      if (look) { look.flames.clear(); drawFlames(); }   // clear embers, redraw igniter at once
+    },
+    paint,
+    redraw() {
+      if (!look && world.view && typeof document !== 'undefined') look = buildLook();
+      gatherFlames();
+      if (look) { drawFlames(); paint(); }
+    },
+    totalHRR() {
+      let sum = fire.firePool?.length ? fire.heatRelease() : 0;
+      for (const it of items) sum += it.o.hrr || 0;
+      for (const gp of gasPipes) sum += gp.hrr || 0;
+      return sum;
+    },
+    burningCount() {
+      let c = fire.firePool?.length && fire.heatRelease() > 0 ? 1 : 0;
+      for (const it of items) if (it.burning || it.o.hrr > 0) c++;
+      for (const gp of gasPipes) if (gp.hrr > 0) c++;
+      return c;
     },
     // For the console and tools/combustion-check.mjs.
     PARAMS,
     items,
+    /**
+     * The fire zone (firezone.js), for seeing through smoke and walls to it:
+     * opens a generous cutaway window around each fire, clamped inside the
+     * room's interior wall/floor/ceiling faces so front walls and upper slabs
+     * open cleanly while back walls and the fire's own floor stay solid.
+     */
+    fireZone(zone) {
+      if (!look && world.view && typeof document !== 'undefined') {
+        look = buildLook();
+        gatherFlames();
+        if (look) drawFlames();
+      } else {
+        gatherFlames();
+        if (look) drawFlames();
+      }
+      zone.begin();
+      const GROW = 1.8;
+      const byRoom = new Map();
+      for (let f = 0; f < nFlames; f++) {
+        const k = 7 * f;
+        const cx = (FL[k] + FL[k + 1]) / 2, cz = (FL[k + 2] + FL[k + 3]) / 2, y0 = FL[k + 4];
+        const r = world.rooms?.find((rm) =>
+          cx >= rm.min[0] - 0.15 && cx <= rm.max[0] + 0.15 &&
+          cz >= rm.min[2] - 0.15 && cz <= rm.max[2] + 0.15 &&
+          y0 + 0.3 >= rm.min[1] - 0.2 && y0 + 0.3 <= rm.max[1] + 0.2);
+        if (r) {
+          let rz0 = r.min[2], rz1 = r.max[2], key = r.code;
+          if (r.code === 'A102' || r.code === 'A103') { rz0 = 10.37; rz1 = 17.38; key = 'A102_103'; }
+          else if (r.code === 'B102' || r.code === 'B103') { rz0 = 0.42; rz1 = 7.43; key = 'B102_103'; }
+          const x0 = Math.max(r.min[0] + 0.04, FL[k] - GROW);
+          const x1 = Math.min(r.max[0] - 0.04, FL[k + 1] + GROW);
+          const z0 = Math.max(rz0 + 0.04, FL[k + 2] - GROW);
+          const z1 = Math.min(rz1 - 0.04, FL[k + 3] + GROW);
+          const by0 = r.min[1] + 0.08, by1 = r.max[1] - 0.04;
+          const prev = byRoom.get(key);
+          if (prev) {
+            prev[0] = Math.min(prev[0], x0); prev[1] = Math.min(prev[1], by0); prev[2] = Math.min(prev[2], z0);
+            prev[3] = Math.max(prev[3], x1); prev[4] = Math.max(prev[4], by1); prev[5] = Math.max(prev[5], z1);
+          } else {
+            byRoom.set(key, [x0, by0, z0, x1, by1, z1]);
+          }
+        } else {
+          zone.add(FL[k], y0 + 0.08, FL[k + 2], FL[k + 1], Math.max(FL[k + 5], y0 + 2.4), FL[k + 3], 1.2);
+        }
+      }
+      for (const b of byRoom.values()) zone.add(b[0], b[1], b[2], b[3], b[4], b[5], 0);
+      zone.end();
+    },
     /** Grams of soot and joules of heat the burning items have put into the air. */
     made() { return { sootG: sootMadeG, heatJ: heatMadeJ }; },
     /** Every item that is not cold: state, kW, dose share, surface °C, flux in. */

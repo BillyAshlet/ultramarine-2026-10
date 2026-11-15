@@ -235,6 +235,7 @@ export class HouseFire extends MacFire {
   setPool(cells) {
     this.firePool = cells;
     this.poolVolume = cells.length * this.cell ** 3;
+    this.poolStart = this.time ?? 0;
   }
 
   /** The burner's numbers from materials.json `igniter` ({value} fields). */
@@ -251,8 +252,10 @@ export class HouseFire extends MacFire {
 
   /** The burner: full power from the moment it is placed, out after its duration. */
   heatRelease() {
-    if (this.designFire) return Math.min(this.growth * this.time * this.time, this.peak);
-    return this.time < this.igniter.duration ? this.igniter.power : 0;
+    if (!this.firePool || this.firePool.length === 0) return 0;
+    const age = Math.max(0, this.time - (this.poolStart ?? 0));
+    if (this.designFire) return Math.min(this.growth * age * age, this.peak);
+    return age < this.igniter.duration ? this.igniter.power : 0;
   }
 
   /**
@@ -286,6 +289,7 @@ export class HouseFire extends MacFire {
 
   reset() {
     super.reset();
+    this.poolStart = 0;
     this.sootMade = 0;
     this.heatMade = 0;
     this.walls?.reset();

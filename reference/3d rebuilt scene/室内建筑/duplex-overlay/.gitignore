@@ -1,3 +1,2 @@
-# The NIBS Duplex model and geometry made from it: licence not checked yet.
+# Raw IFC source files stay local; converted geometry in data/ is tracked for Vercel builds.
 ifc/
-data/

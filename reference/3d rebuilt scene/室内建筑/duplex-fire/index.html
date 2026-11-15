@@ -8,7 +8,7 @@
   :root { color-scheme: dark; --panel: rgba(16, 19, 23, 0.9); --text: #e6e6ea; --dim: #9a9aa6; --accent: #ff6a1a; }
   html, body { margin: 0; height: 100%; background: #111418; color: var(--text); font: 13px/1.45 -apple-system, system-ui, sans-serif; overflow: hidden; }
   #view canvas { display: block; }
-  #panel { position: fixed; top: 12px; left: 12px; width: 290px; max-width: calc(100vw - 24px); box-sizing: border-box; background: var(--panel); border: 1px solid #2a3038; border-radius: 8px; padding: 12px; }
+  #panel { position: fixed; top: 12px; left: 12px; width: 290px; max-width: calc(100vw - 24px); max-height: calc(100vh - 42px); overflow-y: auto; box-sizing: border-box; background: var(--panel); border: 1px solid #2a3038; border-radius: 8px; padding: 12px; }
   h1 { font-size: 14px; margin: 0 0 8px; }
   .row { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0; align-items: center; }
   button, select { background: #2a2d36; color: var(--text); border: 0; border-radius: 4px; padding: 5px 9px; font: inherit; cursor: pointer; }
@@ -44,7 +44,10 @@
     <label><input type="checkbox" id="roof"> Roof 屋顶</label>
   </div>
   <div class="row">
-    <label style="flex:1">Walls 墙体 <span id="opacityVal"></span><br><input type="range" id="opacity" min="0.05" max="1" step="0.05" value="0.35" style="width:100%"></label>
+    <label style="flex:1">Walls 墙体 <span id="opacityVal"></span><br><input type="range" id="opacity" min="0.05" max="1" step="0.05" value="1" style="width:100%"></label>
+  </div>
+  <div class="row">
+    <label style="flex:1">Furniture 家具 <span id="furnitureOpacityVal"></span><br><input type="range" id="furnitureOpacity" min="0" max="1" step="0.05" value="1" style="width:100%"></label>
   </div>
   <div class="row">
     <label style="flex:1">Smoke 烟浓淡 <span id="smokeOpacityVal"></span><br><input type="range" id="smokeOpacity" min="0.1" max="3" step="0.05" value="1" style="width:100%"></label>
@@ -52,32 +55,27 @@
   <div class="row">
     <label class="layer"><input type="checkbox" id="show-gas" checked><span class="swatch" style="background:#ffc400"></span>Gas 燃气</label>
     <label class="layer"><input type="checkbox" id="show-electrical" checked><span class="swatch" style="background:#50dc78"></span>Electrical 电气</label>
-    <label class="layer"><input type="checkbox" id="show-water"><span class="swatch" style="background:#3c8cff"></span>Water 给排水</label>
-    <label class="layer"><input type="checkbox" id="show-heating"><span class="swatch" style="background:#e63ca0"></span>Heating 暖通</label>
+    <label class="layer"><input type="checkbox" id="show-water" checked><span class="swatch" style="background:#3c8cff"></span>Water 给排水</label>
+    <label class="layer"><input type="checkbox" id="show-heating" checked><span class="swatch" style="background:#e63ca0"></span>Heating 暖通</label>
   </div>
   <div class="row">
-    <label style="flex:1">Pipes 管线 <span id="pipeOpacityVal"></span><br><input type="range" id="pipeOpacity" min="0.05" max="1" step="0.05" value="1" style="width:100%"></label>
+    <label style="flex:1">Pipes 管线透视 <span id="pipeOpacityVal"></span><br><input type="range" id="pipeOpacity" min="0" max="1" step="0.05" value="0.9" style="width:100%"></label>
   </div>
   <div class="row">
-    <button id="run">Pause 暂停</button>
-    <button id="restart">Restart 重来</button>
-    <button data-place="1">Fire on Level 1 火放一层</button>
-    <button data-place="2">Fire on Level 2 火放二层</button>
+    <button id="startFire" style="background:#d95b16;color:#fff;font-weight:600">Start 默认起火</button>
+    <button id="run">Run 继续</button>
+    <button id="restart">Reset 重置</button>
+  </div>
+  <div class="row">
+    <span class="dim">Speed 倍速</span>
+    <button data-speed="1" class="on">1×</button>
+    <button data-speed="3">3×</button>
+    <button data-speed="5">5×</button>
     <button data-mode="smoke" class="on">Smoke 烟</button>
     <button data-mode="heat">Heat 热</button>
+    <label style="display:none"><input type="checkbox" id="furniture" checked></label>
   </div>
-  <div class="dim" id="placeHint" hidden></div>
-  <div class="row">
-    <label>Growth 增长 <select id="growth">
-      <option value="slow">Slow 慢</option>
-      <option value="medium" selected>Medium 中</option>
-      <option value="fast">Fast 快</option>
-      <option value="ultrafast">Ultra-fast 超快</option>
-    </select></label>
-    <label><input type="checkbox" id="furniture" checked> Furniture 家具</label>
-  </div>
-  <div class="dim">Pick Fire on Level 1 or 2, then click a floor there; the other storey turns see-through meanwhile. Or drag the flame along its own floor. The fire restarts from nothing. Double-click a door to open or shut it.<br>先选「火放一层」或「火放二层」，再点那层的地面；放置时另一层会变成半透明。也可以拖动火焰在本层移动。火会从头开始烧。双击门可以开关门。</div>
-  <div class="dim" style="margin-top:6px">A t² design fire up to 1 MW. Walls, floors and ceilings take heat out of the air.<br>t² 设计火灾，上限 1 MW。墙、地板和天花板会吸走空气里的热。</div>
+  <div class="dim">Click "Start" for the living-room sofa fire, or pick "Ignite 点火" on the right to light any furniture corner, floor, or gas cloud. Double-click doors to open/shut; click any object for data.<br>点「默认起火」引燃客厅沙发，或用右下角「点火」点任意家具边角、地面或燃气云。双击门开关；单击物体看参数卡。</div>
 </div>
 <div id="legend" hidden>
   <div>Air 空气温度</div>

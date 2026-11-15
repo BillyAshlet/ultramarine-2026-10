@@ -24,7 +24,13 @@
 // Duplex: the full-scale smoke and heat are settable (heat is in kelvin above
 // ambient here, not grid units), and smoke above a height is not drawn, so a
 // cut-away storey shows only its own smoke.
+//
+// The fire zone (firezone.js, B, 2026-11-11): smoke between the eye and the
+// area that is burning is thinned by the 火区透视度 slider, so the fire can
+// be seen from the usual view down through the smoke layer. Smoke elsewhere
+// is drawn as simulated, and at 0 (or with nothing burning) nothing changes.
 import * as THREE from 'three';
+import { ZONE_GLSL, makeZone } from './firezone.js';
 
 const vertexShader = /* glsl */ `
   out vec2 vUv;
@@ -51,6 +57,7 @@ const fragmentShader = /* glsl */ `
   uniform float uSmokeSigma;      // how fast light dies per metre at smoke = 1
   uniform float uHeatSigma;
   uniform int uMode;              // 0 = eyes (smoke), 1 = thermal camera (heat)
+  uniform int uHasVolume;         // 0 = skip raymarch when air holds no smoke/heat yet
   uniform float uJitter;
   uniform int uDetail;            // 0 = the plain grid, as before; 1 = with detail
   uniform float uThinGamma;       // below 1 draws thin smoke denser; 1 = as simulated
@@ -61,6 +68,7 @@ const fragmentShader = /* glsl */ `
   uniform float uNoiseTile;       // metres one tile of noise spans
   uniform float uFlowPeriod;      // grid seconds before the noise is re-seeded
   uniform vec3 uLightDir;         // towards the light
+${ZONE_GLSL}
 
   vec3 worldAt(vec2 ndcXY, float ndcZ) {
     vec4 v = uInvProj * vec4(ndcXY, ndcZ, 1.0);
@@ -126,40 +134,59 @@ const fragmentShader = /* glsl */ `
 
   void main() {
     vec4 base = texture(tColor, vUv);
+    // A thermal camera does not see colour, only how warm things are; walls
+    // at room temperature read as dim grey.
+    vec3 background = uMode == 1 ? vec3(dot(base.rgb, vec3(0.3, 0.59, 0.11)) * 0.22) : base.rgb;
+    if (uHasVolume == 0) { outColor = vec4(toScreen(max(background, vec3(0.0))), 1.0); return; }
+
     float depth = texture(tDepth, vUv).x;
     vec2 ndc = vUv * 2.0 - 1.0;
     vec3 dir = normalize(worldAt(ndc, 1.0) - uCamPos);
     float sceneT = depth >= 1.0 ? 1e9 : length(worldAt(ndc, depth * 2.0 - 1.0) - uCamPos);
 
-    // A thermal camera does not see colour, only how warm things are; walls
-    // at room temperature read as dim grey.
-    vec3 background = uMode == 1 ? vec3(dot(base.rgb, vec3(0.3, 0.59, 0.11)) * 0.22) : base.rgb;
-
     vec3 t0 = (uBoxMin - uCamPos) / dir, t1 = (uBoxMax - uCamPos) / dir;
     vec3 tmin = min(t0, t1), tmax = max(t0, t1);
     float tNear = max(max(tmin.x, tmin.y), max(tmin.z, 0.0));
     float tFar = min(min(tmax.x, tmax.y), min(tmax.z, sceneT));
-    if (tFar <= tNear) { outColor = vec4(toScreen(background), 1.0); return; }
+    // Clip analytically against uClipY so single-storey views skip empty air above the ceiling.
+    if (abs(dir.y) < 1e-6) {
+      if (uCamPos.y > uClipY) tFar = -1.0;
+    } else {
+      float tClip = (uClipY - uCamPos.y) / dir.y;
+      if (dir.y < 0.0) tNear = max(tNear, tClip);
+      else tFar = min(tFar, tClip);
+    }
+    if (tFar <= tNear) { outColor = vec4(toScreen(max(background, vec3(0.0))), 1.0); return; }
 
     float transmit = 1.0;
     vec3 glow = vec3(0.0);
+    // The fire zone: samples nearer than its far side (zone.y) thin by zone.x;
+    // a faint warm rim marks the edge where the smoke layer is opened.
+    vec2 zone = zoneAlongRay(uCamPos, dir);
+    float zoneRim = clamp(zone.x * (1.0 - zone.x) * 4.0, 0.0, 1.0);
     // Smoke from a fire is soot: it reflects little light and reads dark.
     // A paler grey with full light from above looked like fog or steam.
     vec3 soot = toLinear(vec3(0.26, 0.25, 0.24));
     vec3 fire = toLinear(vec3(1.0, 0.45, 0.12));
+    vec3 rimTint = toLinear(vec3(0.55, 0.24, 0.08));
     for (int s = 0; s < 400; s++) {
       float t = tNear + (float(s) + uJitter) * uStep;
       if (t > tFar) break;
       vec3 p = uCamPos + dir * t;
-      if (p.y > uClipY) continue;
       vec2 cell = texture(tVolume, gridUvw(p)).rg;
       if (uMode == 1) {
+        if (cell.g < 0.005) continue;
         float heat = heatLooks(cell.g);
         float a = 1.0 - exp(-uHeatSigma * heat * uStep);
+        if (t < zone.y) a *= 1.0 - zone.x;
+        if (a < 1e-5) continue;
         glow += transmit * a * heatColor(heat * 1.2);
         transmit *= 1.0 - a;
       } else if (uDetail == 0) {
+        if (cell.r < 0.005) continue;
         float a = 1.0 - exp(-uSmokeSigma * looks(cell.r) * uStep);
+        if (t < zone.y) a *= 1.0 - zone.x;
+        if (a < 1e-5) continue;
         glow += transmit * a * toLinear(vec3(0.16, 0.15, 0.14));
         transmit *= 1.0 - a;
       } else {
@@ -167,6 +194,10 @@ const fragmentShader = /* glsl */ `
         vec3 wind = (texture(tVelocity, gridUvw(p)).rgb - 0.5) * 2.0 * uVelRange;
         float d = detailedSmoke(looks(cell.r), flowingNoise(p, wind));
         float a = 1.0 - exp(-uSmokeSigma * d * uStep);
+        if (t < zone.y) a *= 1.0 - zone.x;
+        // Skip shadow lookups only in true empty gaps; cutting at 0.002 clipped
+        // the soft feathered rims of Worley wisps along multi-metre rays.
+        if (a < 1e-5) continue;
         // How much of the light from above reaches this point through the
         // smoke over it (coarse smoke is enough for a soft shadow).
         float over = smokeAt(p + uLightDir * 0.2) + smokeAt(p + uLightDir * 0.5) + smokeAt(p + uLightDir * 0.9);
@@ -176,12 +207,13 @@ const fragmentShader = /* glsl */ `
         // At a lower threshold the whole rising plume glowed, which read as
         // a pillar of fire up to the ceiling.
         c += fire * smoothstep(0.75, 1.2, cell.g * cell.g) * 0.7;
+        c = mix(c, rimTint, zoneRim * 0.45 * step(t, zone.y));
         glow += transmit * a * c;
         transmit *= 1.0 - a;
       }
       if (transmit < 0.02) break;
     }
-    outColor = vec4(toScreen(background * transmit + glow), 1.0);
+    outColor = vec4(toScreen(max(background * transmit + glow, vec3(0.0))), 1.0);
   }
 `;
 
@@ -241,8 +273,14 @@ export class SmokePass {
     this.heatScale = 1.2;    // heat drawn at the top of the thermal palette
     this.clipY = 1e6;
     this.time = 0;
+    this.hasSmoke = false;
+    this.hasHeat = false;
+    this._lastFluid = null;
     const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+    // Half-float linear colour avoids 8-bit banding in dark soot and pale ceilings;
+    // full buffer size is kept because 0.5x raymarching made wisps blocky on Retina.
     this.target = new THREE.WebGLRenderTarget(size.x, size.y, {
+      type: THREE.HalfFloatType,
       depthTexture: new THREE.DepthTexture(size.x, size.y),
     });
 
@@ -270,6 +308,9 @@ export class SmokePass {
     this.noise.unpackAlignment = 1;
     this.noise.needsUpdate = true;
 
+    // The fire zone's boxes and slider; main.js shares these uniforms with the
+    // house materials it fades (firezone.js fadeForZone).
+    this.zone = makeZone();
     const boxMin = grid.origin.clone();
     const boxMax = grid.origin.clone().add(new THREE.Vector3(nx, ny, nz).multiplyScalar(grid.cell));
     this.material = new THREE.ShaderMaterial({
@@ -290,6 +331,7 @@ export class SmokePass {
         uSmokeSigma: { value: 4.0 },
         uHeatSigma: { value: 2.5 },
         uMode: { value: 0 },
+        uHasVolume: { value: 0 },
         uJitter: { value: 0 },
         uDetail: { value: 1 },
         uThinGamma: { value: 0.6 },
@@ -300,10 +342,12 @@ export class SmokePass {
         uNoiseTile: { value: 1.6 },
         uFlowPeriod: { value: 3.0 },
         uLightDir: { value: new THREE.Vector3(0.25, 1, 0.15).normalize() },
+        ...this.zone.uniforms,
       },
       depthTest: false, depthWrite: false,
     });
-    this.quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), this.material);
+    const quadGeo = new THREE.PlaneGeometry(2, 2);
+    this.quad = new THREE.Mesh(quadGeo, this.material);
     this.quad.frustumCulled = false;
     this.postScene = new THREE.Scene();
     this.postScene.add(this.quad);
@@ -315,23 +359,47 @@ export class SmokePass {
     this.target.setSize(size.x, size.y);
   }
 
-  /** Copy the fluid's smoke, heat and wind (interior cells only) into the 3D textures. */
-  upload(fluid) {
-    const { nx, ny, nz } = this.grid;
-    const { sy, sz, dens, temp, u, v, w } = fluid;
+  /** Copy the fluid's smoke, heat and wind (air cells only) into the 3D textures. */
+  upload(fire) {
+    const { nx, ny } = this.grid;
+    const { fluid, fi, fj, fk, dens, temp, u, v, w } = fire;
+    if (this._lastFluid !== fluid) {
+      this.voxels.fill(0);
+      this.windBytes.fill(128);
+      this._lastFluid = fluid;
+    }
+    const { voxels, windBytes } = this;
+    const invSmoke = 1 / this.smokeScale, invHeat = 1 / this.heatScale;
     const k8 = 127 / VEL_RANGE_CELLS;
-    const pack = (x) => Math.max(0, Math.min(255, 128 + x * k8));
-    let o = 0, o4 = 0;
-    for (let k = 1; k <= nz; k++) for (let j = 1; j <= ny; j++) {
-      let c = 1 + sy * j + sz * k;
-      for (let i = 1; i <= nx; i++, c++, o += 2, o4 += 4) {
-        this.voxels[o] = Math.min(255, Math.sqrt(Math.max(0, dens[c]) / this.smokeScale) * 255);
-        this.voxels[o + 1] = Math.min(255, Math.sqrt(Math.max(0, temp[c]) / this.heatScale) * 255);
-        this.windBytes[o4] = pack(u[c]);
-        this.windBytes[o4 + 1] = pack(v[c]);
-        this.windBytes[o4 + 2] = pack(w[c]);
+    let anySmoke = false, anyHeat = false;
+    for (let n = 0, len = fluid.length; n < len; n++) {
+      const c = fluid[n];
+      const idx = (fi[n] - 1) + nx * ((fj[n] - 1) + ny * (fk[n] - 1));
+      const o2 = idx * 2, o4 = idx * 4;
+      const d = dens[c], t = temp[c];
+      if (d > 0) {
+        anySmoke = true;
+        voxels[o2] = Math.min(255, Math.sqrt(d * invSmoke) * 255);
+      } else {
+        voxels[o2] = 0;
+      }
+      if (t > 0) {
+        anyHeat = true;
+        voxels[o2 + 1] = Math.min(255, Math.sqrt(t * invHeat) * 255);
+      } else {
+        voxels[o2 + 1] = 0;
+      }
+      const ux = u[c], vy = v[c], wz = w[c];
+      if (ux === 0 && vy === 0 && wz === 0) {
+        windBytes[o4] = windBytes[o4 + 1] = windBytes[o4 + 2] = 128;
+      } else {
+        windBytes[o4] = Math.max(0, Math.min(255, 128 + ux * k8));
+        windBytes[o4 + 1] = Math.max(0, Math.min(255, 128 + vy * k8));
+        windBytes[o4 + 2] = Math.max(0, Math.min(255, 128 + wz * k8));
       }
     }
+    this.hasSmoke = anySmoke;
+    this.hasHeat = anyHeat;
     this.volume.needsUpdate = true;
     this.velocity.needsUpdate = true;
   }
@@ -339,19 +407,25 @@ export class SmokePass {
   render(scene, camera, mode) {
     this.renderer.setRenderTarget(this.target);
     this.renderer.render(scene, camera);
-    this.renderer.setRenderTarget(null);
+
+    const isHeat = mode === 'heat';
+    const hasVolume = isHeat ? this.hasHeat : this.hasSmoke;
     const u = this.material.uniforms;
-    camera.updateMatrixWorld();
-    u.uInvProj.value.copy(camera.projectionMatrixInverse);
-    u.uCamWorld.value.copy(camera.matrixWorld);
-    u.uCamPos.value.setFromMatrixPosition(camera.matrixWorld);
-    u.uMode.value = mode === 'heat' ? 1 : 0;
-    u.uJitter.value = Math.random();
-    u.uDetail.value = this.detail ? 1 : 0;
-    u.uThinGamma.value = this.thinGamma;
-    u.uHeatGamma.value = this.heatGamma;
-    u.uTime.value = this.time;
-    u.uClipY.value = this.clipY;
+    u.uMode.value = isHeat ? 1 : 0;
+    u.uHasVolume.value = hasVolume ? 1 : 0;
+    if (hasVolume) {
+      camera.updateMatrixWorld();
+      u.uInvProj.value.copy(camera.projectionMatrixInverse);
+      u.uCamWorld.value.copy(camera.matrixWorld);
+      u.uCamPos.value.setFromMatrixPosition(camera.matrixWorld);
+      u.uJitter.value = Math.random();
+      u.uDetail.value = this.detail ? 1 : 0;
+      u.uThinGamma.value = this.thinGamma;
+      u.uHeatGamma.value = this.heatGamma;
+      u.uTime.value = this.time;
+      u.uClipY.value = this.clipY;
+    }
+    this.renderer.setRenderTarget(null);
     this.renderer.render(this.postScene, this.postCamera);
   }
 }

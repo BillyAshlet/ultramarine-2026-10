@@ -38,6 +38,28 @@ const T0 = 293;
 const FLAME_DT = 800;          // K above ambient, as windy.js
 const TURBULENT_MIXING = 2;    // heat and soot mix twice as fast as momentum, as windy.js
 
+function hasNonZero(arr, fluid) {
+  for (let n = 0, len = fluid.length; n < len; n++) {
+    if (arr[fluid[n]] !== 0) return true;
+  }
+  return false;
+}
+
+// Compute upwind TVD flux (van Leer limiter) across one open grid face.
+function faceFlux(q, c, s, v, open, h) {
+  if (!open[c] || v === 0) return 0;
+  if (v > 0) {
+    const qa = q[c - s], jump = q[c] - qa;
+    if (jump === 0 || !open[c - s]) return v * qa;
+    const r = (qa - q[c - 2 * s]) / jump;
+    return r > 0 ? v * (qa + (r / (1 + r)) * (1 - v * h) * jump) : v * qa;
+  }
+  const qa = q[c], jump = q[c - s] - qa;
+  if (jump === 0 || !open[c + s]) return v * qa;
+  const r = (qa - q[c + s]) / jump;
+  return r > 0 ? v * (qa + (r / (1 + r)) * (1 + v * h) * jump) : v * qa;
+}
+
 export class MacFire {
   constructor({ nx, ny, nz, cell, solid, burnTime = 1.5, smagorinsky = 0.2 }) {
     this.nx = nx; this.ny = ny; this.nz = nz;
@@ -64,7 +86,13 @@ export class MacFire {
     this.time = 0;
     this.burnTime = burnTime;
     this.smagorinsky = smagorinsky;
-    this.iterations = 40;
+    // Pressure sweeps per step. It was 40, and project() took about 60% of a
+    // step. Each solve starts from last step's pressure, so 10 sweeps give the
+    // same fire: on the 20 cm coupling run (all open, bedrooms shut, doors
+    // switched mid-fire) every event within 0.4 s, zone pressures within 13 Pa,
+    // soot per room within 3%, at under half the cost (55 -> 26 ms a step).
+    // Not yet checked with a gas deflagration. See 进度/耦合/40cm.md.
+    this.iterations = 10;
     this.overRelax = 1.8;
     this.sealBorder();
     this.updateTopology();
@@ -104,6 +132,24 @@ export class MacFire {
         this.temp[c] = this.dens[c] = this.fuel[c] = this.p[c] = 0;
         for (const x of this.extras) x.field[c] = 0;
       }
+    }
+    this.fx.fill(0); this.fy.fill(0); this.fz.fill(0);
+    // Precompute per-fluid-cell 6-face openness mask and reciprocal count for branch-light SOR projection.
+    const nf = this.fluid.length;
+    this.div = new Float64Array(nf);
+    this.pMask = new Uint8Array(nf);
+    this.pInv = new Float64Array(nf);
+    for (let n = 0; n < nf; n++) {
+      const c = this.fluid[n];
+      let m = 0, cnt = 0;
+      if (this.openX[c]) { m |= 1; cnt++; }
+      if (this.openX[c + 1]) { m |= 2; cnt++; }
+      if (this.openY[c]) { m |= 4; cnt++; }
+      if (this.openY[c + sy]) { m |= 8; cnt++; }
+      if (this.openZ[c]) { m |= 16; cnt++; }
+      if (this.openZ[c + sz]) { m |= 32; cnt++; }
+      this.pMask[n] = m;
+      this.pInv[n] = cnt ? 1 / cnt : 0;
     }
   }
 
@@ -190,35 +236,34 @@ export class MacFire {
     const { fluid, fi, fj, fk, sy, sz, uf, vf, wf, uf0, vf0, wf0, openX, openY, openZ } = this;
     uf0.set(uf); vf0.set(vf); wf0.set(wf);
     const s = dt / this.cell;   // m/s to cells per step
-    const back = (dx, dy, dz) => {
-      const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
-      return len > 1 ? 1 / len : 1;
-    };
-    for (let n = 0; n < fluid.length; n++) {
+    for (let n = 0, len = fluid.length; n < len; n++) {
       const c = fluid[n], i = fi[n], j = fj[n], k = fk[n];
       if (openX[c]) {
         // On an x-face: v and w are the four nearest of their faces.
         const u = uf0[c];
         const v = 0.25 * (vf0[c] + vf0[c + sy] + vf0[c - 1] + vf0[c - 1 + sy]);
         const w = 0.25 * (wf0[c] + wf0[c + sz] + wf0[c - 1] + wf0[c - 1 + sz]);
-        let dx = s * u, dy = s * v, dz = s * w;
-        const f = back(dx, dy, dz);
+        const dx = s * u, dy = s * v, dz = s * w;
+        const d2 = dx * dx + dy * dy + dz * dz;
+        const f = d2 > 1 ? 1 / Math.sqrt(d2) : 1;
         uf[c] = this.sampleFace(uf0, i - 0.5 - dx * f, j - dy * f, k - dz * f, 0.5, 0, 0);
       }
       if (openY[c]) {
         const v = vf0[c];
         const u = 0.25 * (uf0[c] + uf0[c + 1] + uf0[c - sy] + uf0[c - sy + 1]);
         const w = 0.25 * (wf0[c] + wf0[c + sz] + wf0[c - sy] + wf0[c - sy + sz]);
-        let dx = s * u, dy = s * v, dz = s * w;
-        const f = back(dx, dy, dz);
+        const dx = s * u, dy = s * v, dz = s * w;
+        const d2 = dx * dx + dy * dy + dz * dz;
+        const f = d2 > 1 ? 1 / Math.sqrt(d2) : 1;
         vf[c] = this.sampleFace(vf0, i - dx * f, j - 0.5 - dy * f, k - dz * f, 0, 0.5, 0);
       }
       if (openZ[c]) {
         const w = wf0[c];
         const u = 0.25 * (uf0[c] + uf0[c + 1] + uf0[c - sz] + uf0[c - sz + 1]);
         const v = 0.25 * (vf0[c] + vf0[c + sy] + vf0[c - sz] + vf0[c - sz + sy]);
-        let dx = s * u, dy = s * v, dz = s * w;
-        const f = back(dx, dy, dz);
+        const dx = s * u, dy = s * v, dz = s * w;
+        const d2 = dx * dx + dy * dy + dz * dz;
+        const f = d2 > 1 ? 1 / Math.sqrt(d2) : 1;
         wf[c] = this.sampleFace(wf0, i - dx * f, j - dy * f, k - 0.5 - dz * f, 0, 0, 0.5);
       }
     }
@@ -230,27 +275,39 @@ export class MacFire {
    * face winds. phi here is pressure times dt / (rho * dx), in m/s.
    */
   project() {
-    const { fluid, sy, sz, uf, vf, wf, p, openX, openY, openZ } = this;
+    const { fluid, sy, sz, uf, vf, wf, p, openX, openY, openZ, div, pMask, pInv } = this;
     const omega = this.overRelax;
+    const inv6 = 1 / 6;
+    const nf = fluid.length;
+    for (let n = 0; n < nf; n++) {
+      const c = fluid[n];
+      div[n] = -(uf[c + 1] - uf[c] + vf[c + sy] - vf[c] + wf[c + sz] - wf[c]);
+    }
+    // Gauss-Seidel on sum(p_n - p_c) = out, over-relaxed (SOR), starting
+    // from last step's pressure: plain sweeps carry a correction only a
+    // cell or two each, which on a house-sized grid never reached the
+    // next room (fluid3d.js found the same).
     for (let it = 0; it < this.iterations; it++) {
-      for (let n = 0; n < fluid.length; n++) {
+      for (let n = 0; n < nf; n++) {
+        const m = pMask[n];
+        if (!m) continue;
         const c = fluid[n];
-        const out = uf[c + 1] - uf[c] + vf[c + sy] - vf[c] + wf[c + sz] - wf[c];
-        let s = -out, count = 0;
-        if (openX[c]) { s += p[c - 1]; count++; }
-        if (openX[c + 1]) { s += p[c + 1]; count++; }
-        if (openY[c]) { s += p[c - sy]; count++; }
-        if (openY[c + sy]) { s += p[c + sy]; count++; }
-        if (openZ[c]) { s += p[c - sz]; count++; }
-        if (openZ[c + sz]) { s += p[c + sz]; count++; }
-        // Gauss-Seidel on sum(p_n - p_c) = out, over-relaxed (SOR), starting
-        // from last step's pressure: plain sweeps carry a correction only a
-        // cell or two each, which on a house-sized grid never reached the
-        // next room (fluid3d.js found the same).
-        if (count) p[c] += omega * (s / count - p[c]);
+        if (m === 63) {
+          const s = div[n] + p[c - 1] + p[c + 1] + p[c - sy] + p[c + sy] + p[c - sz] + p[c + sz];
+          p[c] += omega * (s * inv6 - p[c]);
+        } else {
+          let s = div[n];
+          if (m & 1) s += p[c - 1];
+          if (m & 2) s += p[c + 1];
+          if (m & 4) s += p[c - sy];
+          if (m & 8) s += p[c + sy];
+          if (m & 16) s += p[c - sz];
+          if (m & 32) s += p[c + sz];
+          p[c] += omega * (s * pInv[n] - p[c]);
+        }
       }
     }
-    for (let n = 0; n < fluid.length; n++) {
+    for (let n = 0; n < nf; n++) {
       const c = fluid[n];
       if (openX[c]) uf[c] -= p[c] - p[c - 1];
       if (openY[c]) vf[c] -= p[c] - p[c - sy];
@@ -276,7 +333,7 @@ export class MacFire {
     const { fluid, sy, sz, uf, vf, wf, openX, openY, openZ, fx, fy, fz } = this;
     const dx = this.cell;
     let worst = 0;
-    for (let n = 0; n < fluid.length; n++) {
+    for (let n = 0, len = fluid.length; n < len; n++) {
       const c = fluid[n];
       const out = Math.max(0, uf[c + 1]) - Math.min(0, uf[c]) + Math.max(0, vf[c + sy]) - Math.min(0, vf[c])
         + Math.max(0, wf[c + sz]) - Math.min(0, wf[c]);
@@ -285,37 +342,22 @@ export class MacFire {
     const parts = Math.max(1, Math.ceil(worst * dt / dx / 0.9));
     const h = dt / parts / dx;
     this.substeps = parts;
-    // The value at a face between upwind cell a and downwind cell b, with aa
-    // the next cell upwind of a (or -1 past a wall); cfl is the share of a
-    // cell the face passes in one substep.
-    const faceValue = (q, a, b, aa, cfl) => {
-      const qa = q[a], jump = q[b] - qa;
-      if (aa < 0 || jump === 0) return qa;
-      const r = (qa - q[aa]) / jump;
-      const limiter = r > 0 ? 2 * r / (1 + r) : 0;   // van Leer
-      return qa + 0.5 * limiter * (1 - cfl) * jump;
-    };
-    for (const q of [this.temp, this.dens, this.fuel, ...this.extras.map((x) => x.field)]) {
+    const fields = [this.temp, this.dens, this.fuel];
+    for (let e = 0; e < this.extras.length; e++) fields.push(this.extras[e].field);
+    for (let fi = 0; fi < fields.length; fi++) {
+      const q = fields[fi];
+      if (!hasNonZero(q, fluid)) continue;
       for (let part = 0; part < parts; part++) {
-        for (let n = 0; n < fluid.length; n++) {
+        for (let n = 0, len = fluid.length; n < len; n++) {
           const c = fluid[n];
-          const u = uf[c], v = vf[c], w = wf[c];
-          fx[c] = !openX[c] ? 0 : u > 0
-            ? u * faceValue(q, c - 1, c, openX[c - 1] ? c - 2 : -1, u * h)
-            : u * faceValue(q, c, c - 1, openX[c + 1] ? c + 1 : -1, -u * h);
-          fy[c] = !openY[c] ? 0 : v > 0
-            ? v * faceValue(q, c - sy, c, openY[c - sy] ? c - 2 * sy : -1, v * h)
-            : v * faceValue(q, c, c - sy, openY[c + sy] ? c + sy : -1, -v * h);
-          fz[c] = !openZ[c] ? 0 : w > 0
-            ? w * faceValue(q, c - sz, c, openZ[c - sz] ? c - 2 * sz : -1, w * h)
-            : w * faceValue(q, c, c - sz, openZ[c + sz] ? c + sz : -1, -w * h);
+          fx[c] = faceFlux(q, c, 1, uf[c], openX, h);
+          fy[c] = faceFlux(q, c, sy, vf[c], openY, h);
+          fz[c] = faceFlux(q, c, sz, wf[c], openZ, h);
         }
-        for (let n = 0; n < fluid.length; n++) {
+        // Closed faces remain 0 because updateTopology() zeroes fx/fy/fz and loop 1 writes 0 when !open*.
+        for (let n = 0, len = fluid.length; n < len; n++) {
           const c = fluid[n];
-          // A high face belongs to the next cell; if that cell is solid, the
-          // face is closed and its flux was never set, so read it as zero.
-          const fxh = openX[c + 1] ? fx[c + 1] : 0, fyh = openY[c + sy] ? fy[c + sy] : 0, fzh = openZ[c + sz] ? fz[c + sz] : 0;
-          q[c] -= h * (fxh - fx[c] + fyh - fy[c] + fzh - fz[c]);
+          q[c] -= h * (fx[c + 1] - fx[c] + fy[c + sy] - fy[c] + fz[c + sz] - fz[c]);
         }
       }
     }
@@ -353,40 +395,47 @@ export class MacFire {
     }
   }
 
+  /** Spread one face-velocity component among its open neighbours without temporary offset arrays. */
+  mixFace(f, scratch, open, across, k) {
+    const { fluid, sy, sz, eddy } = this;
+    scratch.set(f);
+    for (let n = 0, len = fluid.length; n < len; n++) {
+      const c = fluid[n];
+      if (!open[c]) continue;
+      const e = 0.5 * (eddy[c] + eddy[c - across]);
+      const here = scratch[c];
+      let change = 0;
+      let m = c + 1;  if (open[m]) change += (e + 0.5 * (eddy[m] + eddy[m - across])) * (scratch[m] - here);
+      m = c - 1;      if (open[m]) change += (e + 0.5 * (eddy[m] + eddy[m - across])) * (scratch[m] - here);
+      m = c + sy;     if (open[m]) change += (e + 0.5 * (eddy[m] + eddy[m - across])) * (scratch[m] - here);
+      m = c - sy;     if (open[m]) change += (e + 0.5 * (eddy[m] + eddy[m - across])) * (scratch[m] - here);
+      m = c + sz;     if (open[m]) change += (e + 0.5 * (eddy[m] + eddy[m - across])) * (scratch[m] - here);
+      m = c - sz;     if (open[m]) change += (e + 0.5 * (eddy[m] + eddy[m - across])) * (scratch[m] - here);
+      f[c] = here + k * change;
+    }
+  }
+
   /** Spread each face wind among its open neighbours of the same direction. */
   mixVelocity(dt) {
-    const { fluid, sy, sz, eddy } = this;
     const k = 0.5 * dt;
-    const faces = [[this.uf, this.uf0, this.openX, 1], [this.vf, this.vf0, this.openY, sy], [this.wf, this.wf0, this.openZ, sz]];
-    for (const [f, scratch, open, across] of faces) {
-      scratch.set(f);
-      for (let n = 0; n < fluid.length; n++) {
-        const c = fluid[n];
-        if (!open[c]) continue;
-        const e = 0.5 * (eddy[c] + eddy[c - across]), here = scratch[c];
-        let change = 0;
-        for (const o of [1, -1, sy, -sy, sz, -sz]) {
-          const m = c + o;
-          if (!open[m]) continue;
-          change += (e + 0.5 * (eddy[m] + eddy[m - across])) * (scratch[m] - here);
-        }
-        f[c] = here + k * change;
-      }
-    }
+    this.mixFace(this.uf, this.uf0, this.openX, 1, k);
+    this.mixFace(this.vf, this.vf0, this.openY, this.sy, k);
+    this.mixFace(this.wf, this.wf0, this.openZ, this.sz, k);
   }
 
   /** Spread a scalar by the eddies, only across open faces, so nothing crosses a wall and totals are kept. */
   mixScalar(x, scratch, dt) {
     const { fluid, sy, sz, eddy, openX, openY, openZ } = this;
+    if (!hasNonZero(x, fluid)) return;
     scratch.set(x);
     const k = 0.5 * dt * TURBULENT_MIXING;
     // Each face is counted once, from its high side, and moves the same amount
     // out of one cell as into the other.
-    for (let n = 0; n < fluid.length; n++) {
+    for (let n = 0, len = fluid.length; n < len; n++) {
       const c = fluid[n], e = eddy[c], here = scratch[c];
-      if (openX[c]) { const m = c - 1, d = k * (e + eddy[m]) * (scratch[m] - here); x[c] += d; x[m] -= d; }
-      if (openY[c]) { const m = c - sy, d = k * (e + eddy[m]) * (scratch[m] - here); x[c] += d; x[m] -= d; }
-      if (openZ[c]) { const m = c - sz, d = k * (e + eddy[m]) * (scratch[m] - here); x[c] += d; x[m] -= d; }
+      if (openX[c]) { const m = c - 1, dm = scratch[m] - here; if (dm !== 0) { const d = k * (e + eddy[m]) * dm; x[c] += d; x[m] -= d; } }
+      if (openY[c]) { const m = c - sy, dm = scratch[m] - here; if (dm !== 0) { const d = k * (e + eddy[m]) * dm; x[c] += d; x[m] -= d; } }
+      if (openZ[c]) { const m = c - sz, dm = scratch[m] - here; if (dm !== 0) { const d = k * (e + eddy[m]) * dm; x[c] += d; x[m] -= d; } }
     }
   }
 
