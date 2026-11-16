@@ -36,7 +36,7 @@ const PHASES_AFTER = ['transfer', 'react', 'report'];
  * Files the world looks for, in this order within each phase. Add a name
  * here when a new mechanism needs its own file.
  */
-export const MODULES = ['sources', 'actions', 'combustion', 'gas', 'water', 'radiation', 'leaks', 'card', 'eventsView'];
+export const MODULES = ['sources', 'actions', 'combustion', 'gas', 'water', 'radiation', 'leaks', 'card', 'eventsView', 'analysis'];
 
 export class World {
   /**

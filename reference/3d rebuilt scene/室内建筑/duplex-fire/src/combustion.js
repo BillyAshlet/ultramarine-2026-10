@@ -94,6 +94,8 @@ export const PARAMS = {
   flameReach: { value: 0.2, unit: 'm', source: 'NIST TN 1446 p. 19: flames reached 20 cm (bedclothes fire) to 39 cm (twin bed) sideways from a burning bed; the low end, used for every flame (假设)' },
   flameHeight: { value: [0.235, 1.02], unit: 'L = a Q^(2/5) − b D (kW, m)', source: 'Heskestad flame height, as radiation.js' },
   airRhoCp: { value: 1.2 * 1005, unit: 'J/m³K', source: 'air, as house.js counts heat' },
+  enclosureFluxBase: { value: 12, unit: 'kW/m²', source: '[估] upper-layer self-flux reached by a single sofa burning alone in A102 (~11.9 kW/m²); external enclosure acceleration starts above this so free-burn curves match NIST TN 2303' },
+  enclosureFluxScale: { value: 20, unit: 'kW/m²', source: 'Tewarson / Babrauskas (SFPE Handbook): external enclosure radiation (~20 kW/m² at flashover) accelerates pyrolysis rate while conserving total fuel energy' },
 };
 const P = (k) => PARAMS[k].value;
 const T0K = 293;
@@ -191,7 +193,7 @@ export default function combustion(world) {
   const gasCeilY = new Map();
 
   function fresh(it) {
-    it.dose = 0; it.t = 0; it.below = 0; it.wetMul = 1; it.lastWet = 0;
+    it.dose = 0; it.t = 0; it.below = 0; it.wetMul = 1; it.lastWet = 0; it.pilotUntil = 0;
     it.sampleAt = 0; it.n = 0; it.burning = false; it.qIn = 0;
     if (it.history) it.history.fill(0);
     const o = it.o;
@@ -218,7 +220,10 @@ export default function combustion(world) {
     if (!it || o.state === '燃烧' || o.state === '烧尽') return false;
     it.burning = true;
     it.below = 0;
-    if (why === 'lighter' && it.wetMul < 0.6) it.wetMul = 0.6;
+    if (it.wetMul < 0.45) it.wetMul = why === 'lighter' ? 0.7 : 0.45;
+    if (why === 'lighter' && it.outFlux != null) {
+      it.pilotUntil = world.time + Math.max(materials.igniter?.duration?.value ?? 200, it.model.tPeak * 0.85);
+    }
     it.dose = Math.max(it.dose, it.need);
     if (atX != null && atZ != null) {
       it.seedX = Math.min(o.max[0], Math.max(o.min[0], atX));
@@ -257,10 +262,14 @@ export default function combustion(world) {
       // Water landing on it (water.js): Evans 1993.
       const wr = o.wetRate ?? 0;
       if (wr > 0) it.wetMul *= Math.exp(-dt / (3.0 * Math.pow(wr, -1.85)));
-      it.t += dt;
+      // Enclosure radiative feedback (Tewarson / Babrauskas): accelerates progression along
+      // the item's curve when external flux exceeds single-item baseline, keeping total MJ exact.
+      const qExt = Math.max(0, (o.flux ?? 0) - P('enclosureFluxBase'));
+      const speed = 1 + Math.min(2.5, qExt / P('enclosureFluxScale'));
+      it.t += dt * speed;
       // Going out takes extinctionDelay; meanwhile the flame dies down (假设: linearly).
       const dying = it.below > 0 ? Math.max(0, 1 - it.below / it.outDelay) : 1;
-      const q = it.model.hrr(it.t) * it.wetMul * dying;
+      const q = it.model.hrr(it.t) * speed * it.wetMul * dying;
       o.hrr = q;
       o.burnedMJ += q * dt / 1e6;
       o.burn.t = it.t;
@@ -396,7 +405,7 @@ export default function combustion(world) {
       // What reaches it from outside: radiation (C), and flame contact from
       // another fire or the igniter. Its own fire is in neither.
       let radiant = radiation ? o.flux : 0;
-      const touched = nFlames > 0 && inFlame(o, n);
+      const touched = (nFlames > 0 && inFlame(o, n)) || w.time < (it.pilotUntil ?? 0);
       if (touched) radiant = Math.max(radiant, P('contactFlux'));
       if (it.burning) {
         // Wood goes out when what reaches it from outside is too little; an
@@ -407,7 +416,9 @@ export default function combustion(world) {
         }
         it.qIn = radiant;
       } else {
-        const q = Math.max(radiant, contactFlux(o));
+        // Active water spray landing on the surface absorbs 2613 kJ/kg = 2613 kW/m² per mm/s,
+        // keeping a wet extinguished item from immediately re-igniting while water pours on it.
+        const q = Math.max(0, Math.max(radiant, contactFlux(o)) - (o.wetRate ?? 0) * 2613);
         it.qIn = q;
         if (q >= it.qcr) it.dose += q * q * dt;
         else it.dose = Math.max(0, it.dose - (it.qcr * it.qcr - q * q) * dt);

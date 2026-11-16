@@ -60,7 +60,10 @@
 // leak cells. Zones are found again only when the solver's cell list changes
 // (doors.js calls updateTopology), not every step.
 
+import * as THREE from 'three';
+
 const T0 = 293;              // K: the solver's zero (mac3d.js)
+const G = 9.81;
 const RHO = 1.2;             // kg/m³, as house.js counts heat
 const CP = 1005;             // J/(kg K)
 const P_REF = 4;             // Pa: the leakage areas are quoted at this
@@ -72,7 +75,7 @@ const SWEEPS = 4, NEWTON = 16;
 
 export default function leaks(world) {
   const { fire, grid, objects } = world;
-  const M = world.materials.leakage, FAN = world.materials.exhaust_fan;
+  const M = world.materials.leakage, FAN = world.materials.exhaust_fan, WM = world.materials.window;
   const val = (m, key) => {
     const f = m?.[key];
     if (!f || typeof f !== 'object' || typeof f.value !== 'number') throw new Error(`[leaks] materials.json is missing ${key}`);
@@ -93,6 +96,15 @@ export default function leaks(world) {
   const STUCK = val(M, 'doorStuckPressure');
   const VISIBLE = val(M, 'smokeVisible');
   const FAN_Q = val(FAN, 'flow'), FAN_SHUT = val(FAN, 'shutoffPressure');
+  const WIN = {
+    breakK: (WM?.breakTemp?.value ?? 260) + 273 - T0,
+    breakPa: WM?.breakPressure?.value ?? 3000,
+    lag: WM?.thermalLag?.value ?? 35,
+    openFrac: WM?.openFraction?.value ?? 0.5,
+    cd: WM?.dischargeCoefficient?.value ?? 0.68,
+    alpha: WM?.absorptivity?.value ?? 0.78,
+    h: WM?.surfaceH?.value ?? 18,
+  };
 
   const { W, H, D, sy, sz, size, cell, solid } = fire;
   const Vc = cell ** 3;
@@ -237,6 +249,72 @@ export default function leaks(world) {
     return { o, duct, intake: Int32Array.from(intake) };
   });
 
+  // Exterior windows (Pagni & Joshi 1991 / Babrauskas 1998 thermal breakage; Kiwa 2021 pressure breakage).
+  const winDrawGroup = world.view?.scene ? new THREE.Group() : null;
+  if (winDrawGroup) {
+    winDrawGroup.name = 'broken-windows';
+    world.view.scene.add(winDrawGroup);
+  }
+  const winLineMat = winDrawGroup ? new THREE.LineBasicMaterial({
+    color: 0xffa43b, transparent: true, opacity: 0.92, depthTest: false,
+    clippingPlanes: world.view.cut ? [world.view.cut] : [],
+  }) : null;
+  const winPaneMat = winDrawGroup ? new THREE.MeshBasicMaterial({
+    color: 0xff8c2a, transparent: true, opacity: 0.16, side: THREE.DoubleSide, depthWrite: false,
+    clippingPlanes: world.view.cut ? [world.view.cut] : [],
+  }) : null;
+
+  const windows = objects.list.filter((o) => o.class === '窗' && o.cells.length > 0).map((o) => {
+    const spanX = o.max[0] - o.min[0], spanY = o.max[1] - o.min[1], spanZ = o.max[2] - o.min[2];
+    const width = Math.max(spanX, spanZ);
+    const paneArea = width * spanY;
+    const yMid = o.min[1] + spanY * 0.5;
+    const yTopThird = o.min[1] + spanY * 0.65;
+    const airCells = [...o.cells].filter((c) => !solid[c]);
+    const upper = airCells.filter((c) => at(c)[1] >= yMid);
+    const hotSample = airCells.filter((c) => at(c)[1] >= yTopThird);
+    let marker = null;
+    if (winDrawGroup) {
+      marker = new THREE.Group();
+      const thinX = spanX < spanZ;
+      const cx = (o.min[0] + o.max[0]) / 2, cy = (o.min[1] + o.max[1]) / 2, cz = (o.min[2] + o.max[2]) / 2;
+      const x0 = thinX ? cx : o.min[0] + 0.04, x1 = thinX ? cx : o.max[0] - 0.04;
+      const z0 = thinX ? o.min[2] + 0.04 : cz, z1 = thinX ? o.max[2] - 0.04 : cz;
+      const y0 = o.min[1] + 0.04, y1 = o.max[1] - 0.04;
+      const xm = (x0 + x1) * 0.5 + (thinX ? 0 : 0.06), zm = (z0 + z1) * 0.5 + (thinX ? 0.06 : 0), ym = cy - 0.08;
+      const pts = new Float32Array([
+        x0, y0, z0, x1, y0, z1,  x1, y0, z1, x1, y1, z1,  x1, y1, z1, x0, y1, z0,  x0, y1, z0, x0, y0, z0,
+        x0, y0, z0, xm, ym, zm,  x1, y0, z1, xm, ym, zm,  x1, y1, z1, xm, ym, zm,  x0, y1, z0, xm, ym, zm,
+      ]);
+      const lg = new THREE.BufferGeometry();
+      lg.setAttribute('position', new THREE.BufferAttribute(pts, 3));
+      const lines = new THREE.LineSegments(lg, winLineMat);
+      lines.renderOrder = 8;
+      const pg = new THREE.PlaneGeometry(width - 0.08, Math.max(0.1, spanY - 0.08));
+      const pane = new THREE.Mesh(pg, winPaneMat);
+      pane.position.set(cx, cy, cz);
+      if (thinX) pane.rotation.y = Math.PI / 2;
+      pane.renderOrder = 7;
+      marker.add(pane, lines);
+      marker.visible = false;
+      winDrawGroup.add(marker);
+    }
+    return {
+      o, width, height: spanY, paneArea,
+      openArea: paneArea * WIN.openFrac,
+      ela: paneArea * WIN.openFrac * WIN.cd,
+      cells: Int32Array.from(airCells),
+      upper: Int32Array.from(upper.length ? upper : airCells),
+      hotSample: Int32Array.from(hotSample.length ? hotSample : airCells),
+      tg: 0, brokenBy: null, marker,
+    };
+  });
+  let brokenWinMask = '';
+  const currentWinMask = () => windows.map((w) => (w.o.state === '失效' ? '1' : '0')).join('');
+  const syncWindowMarkers = () => {
+    for (const w of windows) if (w.marker) w.marker.visible = w.o.state === '失效';
+  };
+
   // A unit's leakage outdoors: its total (3 ACH50 over its volume) less what
   // goes to the other unit through the party wall and back-to-back outlets.
   const unitVolume = [0, 0, 0];
@@ -362,6 +440,15 @@ export default function leaks(world) {
       const g = group('fan', zoneOf[intake[0]], -1, { fan: f.o, label: f.o.id });
       g.a = intake; g.b = intake.map(() => -1);
     }
+    for (const w of windows) {
+      if (w.o.state !== '失效' || !w.cells.length) continue;
+      const z0 = zoneOf[w.cells[0]];
+      if (!real(z0)) continue;
+      const g = group('window', z0, -1, { window: w, label: `${w.o.id} ${w.o.room ?? ''}`.trim() });
+      g.ela = w.ela;
+      g.a = [...w.cells];
+      g.b = g.a.map(() => -1);
+    }
     for (const g of groups) {
       g.a = Int32Array.from(g.a); g.b = Int32Array.from(g.b);
       g.K = C * g.ela;
@@ -377,6 +464,8 @@ export default function leaks(world) {
     if (oldP.length) for (let z = 0; z < Z; z++) P[z] = 0;
     primed = false;
     fluidRef = fire.fluid;
+    brokenWinMask = currentWinMask();
+    syncWindowMarkers();
   }
 
   // --- each step ---------------------------------------------------------------------
@@ -489,11 +578,66 @@ export default function leaks(world) {
         }
       }
     }
+    // Natural bidirectional buoyancy venting through broken windows (Prahl & Emmons 1975):
+    // hot upper smoke pours out the top half while fresh cool air enters below.
+    for (const w of windows) {
+      if (w.o.state !== '失效' || !w.upper.length) continue;
+      const z0 = zoneOf[w.upper[0]];
+      if (z0 < 0 || zones[z0]?.void) continue;
+      let dT = 0;
+      for (let i = 0; i < w.upper.length; i++) dT += Math.max(0, temp[w.upper[i]]);
+      dT /= w.upper.length;
+      if (dT <= 1) continue;
+      const qBuoy = (1 / 3) * WIN.cd * w.openArea * Math.sqrt((G * dT * w.height) / (T0 + dT));
+      const f = Math.min((qBuoy * dt) / (w.upper.length * Vc), MAX_SHARE);
+      let heat = 0, soot = 0;
+      for (let i = 0; i < w.upper.length; i++) {
+        const d = w.upper[i];
+        for (let k = 0; k < fields.length; k++) {
+          const F = fields[k];
+          const amt = f * F[d];
+          if (amt === 0) continue;
+          F[d] -= amt;
+          if (k > 2) books.scalarsOut[fieldNames[k]] = (books.scalarsOut[fieldNames[k]] ?? 0) + amt * Vc;
+          if (F === temp) heat += amt;
+          else if (F === dens) soot += amt;
+        }
+      }
+      S[z0] -= heat;
+      books.moved.window = (books.moved.window ?? 0) + soot * Vc;
+      books.sootOut += soot * Vc;
+      books.heatOut += heat * Vc * RHO * CP;
+    }
+  }
+
+  function updateWindows(dt) {
+    const { temp } = fire;
+    const ease = 1 - Math.exp(-dt / WIN.lag);
+    for (const w of windows) {
+      if (w.o.state === '失效') continue;
+      let tAir = 0;
+      for (let i = 0; i < w.hotSample.length; i++) tAir += temp[w.hotSample[i]];
+      tAir /= w.hotSample.length;
+      const tRad = !w.o.wallAir && w.o.flux > 0 ? (WIN.alpha * w.o.flux * 1000) / WIN.h : 0;
+      w.tg += (tAir + tRad - w.tg) * ease;
+      const z0 = zoneOf[w.cells[0]];
+      const pa = z0 >= 0 ? P[z0] : 0;
+      if (w.tg >= WIN.breakK || pa >= WIN.breakPa) {
+        const by = w.tg >= WIN.breakK ? 'heat' : 'pressure';
+        w.o.state = '失效';
+        w.brokenBy = by;
+        const pos = [0, 1, 2].map((a) => +((w.o.min[a] + w.o.max[a]) / 2).toFixed(2));
+        world.events.emit({
+          type: '窗户破裂', objectId: w.o.id, pos,
+          data: { by, room: w.o.room, glassC: Math.round(w.tg + T0 - 273), pa: Math.round(pa) },
+        });
+      }
+    }
   }
 
   function transfer(_world, dt) {
     const t = performance.now();
-    if (fire.fluid !== fluidRef) {
+    if (fire.fluid !== fluidRef || currentWinMask() !== brokenWinMask) {
       const r = performance.now();
       rebuild();
       cost.rebuildMs = performance.now() - r;
@@ -523,6 +667,8 @@ export default function leaks(world) {
           world.events.emit({ type: '超压', pos: at(fire.fluid.find((c) => zoneOf[c] === z) ?? 0), data: { pa: Math.round(P[z]), zone: label } });
         }
       }
+      updateWindows(dt);
+      if (currentWinMask() !== brokenWinMask) syncWindowMarkers();
     }
     Sprev.set(S);
     primed = true;
@@ -534,10 +680,12 @@ export default function leaks(world) {
     primed = false;
     vexp.fill(0); P.fill(0);
     for (const g of groups) g.q = 0;
+    for (const w of windows) { w.tg = 0; w.brokenBy = null; }
     books.sootOut = books.heatOut = books.sootAcrossUnits = 0;
     books.scalarsOut = {}; books.moved = {};
     firsts.length = 0; firstSeen.clear(); peaks.clear(); stuck.clear();
     cost.steps = cost.ms = cost.solveMs = cost.moveMs = 0;
+    rebuild();
   }
 
   // --- console ------------------------------------------------------------------------
@@ -574,6 +722,7 @@ export default function leaks(world) {
     peaks() { return Object.fromEntries([...peaks].map(([k, v]) => [k, Math.round(v)])); },
     pressure(z) { return P[z]; },
     outletPairs: outletPairs.map((p) => p.o.map((o) => `${o.id} ${o.room ?? ''}`).join(' ↔ ')),
+    windows: () => windows.map((w) => ({ id: w.o.id, room: w.o.room, state: w.o.state, by: w.brokenBy, glassC: +(w.tg + T0 - 273).toFixed(1) })),
     fans,
     cost() { const n = Math.max(1, cost.steps); return { msPerStep: +(cost.ms / n).toFixed(3), solve: +(cost.solveMs / n).toFixed(3), move: +(cost.moveMs / n).toFixed(3), rebuildMs: +cost.rebuildMs.toFixed(1), rebuilds: cost.rebuilds }; },
     get zoneOf() { return zoneOf; },

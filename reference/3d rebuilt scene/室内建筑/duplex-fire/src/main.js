@@ -305,19 +305,37 @@ function placeFire(x, z, lvl = 1) {
   if (ok) startSim();
   return ok;
 }
+let fastForwardUntil = null;
 function setSpeed(s) {
   simSpeed = s;
   simAccum = 0;
+  // Scale solver dt safely (mac3d CFL-substeps scalar advection and caps eddy viscosity)
+  // so 4× and 12× actually reach high wall-clock speed instead of hitting a 2.5× CPU ceiling.
+  fire.dt = s >= 10 ? 0.14 : s >= 4 ? 0.08 : 0.05;
   for (const b of document.querySelectorAll('[data-speed]')) b.classList.toggle('on', +b.dataset.speed === s);
 }
+function fastForward(seconds = 30) {
+  const activeCount = (world.combustion?.burningCount?.() ?? 0) + (fire.heatRelease() > 0 ? 1 : 0);
+  if (simTime === 0 && activeCount === 0 && !(world.gas?.status?.().outlets?.length > 0) && !(world.water?.status?.().outlets?.length > 0)) {
+    startDefaultFire();
+  }
+  fastForwardUntil = Math.max(fastForwardUntil ?? fire.time, fire.time) + seconds;
+  uploadDirty = true;
+}
 document.getElementById('startFire')?.addEventListener('click', startDefaultFire);
+document.getElementById('ffwd')?.addEventListener('click', () => fastForward(30));
 runButton.addEventListener('click', () => {
+  fastForwardUntil = null;
   running = !running;
   userPaused = !running;
   simAccum = 0;
   syncRunButton();
 });
-document.getElementById('restart').addEventListener('click', resetAll);
+document.getElementById('restart').addEventListener('click', () => {
+  fastForwardUntil = null;
+  fire.dt = simSpeed >= 10 ? 0.14 : simSpeed >= 4 ? 0.08 : 0.05;
+  resetAll();
+});
 for (const b of document.querySelectorAll('[data-speed]')) {
   b.addEventListener('click', () => setSpeed(+b.dataset.speed));
 }
@@ -467,7 +485,7 @@ world.view = {
   scene, camera, renderer, controls, cut, building, dressed, doors, meta, extras, extraMeshes,
   services, serviceMeshes, smoke, rayAt, floorPoint, roomAt, LEVELS, focus: fade.uFocus,
   furnitureOpacity: +furnitureOpacity.value,
-  startSim, lightFloor, startDefaultFire, resetAll, setSpeed,
+  startSim, lightFloor, startDefaultFire, resetAll, setSpeed, fastForward,
   isRunning: () => running,
   isUserPaused: () => userPaused,
   getLevel: () => level,
@@ -481,11 +499,26 @@ const combustionModule = world.modules.find((m) => m.name === 'combustion');   /
 function frame() {
   const dt = Math.min(clock.getDelta(), 0.1);
   const interactive = interacting || performance.now() < wheelUntil;
-  if (running && !interactive) {
-    simAccum = Math.min(simAccum + dt * simSpeed, fire.dt * 8);
+  if (fastForwardUntil != null && !interactive) {
+    const prevDt = fire.dt;
+    fire.dt = 0.15;
     let steps = 0;
     const t0 = performance.now();
-    while (simAccum >= fire.dt && steps < 8 && (steps === 0 || performance.now() - t0 < 46)) {
+    while (fire.time < fastForwardUntil && steps < 14 && performance.now() - t0 < 52) {
+      const s = performance.now();
+      world.step();
+      stepMs = stepMs ? stepMs * 0.9 + (performance.now() - s) * 0.1 : performance.now() - s;
+      steps++;
+    }
+    fire.dt = prevDt;
+    simTime = fire.time;
+    uploadDirty = true;
+    if (fire.time >= fastForwardUntil) fastForwardUntil = null;
+  } else if (running && !interactive) {
+    simAccum = Math.min(simAccum + dt * simSpeed, fire.dt * 10);
+    let steps = 0;
+    const t0 = performance.now();
+    while (simAccum >= fire.dt && steps < 10 && (steps === 0 || performance.now() - t0 < 46)) {
       const s = performance.now();
       world.step();
       stepMs = stepMs ? stepMs * 0.9 + (performance.now() - s) * 0.1 : performance.now() - s;
@@ -521,8 +554,9 @@ function frame() {
       (note ? ` · ${note}` : '');
   } else {
     const kw = totalHRR >= 1e6 ? `${(totalHRR / 1e6).toFixed(2)} MW` : `${(totalHRR / 1000).toFixed(0)} kW`;
+    const ffText = fastForwardUntil != null ? ` · Fast-forward 快进 → ${Math.floor(fastForwardUntil / 60)}:${String(Math.floor(fastForwardUntil % 60)).padStart(2, '0')}` : '';
     fireInfo.textContent = `Fire 燃烧中: ${kw} · ${burningN} burning 处火源` +
-      (!running ? ' · Paused 已暂停' : simSpeed > 1 ? ` · ${simSpeed}×` : '') +
+      (ffText || (!running ? ' · Paused 已暂停' : simSpeed > 1 ? ` · ${simSpeed}×` : '')) +
       (note ? ` · ${note}` : '');
   }
   status.textContent = `t ${Math.floor(simTime / 60)}:${String(Math.floor(simTime % 60)).padStart(2, '0')} (${simSpeed}×) · ` +

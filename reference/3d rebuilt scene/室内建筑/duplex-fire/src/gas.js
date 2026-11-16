@@ -79,6 +79,7 @@ export default function gas(world) {
   const { fire, grid, objects } = world;
   const mat = world.materials;
   const pipeM = mat.gas_pipe, supply = mat.gas_supply, mix = mat.gas_mixture, valveM = mat.gas_appliance_valve;
+  const hoseM = mat.kitchen_gas_hose ?? valveM;
   const P = {
     pressure: v(supply, 'deliveryPressure'),
     rMeter: v(supply, 'meterResistance'),
@@ -101,6 +102,14 @@ export default function gas(world) {
     leakFlow: v(valveM, 'leakFlow') / 3600,
     meltC: v(valveM, 'meltTemp'),
     lag: v(valveM, 'lag'),
+    valveAlpha: valveM?.absorptivity?.value ?? 0.75,
+    valveH: valveM?.surfaceH?.value ?? 18,
+    hoseLeakC: hoseM?.leakTemp?.value ?? 135,
+    hoseMeltC: hoseM?.meltTemp?.value ?? 175,
+    hoseLag: hoseM?.lag?.value ?? 35,
+    hoseAlpha: hoseM?.absorptivity?.value ?? 0.88,
+    hoseH: hoseM?.surfaceH?.value ?? 18,
+    arcDelay: mix?.outletArcDelay?.value ?? 15,
   };
   const rhoGas = RHO_AIR * P.sg;
   const AIT = P.aitC + 273 - T_AMBIENT;          // in the solver's kelvin above ambient
@@ -153,16 +162,52 @@ export default function gas(world) {
     // The boiler's gas valve: on the last piece of the boiler riser that touches air.
     const reached = list.filter((n) => n.path < Infinity && n.o.cells.length > 0 && !n.o.element?.stoveBranch);
     u.end = reached.sort((a, b) => b.path - a.path)[0] ?? null;
-    u.part = u.end ? { unit: u, node: u.end, tp: 0, stage: 0, outlet: null, lag: P.lag, kind: 'boiler' } : null;
-    // The 1st-floor kitchen stove gas cock / hose behind M_Range.
+    u.part = u.end ? {
+      unit: u, node: u.end, tp: 0, stage: 0, outlet: null, kind: 'boiler',
+      leakC: P.leakC, meltC: P.meltC, lag: P.lag, alpha: P.valveAlpha, h: P.valveH,
+    } : null;
+    // The 1st-floor kitchen stove rubber hose / cock behind M_Range.
     u.stove = list.find((n) => n.path < Infinity && n.o.cells.length > 0 && n.o.element?.stoveValve) ?? null;
-    u.stovePart = u.stove ? { unit: u, node: u.stove, tp: 0, stage: 0, outlet: null, lag: P.lag * 0.35, kind: 'stove' } : null;
+    u.stovePart = u.stove ? {
+      unit: u, node: u.stove, tp: 0, stage: 0, outlet: null, kind: 'stove',
+      leakC: P.hoseLeakC, meltC: P.hoseMeltC, lag: P.hoseLag, alpha: P.hoseAlpha, h: P.hoseH,
+    } : null;
   }
   const byObject = new Map(nodes.map((n) => [n.o, n]));
   const parts = [
     ...Object.values(units).map((u) => u.part).filter(Boolean),
     ...Object.values(units).map((u) => u.stovePart).filter(Boolean),
   ];
+
+  // Energised electrical receptacles & switches (NFPA 921 §22.6: MIE of CH4 is 0.28 mJ).
+  const panelByUnit = {};
+  const arcDevices = [];
+  for (const o of objects.list) {
+    if (o.layer !== 'electrical') continue;
+    const uName = /Unit ([AB])/.exec(`${o.name} ${o.element?.panel ?? ''} ${o.element?.system ?? ''}`)?.[1] ?? o.room?.[0];
+    if (uName !== 'A' && uName !== 'B') continue;
+    if (/Panelboard/.test(o.name)) { panelByUnit[uName] = o; continue; }
+    if (/Smoke Detector/.test(o.name) || !o.cells.length) continue;
+    arcDevices.push({ o, unit: uName, dwell: 0 });
+  }
+  const unitPowered = (uName) => panelByUnit[uName]?.on === true;
+  world.events.on((ev) => {
+    if (ev.type !== '合闸' && ev.type !== '排风机开' && ev.type !== '排风机关') return;
+    const uName = ev.data?.unit;
+    if (!uName || !unitPowered(uName) || !any()) return;
+    rebuildActive();
+    let seeds = 0;
+    for (const dev of arcDevices) {
+      if (dev.unit !== uName) continue;
+      for (const c of dev.o.cells) if (flammable(X[c])) seedList[seeds++] = c;
+    }
+    if (seeds) {
+      world.events.emit({ type: '电弧引燃燃气', pos: ev.pos, data: { unit: uName, trigger: ev.type } });
+      deflagrate(seedList, seeds);
+      redrawMarkers();
+      redrawCloud();
+    }
+  });
 
   // --- outlets ---------------------------------------------------------------------
   // kind: 'cut' (full bore), 'leak' (a share of the bore), 'valve' (the boiler's
@@ -930,7 +975,7 @@ export default function gas(world) {
     }
   }
 
-  /** 5. Deflagration and lit outlets; the boiler valves heat up and fail. */
+  /** 5. Deflagration, electrical arcs, lit outlets, and thermal failure of boiler valves / stove hoses. */
   function react(w, dt) {
     if (any()) {
       markFlames();
@@ -940,21 +985,38 @@ export default function gas(world) {
         const c = active[s], x = X[c];
         if (flammable(x) && lightsAt(c)) seedList[seeds++] = c;
       }
+      // Energised receptacles/switches immersed in 5–15 % gas can spark when relays cycle (unless breaker is off).
+      for (const dev of arcDevices) {
+        if (!unitPowered(dev.unit)) { dev.dwell = 0; continue; }
+        let hitCell = -1;
+        for (const c of dev.o.cells) if (flammable(X[c])) { hitCell = c; break; }
+        if (hitCell >= 0) {
+          dev.dwell += dt;
+          if (dev.dwell >= P.arcDelay) {
+            dev.dwell = 0;
+            seedList[seeds++] = hitCell;
+            world.events.emit({ type: '电弧引燃燃气', objectId: dev.o.id, pos: centre(dev.o), data: { unit: dev.unit, trigger: 'energised outlet relay' } });
+          }
+        } else {
+          dev.dwell = Math.max(0, dev.dwell - dt * 0.5);
+        }
+      }
       if (seeds) deflagrate(seedList, seeds);
       for (const o of outlets) {
         if (o.lit || !(o.q > 0)) continue;
         for (const c of o.cells) if (lightsAt(c)) { light(o, 'flame or hot gas'); break; }
       }
     }
-    // The boiler and kitchen-stove valves.
-    const leak = P.leakC + 273 - T_AMBIENT, melt = P.meltC + 273 - T_AMBIENT;
+    // The boiler valves and kitchen-stove hoses (convection + incident radiation).
     for (const p of parts) {
-      const cells = p.node.o.cells;
+      const o = p.node.o, cells = o.cells;
       let tg = 0;
       for (const c of cells) tg += temp[c];
       tg /= cells.length;
-      const ease = 1 - Math.exp(-dt / (p.lag ?? P.lag));
-      p.tp += (tg - p.tp) * ease;
+      const tRad = !o.wallAir && o.flux > 0 ? (p.alpha * o.flux * 1000) / p.h : 0;
+      const ease = 1 - Math.exp(-dt / p.lag);
+      p.tp += (tg + tRad - p.tp) * ease;
+      const leak = p.leakC + 273 - T_AMBIENT, melt = p.meltC + 273 - T_AMBIENT;
       if (p.stage === 0 && p.tp >= leak) fail(p, 1);
       if (p.stage === 1 && p.tp >= melt) fail(p, 2);
     }
@@ -984,6 +1046,7 @@ export default function gas(world) {
     flameCells.length = 0;
     outlets.clear();
     for (const p of parts) { p.tp = 0; p.stage = 0; p.outlet = null; }
+    for (const dev of arcDevices) dev.dwell = 0;
     for (const u of Object.values(units)) u.open = true;
     for (const key of Object.keys(books)) books[key] = 0;
     delete books.lowestBurned; delete books.highestBurned;

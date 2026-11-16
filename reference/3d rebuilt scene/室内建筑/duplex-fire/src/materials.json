@@ -154,8 +154,15 @@
   "window": {
     "label": "窗",
     "class": "窗",
-    "reference": "not looked up yet (架构.md 待查: glass breakage temperature)",
-    "combustible": { "value": false, "source": "glass" }
+    "reference": "24 exterior windows in the NIBS Duplex IFC. Ordinary float glass cracks under thermal edge stress and falls out to vent smoke and admit air; also fails under zone or deflagration overpressure.",
+    "combustible": { "value": false, "source": "soda-lime float glass" },
+    "breakTemp": { "value": 260, "unit": "°C", "source": "Pagni & Joshi 1991, Fire Safety Science 3:791–802; Babrauskas 1998 ('Glass breakage in fires'): single-pane glass cracks at ΔT ≈ 60–90 K and falls out to vent when exposed glass reaches ~250–350 °C" },
+    "breakPressure": { "value": 3000, "unit": "Pa", "source": "Kiwa 2021 (Hy4Heat KIW-WP7-GEN-REP-0003), citing Astbury domestic window tests: 21–48 mbar (30 mbar taken)" },
+    "thermalLag": { "value": 35, "unit": "s", "source": "[估] 4 mm glass pane (ρc·L ≈ 2500 × 840 × 0.004 ≈ 8400 J/m²K) at h_eff ≈ 240 W/m²K including radiation: τ ≈ 35 s" },
+    "openFraction": { "value": 0.5, "source": "Babrauskas 1998: fallout share on thermal breakage varies widely; ~50 % of the pane area taken as open vent (假设)" },
+    "dischargeCoefficient": { "value": 0.68, "source": "Prahl & Emmons 1975, Combust. Flame 25:369 / SFPE Handbook: natural vent flow coefficient Cd ≈ 0.68" },
+    "absorptivity": { "value": 0.78, "source": "Incropera & DeWitt: soda-lime glass long-wave infrared absorptivity ~0.75–0.85" },
+    "surfaceH": { "value": 18, "unit": "W/(m²·K)", "source": "[估] natural convection (~10 W/m²K) plus linearised surface re-radiation (~8 W/m²K near 150–250 °C)" }
   },
 
   "gas_pipe": {
@@ -195,7 +202,9 @@
     "doorFailure": { "value": 3000, "unit": "Pa", "source": "假设: an interior door's latch gives at the same pressure as a window; building elements fail one after another at 100–200 mbar (Kiwa 2021, citing the King inquiry), walls not modelled" },
     "eventVolume": { "value": 0.05, "unit": "m³", "source": "假设: a burn of less gas than this (1.7 MJ) is not reported as a deflagration and pushes nothing open" },
     "flameHeight": { "value": "L = 0.235 Q^0.4 − 1.02 D (m, Q in kW)", "source": "Heskestad's flame height correlation as given in the SFPE Handbook (from memory, not re-read). A lit outlet's flame lights gas in the cells straight above it up to L: about 2 m for a cut line (200 kW), 0.4 m for the leaking boiler valve (5 kW)" },
-    "sootYield": { "value": 0, "source": "假设: methane makes almost no soot at atmospheric pressure (Cranfield, Brookes 1996, summary); taken as none" }
+    "sootYield": { "value": 0, "source": "假设: methane makes almost no soot at atmospheric pressure (Cranfield, Brookes 1996, summary); taken as none" },
+    "minIgnitionEnergy": { "value": 0.28, "unit": "mJ", "source": "Lewis & von Elbe 1987, Combustion, Flames and Explosions of Gases / NFPA 921 §22.6: stoichiometric methane–air MIE ≈ 0.28 mJ, well below domestic switch/relay arcs (1–20 mJ)" },
+    "outletArcDelay": { "value": 15, "unit": "s", "source": "假设: mean immersion time of an energised receptacle/appliance in a 5–15 % gas cloud before a cycling relay or contact sparks it when unit power is left on" }
   },
 
   "gas_appliance_valve": {
@@ -205,20 +214,35 @@
     "leakTemp": { "value": 440, "unit": "°C", "source": "Grohn & Scheele 1997, 'Brandsicherheit von Gasanlagen' Teil 1, SBZ 12/1997: gas appliance control valves (zinc or aluminium die-cast with elastomers) leak 'from 440 °C at the latest' (German; read by a research sub-session)" },
     "leakFlow": { "value": 0.56, "unit": "m³/h", "source": "Grohn & Scheele 1997, Teil 2 (SBZ 13/1997), TU München fire test: a meter pressure regulator leaked about 560 L/h after 25 min, room 819 °C, the part 692 °C. Taken from the moment it starts leaking (假设: the test gives one point, at a higher temperature)" },
     "meltTemp": { "value": 660, "unit": "°C", "source": "NTSB PAR-19/01 pp. 18–19: aluminium alloy melts about 1,220 °F (660 °C); melted regulator covers were read as at least that hot. From here the valve is open at the pipe's full bore (假设)" },
-    "lag": { "value": 550, "unit": "s", "source": "[估] time constant of the part's temperature behind the air around it, fitted to the TU München point above: under the ISO 834 curve (815 °C at 25 min) a first-order lag of 550 s gives 698 °C at 25 min (test: 692 °C)" }
+    "lag": { "value": 550, "unit": "s", "source": "[估] time constant of the part's temperature behind the air around it, fitted to the TU München point above: under the ISO 834 curve (815 °C at 25 min) a first-order lag of 550 s gives 698 °C at 25 min (test: 692 °C)" },
+    "absorptivity": { "value": 0.75, "source": "假设: oxidised cast metal / painted valve body IR absorptivity" },
+    "surfaceH": { "value": 18, "unit": "W/(m²·K)", "source": "[估] natural convection plus linearised surface re-radiation" }
+  },
+
+  "kitchen_gas_hose": {
+    "label": "厨房灶具燃气连接软管（假设）",
+    "class": "燃气阀",
+    "reference": "Flexible elastomer/rubber stove connector behind the 1st-floor kitchen ranges (A103 / B103). Unlike the cast-aluminium boiler regulator upstairs, elastomer stove hoses soften and burn through rapidly under cabinet fire radiation.",
+    "leakTemp": { "value": 135, "unit": "°C", "source": "EN 1762 / GB 29993 NBR/PVC domestic gas hose upper thermal limit (100–125 °C continuous); elastomer seal softening and initial leakage taken at 135 °C (假设)" },
+    "meltTemp": { "value": 175, "unit": "°C", "source": "[估] PVC/NBR flexible gas hose thermal degradation and full-bore pull-off/burn-through under enclosure fire radiation (~160–190 °C)" },
+    "lag": { "value": 35, "unit": "s", "source": "[估] thin-walled (~3 mm) rubber gas hose thermal time constant" },
+    "absorptivity": { "value": 0.88, "source": "Incropera & DeWitt: rubber/elastomer IR absorptivity ~0.85–0.92" },
+    "surfaceH": { "value": 18, "unit": "W/(m²·K)", "source": "[估] natural convection plus linearised surface re-radiation" }
   },
 
   "water_pipe": {
-    "label": "给水管（铜）",
+    "label": "给水管 / 水暖管（铜）",
     "class": "水管",
-    "reference": "IFC 'Pipe Types:Cold Water' / 'Hot Water'. Material 'Copper' in both the MEP and the Plumbing file; the Plumbing file's segment type is 'Copper - A', 25 mm: outer 25.4 mm, inner 23 mm. Kept full by the mains (架构.md ④).",
-    "note": "Only fittings can fail: copper melts at 1085 C, the joints are soldered. Water inside at mains pressure boils near 150 C and could hold a joint below solder melting for longer than modelled here (假设: the joint dries out locally).",
+    "reference": "IFC 'Pipe Types:Cold Water' / 'Hot Water' and 'Hydronic Supply In'. Material 'Copper' in both the MEP and the Plumbing file; the Plumbing file's segment type is 'Copper - A', 25 mm: outer 25.4 mm, inner 23 mm. Kept full by the mains (架构.md ④).",
+    "note": "Only fittings can fail: copper melts at 1085 C, the joints are soldered. Water inside at mains pressure boils near 150 C and could hold a joint below solder melting for longer than modelled here (假设: the joint dries out locally under strong fire flux).",
     "combustible": { "value": false, "source": "copper (IFC)" },
     "jointFailTemp": { "value": 233, "unit": "°C", "source": "Harris 95/5 tin-antimony solder data sheet: solidus 452 °F (233 °C), liquidus 464 °F (240 °C). 假设: the joints are 95/5 and open once they reach the solidus" },
-    "jointLag": { "value": 120, "unit": "s", "source": "假设: time for an exposed water-filled joint to follow the gas around it" },
+    "jointLag": { "value": 75, "unit": "s", "source": "假设: time constant for an exposed thin-wall baseboard/supply joint under fire heating" },
     "jointLagInWall": { "value": 600, "unit": "s", "source": "假设: a joint behind plasterboard (wallAir objects)" },
-    "jointOpening": { "value": 0.25, "source": "假设: share of the bore a failed joint opens; a cut opens all of it" },
-    "dischargeCoefficient": { "value": 0.62, "source": "sharp-edged orifice, the usual textbook value" }
+    "jointOpening": { "value": 0.45, "source": "假设: share of the bore a burst solder joint opens; a cut opens all of it" },
+    "dischargeCoefficient": { "value": 0.62, "source": "sharp-edged orifice, the usual textbook value" },
+    "absorptivity": { "value": 0.75, "source": "Incropera & DeWitt: oxidised/painted copper pipe IR absorptivity ~0.65–0.80" },
+    "surfaceH": { "value": 18, "unit": "W/(m²·K)", "source": "[估] natural convection plus linearised surface re-radiation" }
   },
 
   "drain_pipe": {

@@ -78,6 +78,8 @@ export default function water(world) {
     lagWall: v(pipeM, 'jointLagInWall'),
     jointOpen: v(pipeM, 'jointOpening'),
     cd: v(pipeM, 'dischargeCoefficient'),
+    absorptivity: pipeM?.absorptivity?.value ?? 0.75,
+    surfaceH: pipeM?.surfaceH?.value ?? 18,
     headC: v(headM, 'activationTemp'),
     rti: v(headM, 'rti'),
     kHead: v(headM, 'kFactor') * GPM_PSI,
@@ -887,7 +889,7 @@ export default function water(world) {
     for (const k of catchers) k.o.wetRate += (k.step / (k.top * dt) - k.o.wetRate) * ease;
   }
 
-  /** 5. Joints heat up and may open; sprinkler bulbs heat up and may break. */
+  /** 5. Joints heat up (from touching air + incident radiant flux) and may open; sprinkler bulbs may break. */
   function react(w, dt) {
     const temp = fire.temp;
     const fail = P.failC + 273 - T_AMBIENT;
@@ -896,7 +898,8 @@ export default function water(world) {
       let tg = 0;
       for (const c of n.o.cells) tg += temp[c];
       tg /= n.o.cells.length;
-      n.tj += (tg - n.tj) * (1 - Math.exp(-dt / (n.o.wallAir ? P.lagWall : P.lagOpen)));
+      const tRad = !n.o.wallAir && n.o.flux > 0 ? (P.absorptivity * n.o.flux * 1000) / P.surfaceH : 0;
+      n.tj += (tg + tRad - n.tj) * (1 - Math.exp(-dt / (n.o.wallAir ? P.lagWall : P.lagOpen)));
       if (n.tj >= fail) breakPipe(n, P.jointOpen, 'heat');
     }
     const fire_ = P.headC + 273 - T_AMBIENT;
