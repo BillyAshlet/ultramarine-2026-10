@@ -10,6 +10,7 @@ import { Doors } from './doors.js';
 import { thickenPipes } from './pipes.js';
 import { buildObjects, ensureKitchenGas } from './objects.js';
 import { World } from './world.js';
+import { mountAholoAssets } from './aholo.js';
 
 const DATA = '../duplex-overlay/data';
 // A storey on its own is shown cut just under its own ceiling; 'all' shows
@@ -177,6 +178,7 @@ const doors = new Doors({ scene, building, grid, fire, rooms, dressedDoors: dres
 // mechanism files are loaded further down, once the page is set up.
 const materials = await (await fetch(new URL('./materials.json', import.meta.url))).json();
 const objects = buildObjects(meta, grid, materials);
+const aholo = await mountAholoAssets({ meta, extras, extraMeshes, objects, cut, scene, renderer });
 const world = new World({ fire, grid, objects, rooms, materials });
 
 function showLevel(lvl) {
@@ -214,7 +216,7 @@ renderer.domElement.addEventListener('pointerleave', () => { doors.hover(null); 
 const fade = { uFadeMode: { value: 0 }, uFadeDist: { value: 0 }, uFocus: { value: 0 } };
 const fadeMaterials = [
   ...Object.values(dressed.groups).map((m) => m.material),
-  material, serviceMaterial, doors.material,
+  material, serviceMaterial, doors.material, ...aholo.materials,
 ];
 for (const m of fadeMaterials) {
   m.onBeforeCompile = (shader) => {
@@ -238,6 +240,7 @@ for (const [kind, mesh] of Object.entries(dressed.groups)) {
 }
 fadeForZone(doors.material, smoke.zone, { mode: 0 });
 fadeForZone(material, smoke.zone, { mode: 2 });
+for (const m of aholo.materials) fadeForZone(m, smoke.zone, { mode: 2 });
 
 // Pointing at a door makes it breathe; double-clicking it opens or shuts it.
 renderer.domElement.addEventListener('dblclick', (ev) => {
@@ -393,6 +396,7 @@ const applyFurnitureOpacity = (o) => {
   material.transparent = !solid;
   material.depthWrite = solid;
   material.needsUpdate = true;
+  aholo.setOpacity(o);
   if (shown) lastFurnitureOpacity = o;
   furnitureBox.checked = shown;
   document.getElementById('furnitureOpacityVal').textContent = o.toFixed(2);

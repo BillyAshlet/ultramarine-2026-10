@@ -353,7 +353,13 @@ export default function radiation(world) {
         clippingPlanes: view.cut ? [view.cut] : [], polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -2,
       });
       if (view.smoke?.zone) fadeForZone(mat, view.smoke.zone, { mode: 2 });
-      const mesh = new THREE.Mesh(m.geometry, mat);
+      const ah = m.userData.element?._aholoMesh;
+      const mesh = new THREE.Mesh(ah ? ah.geometry : m.geometry, mat);
+      if (ah) {
+        ah.updateWorldMatrix(true, false);
+        mesh.matrixAutoUpdate = false;
+        mesh.matrix.copy(ah.matrixWorld);
+      }
       mesh.renderOrder = 3;
       mesh.visible = false;
       group.add(mesh);

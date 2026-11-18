@@ -27,18 +27,23 @@ execFileSync(process.execPath, [viteBin, 'build', '--base=/v1/', '--outDir', res
 cpSync(resolve(duplexFire, 'index.html'), resolve(dist, 'index.html'));
 cpSync(resolve(duplexFire, 'src'), resolve(dist, 'src'), { recursive: true });
 cpSync(resolve(duplexFire, 'vendor'), resolve(dist, 'vendor'), { recursive: true });
+if (existsSync(resolve(duplexFire, 'assets'))) cpSync(resolve(duplexFire, 'assets'), resolve(dist, 'assets'), { recursive: true });
 cpSync(duplexData, resolve(dist, 'duplex-overlay/data'), { recursive: true });
 
 // 3. Sanity-check required runtime files before finishing.
 for (const rel of [
   'index.html',
   'src/main.js',
+  'src/aholo.js',
   'src/flames.js',
   'src/firezone.js',
   'src/materials.json',
   'vendor/three.module.js',
   'vendor/three.core.js',
   'vendor/OrbitControls.js',
+  'vendor/loaders/GLTFLoader.js',
+  'assets/aholo/sofa.glb',
+  'assets/aholo/coffee_table.glb',
   'duplex-overlay/data/meta.json',
   'duplex-overlay/data/building.bin',
   'duplex-overlay/data/gas.bin',

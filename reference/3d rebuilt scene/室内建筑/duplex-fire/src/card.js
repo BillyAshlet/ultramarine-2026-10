@@ -342,6 +342,7 @@ export function cardFor(o, world) {
     ['Class 类别', o.class],
     ['Room 房间', o.room ?? '—'],
   ];
+  if (o.element?.aholoSource) rows.push(['Asset 资产来源', o.element.aholoSource]);
   if (m.reference) rows.push(['Tested as 参考实测', m.reference]);
 
   const used = new Set();

@@ -1919,8 +1919,8 @@ export default function analysis(world) {
     const movedEntries = Object.entries(lb.moved || {}).filter(([, v]) => v > 1e-5).sort((a, b) => b[1] - a[1]);
 
     const splitY = Math.floor(h * (big ? 0.54 : 0.52));
-    const padL = 42, padR = 12, padT = 20, padB = 22;
-    const x0 = padL, x1 = w - padR, y0 = padT, y1 = splitY - 14;
+    const padL = 46, padR = 12, padT = 20, padB = 22;
+    const x0 = padL, x1 = w - padR, y0 = padT, y1 = splitY - 22;
 
     const allPts = baseline?.samples ? [...samples, ...baseline.samples] : samples;
     let paMax = 4;
@@ -1963,14 +1963,27 @@ export default function analysis(world) {
     ], x0, 10);
 
     // Lower section: Vertical Column Chart of Soot Transport by Pathway (g)
-    const by0 = splitY + 14, by1 = h - padB;
-    const firstKeys = Object.entries(firsts).map(([k, v]) => `${k}:${typeof v === 'number' ? v.toFixed(0) : JSON.stringify(v)}s`).join(' ');
+    const by0 = splitY + 18, by1 = h - padB;
+    const kindCN = { outlet: '插座', party: '分户墙', facade: '外窗', window: '窗缝', door: '门缝', shaft: '竖井', floor: '楼板', crack: '缝隙' };
+    const firstItems = Array.isArray(firsts)
+      ? firsts
+          .filter((f) => f && Number.isFinite(f.time))
+          .slice()
+          .sort((a, b) => a.time - b.time)
+          .map((f) => {
+            const k = kindCN[f.kind] || f.kind || '';
+            const r = f.route && f.route !== f.kind ? ` ${f.route}` : '';
+            const dir = f.from && f.to ? `(${f.from}→${f.to})` : '';
+            return `${Math.round(f.time)}s ${k}${r}${dir}`;
+          })
+      : Object.entries(firsts || {}).map(([k, v]) => `${Math.round(typeof v === 'number' ? v : (v?.time ?? 0))}s ${kindCN[k] || k}`);
+    const firstKeys = firstItems.slice(0, 2).join(' · ');
 
     ctx.save();
     ctx.font = '10px -apple-system, sans-serif';
     ctx.fillStyle = P.ink;
     ctx.textAlign = 'left';
-    ctx.fillText(`通道迁出烟灰 (g) · 跨户 ${(lb.sootAcrossUnits ?? 0).toFixed(2)}g · 外排 ${(lb.sootOut ?? 0).toFixed(2)}g`, x0, splitY + 1);
+    ctx.fillText(`通道迁出烟灰 (g) · 跨户 ${(lb.sootAcrossUnits ?? 0).toFixed(2)}g · 外排 ${(lb.sootOut ?? 0).toFixed(2)}g`, x0, splitY + 4);
 
     if (!movedEntries.length) {
       ctx.strokeStyle = P.axis;
@@ -2024,8 +2037,10 @@ export default function analysis(world) {
       ref.meta.textContent = `跨户 ${(lb.sootAcrossUnits ?? 0).toFixed(2)}g · 峰 ${Math.round(maxPk)}Pa`;
       ref.subbar.textContent = `IFV基准 150–180s · 实测首烟 ${firstKeys || '待到达'}`;
     } else if (big) {
-      const zs = (world.leaks?.zones?.() ?? []).filter((z) => Math.abs(z.pa) >= 5).slice(0, 6);
-      modalHot.innerHTML = zs.map((z) => `<span class="ana-subchip">${z.rooms.split(' ')[0]} ${z.pa.toFixed(0)}Pa</span>`).join('');
+      const zs = (world.leaks?.zones?.() ?? []).filter((z) => Math.abs(z.pa) >= 5).slice(0, 5);
+      const zoneChips = zs.map((z) => `<span class="ana-subchip">${z.rooms.split(' ')[0]} ${z.pa.toFixed(0)}Pa</span>`);
+      const firstChips = firstItems.slice(0, 2).map((s) => `<span class="ana-subchip">首烟 ${s}</span>`);
+      modalHot.innerHTML = [...zoneChips, ...firstChips].join('');
     }
   }
 
@@ -2047,7 +2062,8 @@ export default function analysis(world) {
     if (qr > 0) {
       for (let r = 0.2; r <= rMax + 1e-6; r += 0.1) {
         const effR = Math.max(r, rMin);
-        const qkW = (qr / (4 * Math.PI * effR * effR)) / 1000;
+        // radiation.js pointSource().qr is already in kW (do not divide by 1000 again).
+        const qkW = qr / (4 * Math.PI * effR * effR);
         curve.push([r, qkW]);
         if (qkW > qMax && r >= 0.4) qMax = qkW;
       }
@@ -2119,7 +2135,7 @@ export default function analysis(world) {
     }
 
     drawLegendRow(ctx, [
-      { label: `Modak 点源 (${(qr / 1000).toFixed(0)}kW辐)`, color: P.blue },
+      { label: `Modak 点源 (${qr >= 10 || qr === 0 ? qr.toFixed(0) : qr.toFixed(1)}kW辐)`, color: P.blue },
       { label: '物品受热散点', color: P.amber },
     ], x0, 10);
 
@@ -2201,7 +2217,7 @@ export default function analysis(world) {
       } else if (qr > 0) {
         const hr = ((hv.x - x0) / (x1 - x0)) * rMax;
         const effR = Math.max(hr, rMin);
-        const hq = (qr / (4 * Math.PI * effR * effR)) / 1000;
+        const hq = qr / (4 * Math.PI * effR * effR);
         drawCrosshairBox(ctx, w, [
           { text: `r = ${hr.toFixed(2)} m`, color: P.ink },
           { text: `Modak q = ${hq.toFixed(1)} kW/m²`, color: P.blue },
